@@ -1,0 +1,174 @@
+/*
+ * @(#)HighlightedDocument.java 1.2 99/05/27 Copyright (c) 1998 Sun
+ * Microsystems, Inc. All Rights Reserved. This software is the confidential and
+ * proprietary information of Sun Microsystems, Inc. ("Confidential
+ * Information"). You shall not disclose such Confidential Information and shall
+ * use it only in accordance with the terms of the license agreement you entered
+ * into with Sun. SUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE
+ * SUITABILITY OF THE SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT
+ * LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+ * PARTICULAR PURPOSE, OR NON-INFRINGEMENT. SUN SHALL NOT BE LIABLE FOR ANY
+ * DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING
+ * THIS SOFTWARE OR ITS DERIVATIVES.
+ */
+
+package swing.text.highlight;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.Element;
+import javax.swing.text.GapContent;
+import javax.swing.text.MutableAttributeSet;
+import javax.swing.text.PlainDocument;
+
+import swing.text.highlight.categoriser.AbstractCategoriser;
+import swing.text.highlight.categoriser.Categoriser;
+
+/**
+ * A document to represent text in the form of the a programming language. This
+ * is quite primitive in that it simply provides support for lexically analyzing
+ * the text.
+ * 
+ * @author Timothy Prinzing (version 1.2 05/27/99)
+ * @author Martin Weber
+ */
+public class HighlightedDocument extends PlainDocument
+{
+
+  /**
+   * the Categoriser used for highlighting text of this document.
+   */
+  private Categoriser categoriser;
+
+  /**
+   * @param categoriser
+   *        the Categoriser used for highlighting text of this document or
+   *        <code>null</code> if no highlighting is to be done.
+   */
+  public HighlightedDocument( Categoriser categoriser)
+  {
+    super( new GapContent( 1024));
+    this.categoriser= categoriser;
+  }
+
+  /**
+   * Returns the Categoriser used for highlighting text of this document or
+   * <code>null</code> if no highlighting is to be done.
+   */
+  public final Categoriser getCategoriser()
+  {
+    return categoriser;
+  }
+
+  /**
+   * Updates document structure as a result of text insertion. This will happen
+   * within a write lock. The superclass behavior of updating the line map is
+   * executed followed by marking any comment areas that should backtracked
+   * before scanning.
+   * 
+   * @param chng
+   *        the change event
+   * @param attr
+   *        the set of attributes
+   */
+  protected void insertUpdate( DefaultDocumentEvent chng, AttributeSet attr)
+  {
+    super.insertUpdate( chng, attr);
+
+    // update multiline token marks
+    Element root= getDefaultRootElement();
+    int offset= chng.getOffset();
+    int length= chng.getLength();
+    // Text in einer Zeile wurde eingefügt...
+    // TODO
+    int lineNum= root.getElementIndex( offset);
+    Element line= root.getElement( lineNum);
+    categoriser.insertUpdate( line);
+
+    DocumentEvent.ElementChange ec= chng.getChange( root);
+    if (ec != null) {
+      // line(s) added
+      Element[] added= ec.getChildrenAdded();
+      for (int i= 0; i < added.length; i++) {
+        // TODO eine Zeile wurde eingefügt...
+        Element elem= added[i];
+        categoriser.insertUpdate( elem);
+      }
+    }
+  }
+
+  /**
+   * Updates any document structure as a result of text removal. This will
+   * happen within a write lock. The superclass behavior of updating the line
+   * map is executed followed by placing a lexical update command on the
+   * analyzer queue.
+   * 
+   * @param chng
+   *        the change event
+   */
+  protected void removeUpdate( DefaultDocumentEvent chng)
+  {
+    super.removeUpdate( chng);
+
+    // update multiline token marks
+    Element root= getDefaultRootElement();
+    DocumentEvent.ElementChange ec= chng.getChange( root);
+    if (ec != null) {
+      Element[] added= ec.getChildrenAdded();
+      for (int i= 0; i < added.length; i++) {
+        Element elem= added[i];
+        categoriser.removeUpdate( elem);
+      }
+    }
+  }
+
+  //////////////////////////// stuff for categorisers
+  // TODO Zum Interface machen
+  private Map marks = null;
+
+  /**
+   * Adds a mark that specifies a line as a position to safely start the
+   * scanning.
+   * 
+   * @todo Statt Zeilennummer das line-Element speichern, um die Markierungen
+   *       sicher gegen das Einfügen/Löschen von Zeilen zu machen.
+   * @param lineNum
+   * @param value
+   */
+  public void putMark( int lineNum, Object value)
+  {
+    synchronized (this) {
+      // lazy creation
+      if (marks == null) {
+        marks= new HashMap();
+      }
+      marks.put( new Integer( lineNum), value);
+      //      System.out.println( "marks put()=" + marks);
+    }
+  }
+
+  public Object getMark( int lineNum)
+  {
+    synchronized (this) {
+      if (marks == null) {
+        return null;
+      }
+      return marks.get( new Integer( lineNum));
+    }
+  }
+
+  public Object removeMark( int lineNum)
+  {
+    synchronized (this) {
+      if (marks == null) {
+        return null;
+      }
+      return marks.remove( new Integer( lineNum));
+    }
+  }
+}
+
