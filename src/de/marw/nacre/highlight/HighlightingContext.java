@@ -122,9 +122,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   }
 
   /**
-   * Fetch the foreground color to use for a text run with the given category .
+   * Fetches the foreground color to use for a text run with the given category .
    */
-  public final Color getForeground( Category category)
+  private Color getForeground( Category category)
   {
     if (categoryColors == null) {
       categoryColors = new Color[Category.values().length];
@@ -143,9 +143,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   }
 
   /**
-   * Fetch the font to use for a text run with the given category.
+   * Fetches the font to use for a text run with the given category.
    */
-  public final Font getFont( Category category)
+  private Font getFont( Category category)
   {
     if (categoryFonts == null) {
       categoryFonts = new Font[Category.values().length];
