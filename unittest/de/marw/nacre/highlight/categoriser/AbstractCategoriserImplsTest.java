@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2004 by Martin Weber
  */
@@ -105,7 +105,32 @@ public class AbstractCategoriserImplsTest extends TestCase
 
   public final void testConsumeChars()
   {
-    //TODO Implement consumeChars().
+    String text;
+    char c;
+
+    text = "0123456789abcdefghijklmn";
+    input( text);
+    testee.consumeChars( 3);
+    c = testee.LA( 0);
+    assertEquals( '3', c);
+
+    // check if CharacterIterator methods do not confuse us
+    testee.input.next();
+    testee.consumeChars( 3);
+    c = testee.LA( 0);
+    assertEquals( '7', c);
+    testee.consumeChars( 0);
+    c = testee.LA( 0);
+    assertEquals( '7', c);
+
+    try {
+      testee.consumeChars( 33);
+      fail( "expected IllegalArgumentException");
+    }
+    catch (IllegalArgumentException ex) {
+    }
+
+    testee.closeInput();
   }
 
   public final void testMatchWhitespace()
@@ -320,27 +345,76 @@ public class AbstractCategoriserImplsTest extends TestCase
     len = testee.matchNumber();
     assertEquals( "match len", 18, len);
     testee.closeInput();
-    
+
     input( "56789.e56789abcdefxyz");
     len = testee.matchNumber();
     assertEquals( "match len", 5, len);
     testee.closeInput();
-    
+
     input( "56789.E56789abcdefxyz");
     len = testee.matchNumber();
     assertEquals( "match len", 5, len);
     testee.closeInput();
-    
+
   }
 
-  public final void testMatchInWordlist()
+  public final void testMatchOneOfStrings()
   {
-    //TODO Implement matchInWordlist().
+    boolean matched;
+    String[] matches;
+    String text = "hhhhhhhhhhh01234";
+    input( text);
+
+    matches = new String[] {};
+    matched = testee.matchOneOfStrings( 0, matches);
+    assertEquals( "match empty", false, matched);
+    matched = testee.matchOneOfStrings( 100, matches);
+    assertEquals( "match empty", false, matched);
+
+    matches = new String[] { "", "x", " " };
+    matched = testee.matchOneOfStrings( 0, matches);
+    assertEquals( "match empty", false, matched);
+    matched = testee.matchOneOfStrings( 1, matches);
+    assertEquals( "match empty", false, matched);
+
+    matches = new String[text.length() - 1];
+    for (int i = 0; i < text.length() - 1; i++) {
+      matches[i] = text.substring( 0, i + 1);
+    }
+    for (int i = 0; i < matches.length; i++) {
+      matched = testee.matchOneOfStrings( matches[i].length(), matches);
+      assertEquals( "match \"" + matches[i] + "\"", true, matched);
+    }
+
+    testee.closeInput();
   }
 
   public final void testRegionMatches()
   {
-    //TODO Implement regionMatches().
+    int len;
+    char[] ca = "01234567890123456789".toCharArray();
+    Segment seg = new Segment( ca, 0, ca.length);
+
+    len = AbstractCategoriser.regionMatches( false, seg, 0, "0123456789");
+    assertEquals( "match len", 10, len);
+    len = AbstractCategoriser.regionMatches( false, seg, 3, "3456789012");
+    assertEquals( "match len", 10, len);
+    len = AbstractCategoriser.regionMatches( false, seg, 3, "345678901 ");
+    assertEquals( "no match", 0, len);
+
+    ca = "abcdefghijabcdefghij".toCharArray();
+    seg = new Segment( ca, 0, ca.length);
+    len = AbstractCategoriser.regionMatches( true, seg, 0, "ABCDEFGHIJ");
+    assertEquals( "match len", 10, len);
+    len = AbstractCategoriser.regionMatches( true, seg, 3, "DEFGHIJABC");
+    assertEquals( "match len", 10, len);
+    len = AbstractCategoriser.regionMatches( true, seg, 3, "DEFGHIJABC ");
+    assertEquals( "no match", 0, len);
+
+    ca = "aäoöuü".toCharArray();
+    seg = new Segment( ca, 0, ca.length);
+    len = AbstractCategoriser.regionMatches( true, seg, 0, "AÄOÖUÜ");
+    assertEquals( "match len", 6, len);
   }
 
 }
