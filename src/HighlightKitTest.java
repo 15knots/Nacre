@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
@@ -34,7 +34,7 @@ public class HighlightKitTest
    * lines. <code>true</code>, if the first line of text to categorise is not
    * at offset zero.
    */
-  private static final boolean TEST_MULTILINE_TOKEN_PROOFNESS = false;
+  private static final boolean TEST_MULTILINE_TOKEN_PROOFNESS = true;
 
   public static void main( String[] args)
   {

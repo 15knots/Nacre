@@ -36,6 +36,10 @@ import swing.text.highlight.categoriser.Token;
 public class HighlightingContext extends StyleContext implements ViewFactory
 {
 
+  private static final Object unsafeRestartHere = new Object();
+
+  private static final Object unsafeRestartFollows = new Object();
+
   /**
    * the Categoriser used for highlighting text of this document or
    * <code>null</code> if no highlighting is to be done.
@@ -197,12 +201,19 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     private Color selectedColor;
 
     /**
+     * number of the line we have to start scanning. This will be updated due to
+     * character insertions or deletions.
+     */
+    private int requiredScanStart;
+
+    /**
      * Construct a simple colorized view of java text.
      */
     HiliteView( Element elem)
     {
       super( elem);
       tokenQueue = new TokenQueue( (HighlightedDocument) elem.getDocument());
+      requiredScanStart = 0;
     }
 
     /**
@@ -260,11 +271,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * adjustment is required by text runs that span multiple line (eg
        * '/*'-comments).
        */
-      int p0Adj = getAdjustedStart( linesAbove);
+      int p0Adj = requiredScanStart;
+      if (p0Adj > 0) {
+        p0Adj = Math.min( getAdjustedStart( linesAbove), p0Adj);
+      }
       Segment lexerInput = new Segment();
       try {
         doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-        tokenQueue.initialise( p0, lexerInput, lexerInput.offset - p0Adj);
+        tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
       }
       catch (BadLocationException ex) {
         // we cannot paint highlighted here, so we will render as normal text.
@@ -274,7 +288,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
       super.paint( g, a);
       // drawing complete, notify categoriser
-      HighlightingContext.this.categoriser.closeInput();
+      tokenQueue.close();
     }
 
     /**
@@ -297,7 +311,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       System.out.println( "# drawLine() " + lineIndex + " -------");
       super.drawLine( lineIndex, g, x, y);
 
-      // check and mark whether the next line is unsafe to restart scanning
+      /*
+       * check whether the following line(s) are unsafe to restart scanning and
+       * mark these
+       */
       Token token = null;
       if (!tokenQueue.isEmpty()) {
         Element rootElement = getElement();
@@ -307,13 +324,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         // get last token highlighted
         token = tokenQueue.peek();
         if (token.multiline && token.start < endOffset) {
+          line = rootElement.getElement( lineIndex);
+          // the following line(s) are unsafe to restart scanning
+          Object mark = getMark( line);
+          if (mark != HighlightingContext.unsafeRestartHere)
+            putMark( line, HighlightingContext.unsafeRestartFollows);
           int l0 = lineIndex;
-          while (token.start + token.length > endOffset) {
+          // mark following lines as unsafe to restart scanning
+          while (token.start + token.length >= endOffset) {
             line = rootElement.getElement( ++lineIndex);
-            // the current line is unsafe to restart scanning
-            putMark( line, null);
+            putMark( line, HighlightingContext.unsafeRestartHere);
             endOffset = Math.min( doc.getLength(), line.getEndOffset());
           } // while
+
+          requiredScanStart = lineIndex + 1; // document has been scanned up to
+                                             // here
 
           /*
            * force the component to repaint the following lines, thus supporting
@@ -561,17 +586,37 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         }
       }
       else {
-        if (changes.getType() == DocumentEvent.EventType.INSERT) {
-          int i = 0;
+        int lineIdx = elem.getElementIndex( changes.getOffset());
+        Element line = elem.getElement( lineIdx);
+        Object mark = getMark( line);
+        if (mark != null) {
+          if (mark == HighlightingContext.unsafeRestartHere) {
+            requiredScanStart = Math.min( requiredScanStart, lineIdx - 1);
+          }
+          else if (mark == HighlightingContext.unsafeRestartFollows) {
+            requiredScanStart = Math.min( requiredScanStart, lineIdx);
+          }
+          int endline = removeConsecutiveMarks( lineIdx);
+          damageLineRange( lineIdx, endline, a, getContainer());
         }
-        else if (changes.getType() == DocumentEvent.EventType.REMOVE) {
-          // TODO wenn man in einem multiline comment das erster Sternchen
-          // löscht, klappts nich mit den folgezeilen
-          int i = 0;
-        }
-
       }
       super.updateDamage( changes, a, f);
+    }
+
+    /**
+     * @param line
+     */
+    private int removeConsecutiveMarks( int lineIndex)
+    {
+      Element element = getElement();
+      for (;; lineIndex++ ) {
+        Element line = element.getElement( lineIndex);
+        if (!hasMark( line)) {
+          break;
+        }
+        removeMark( line);
+      }
+      return lineIndex;
     }
 
     ///////////////////////////////////////////////////////////////////
@@ -584,7 +629,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     private Object getMark( Element line)
     {
-      if (unsafeLineMarks == null) {
+      if (unsafeLineMarks == null || line == null) {
         return null;
       }
       return unsafeLineMarks.get( line);
@@ -597,7 +642,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private boolean hasMark( Element line)
     {
-      if (unsafeLineMarks == null) {
+      if (unsafeLineMarks == null || line == null) {
         return false;
       }
       return this.unsafeLineMarks.containsKey( line);
@@ -625,7 +670,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     private Object removeMark( Element line)
     {
-      if (unsafeLineMarks == null) {
+      if (unsafeLineMarks == null || line == null) {
         return null;
       }
       return unsafeLineMarks.remove( line);
@@ -665,7 +710,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * @param line
        *        the starting line in the model.
        */
-      public void initialise( int p0, Segment lexerInput, int seg2docOffset)
+      public void open( int p0, Segment lexerInput, int seg2docOffset)
       {
         //System.out.println( "# TokenQueue.initialise()");
 
@@ -675,7 +720,15 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         do {
           remove();
         } while (!isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
+      }
 
+      /**
+       * Closes this Queue and notifies the categoriser of the end of the
+       * current scanninng process.
+       */
+      public void close()
+      {
+        HighlightingContext.this.categoriser.closeInput();
       }
 
       /**
