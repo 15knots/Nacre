@@ -15,19 +15,22 @@ import javax.swing.text.Segment;
 public abstract class AbstractCategoriser implements Categoriser
 {
 
-  protected static final boolean debug = true;
+  private static final boolean debug = false;
 
+  /**
+   * The input segment currently in use
+   */
   protected Segment input;
 
   /**
+   * This is an abstract class that cannot be instantiated directly.
    */
-  public AbstractCategoriser()
+  protected AbstractCategoriser()
   {
-    super();
   }
 
-  /**
-   * Überschrieben, um
+  /*
+   * 
    */
   public void openInput( Segment lexerInput)
   {
@@ -39,6 +42,9 @@ public abstract class AbstractCategoriser implements Categoriser
     lexerInput.first(); // initialize CharIterator
   }
 
+  /*
+   * 
+   */
   public void closeInput()
   {
     if (debug) {
@@ -82,10 +88,16 @@ public abstract class AbstractCategoriser implements Categoriser
    * 
    *  
    *   
-   *     Number 
-   *        : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *        | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *        | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *    
+   *     
+   *      
+   *        Number 
+   *           : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *           | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *           | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *       
+   *      
+   *     
    *    
    *   
    *  

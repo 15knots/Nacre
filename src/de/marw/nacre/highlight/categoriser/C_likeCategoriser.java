@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2004 by Martin Weber
  */
@@ -19,9 +19,9 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
 {
 
   /**
-   * 
+   * This is an abstract class that cannot be instantiated directly.
    */
-  public C_likeCategoriser()
+  protected C_likeCategoriser()
   {
     super();
   }

@@ -40,13 +40,7 @@ public class C_Categoriser extends C_likeCategoriser
   {
   }
 
-  public void openInput( Segment lexerInput)
-  {
-    super.openInput( lexerInput);
-  }
-
-  /**
-   * Überschrieben, um
+  /* interface Categoriser
    */
   public Token nextToken( HighlightedDocument doc, Token token)
   {
@@ -55,7 +49,7 @@ public class C_Categoriser extends C_likeCategoriser
     }
 
     getToken( doc, token);
-    if (debug) {
+    if (false) {
       // print current token
       System.out.print( "tok=" + token);
       String txt = new String( input.array, token.start, token.length);
@@ -173,7 +167,7 @@ public class C_Categoriser extends C_likeCategoriser
 
   /**
    * Matches the suffix that indicates a floating point numeric literal. <br>
-   * FloatSuffix: [fFlL]
+   * FloatSuffix: [fF][lL] | [lL][fF]
    * 
    * @param lookAhead
    *        the position ahead of the current index of the input segment. *
@@ -198,7 +192,7 @@ public class C_Categoriser extends C_likeCategoriser
 
   /**
    * Matches the suffix that indicates an integer numeric literal. <br>
-   * IntSuffix: [lLuU]
+   * IntSuffix: [uU][lL] | [lL][uU]
    * 
    * @param lookAhead
    *        the position ahead of the current index of the input segment. *
