@@ -92,7 +92,7 @@ public class HighlightedDocument extends PlainDocument
    * @param attr
    *          the set of attributes
    */
-  protected void insertUpdate( DefaultDocumentEvent chng, AttributeSet attr)
+  protected void XinsertUpdate( DefaultDocumentEvent chng, AttributeSet attr)
   {
     super.insertUpdate( chng, attr);
 
@@ -127,7 +127,7 @@ public class HighlightedDocument extends PlainDocument
    * @param chng
    *          the change event
    */
-  protected void removeUpdate( DefaultDocumentEvent chng)
+  protected void XremoveUpdate( DefaultDocumentEvent chng)
   {
     System.out.println( "### removeUpdate()--------------------");
     super.removeUpdate( chng);
@@ -148,7 +148,7 @@ public class HighlightedDocument extends PlainDocument
   /**
    * @see javax.swing.text.AbstractDocument#postRemoveUpdate(javax.swing.text.AbstractDocument.DefaultDocumentEvent)
    */
-  protected void postRemoveUpdate( DefaultDocumentEvent chng)
+  protected void XpostRemoveUpdate( DefaultDocumentEvent chng)
   {
     System.out.println( "### postRemoveUpdate()--------------------");
     // TODO Auto-generated method stub
