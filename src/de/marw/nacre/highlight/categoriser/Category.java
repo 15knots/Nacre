@@ -18,8 +18,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
  * syntax highlighting.
  * 
  * @see de.marw.javax.swing.text.highlight.categoriser.Token
- * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#nextToken(HighlightedDocument,
- *      Token) .
+ * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#nextToken(Document, Token).
  */
 public enum Category {
 

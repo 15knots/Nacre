@@ -53,8 +53,6 @@ public class CategoryStyles implements Serializable
    * 
    * @param category
    *        the category to check
-   * @param attrName
-   *        the attribute name
    * @return true if the category has a value specified
    */
   public boolean isDefined( Category category)
@@ -223,7 +221,7 @@ public class CategoryStyles implements Serializable
 
   /**
    * @param category
-   * @return
+   * @return the StyleEntry for the specified category.
    * @throws IllegalArgumentException
    *         if the category is <code>null</code>.
    */

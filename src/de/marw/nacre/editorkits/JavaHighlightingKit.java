@@ -111,7 +111,7 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * @see Categoriser#openInput(int)
+     * @see Categoriser#openInput(Segment)
      */
     public void openInput( Segment lexerInput)
     {
@@ -134,7 +134,7 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * @see Categoriser#nextToken(HighlightedDocument, Token)
+     * @see Categoriser#nextToken(Document, Token)
      */
     public Token nextToken( Document doc, Token token)
     {
