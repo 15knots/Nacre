@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 
 package swing.text.highlight;
 
@@ -156,6 +156,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * point.
      */
     private boolean lexerValid;
+    private int seg2docOffset;
 
     /**
      * Construct a simple colorized view of java text.
@@ -219,8 +220,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       HighlightedDocument doc = (HighlightedDocument) getDocument();
       Categoriser cato = doc.getCategoriser();
-      Segment catoInput = new Segment();
-      Segment text = getLineBuffer();
 
       Color lastColor = g.getColor();
       Font lastFont = g.getFont();
@@ -228,11 +227,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       int categoryPainting = CategoryConstants.NORMAL;
       //      System.out.println("paintloop ---------------------------------");
 
-      // get token
       Token token = new Token();
-      token = adjustScanner( doc, p0, p1, cato, catoInput, token);
-      while (p0 < p1 && token.length > 0) {
-
+      Segment catoInput = new Segment();
+      Segment text = getLineBuffer();
+      while (p0 < p1) {
+        // get token
+        token = adjustScanner( doc, p0, p1, cato, catoInput, token);
         if (false) {
           // print current token
           Segment txt = new Segment();
@@ -242,37 +242,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         }
         int tokenEnd = token.start + token.length;
 
-        if (token.start == p0) {
+        if (token.start > p0) {
+          // gap between tokens: draw as normal text
+          doc.getText( p0, Math.min( token.start, p1) - p0, text);
+          x = drawHighlightedText( CategoryConstants.NORMAL, text, x, y, g, p0);
+          p0 = token.start;
+        }
+        if (token.start <= p0) {
           // draw current token
           doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
           x = drawHighlightedText( token.categoryId, text, x, y, g, p0);
           categoryPainting = token.categoryId;
           p0 = tokenEnd;
-          token = adjustScanner( doc, p0, p1, cato, catoInput, token);
-          continue;
         }
-        if (token.start > p0) {
-          // draw what we have
-          doc.getText( p0, Math.min( token.start, p1) - p0, text);
-          x = drawHighlightedText( categoryPainting, text, x, y, g, p0);
-          p0 = token.start;
-          continue; // with 'token.start == p0'
-        }
-        if (token.start < p0) {
-          if (tokenEnd >= p1) {
-            // draw complete line
-            doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
-            x = drawHighlightedText( token.categoryId, text, x, y, g, p0);
-            categoryPainting = token.categoryId;
-            p0 = p1;
-            break; // we're done
-          }
-          else {
-            categoryPainting = token.categoryId;
-            token = adjustScanner( doc, p0, p1, cato, catoInput, token);
-            continue; // with 'token.start > p0'
-          }
-        }
+        if(token.length <= 0)
+          break;
       }
 
       //      if (token.start > p0) {
@@ -343,15 +327,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         Categoriser lexer, Segment lexerInput, Token token)
         throws BadLocationException
     {
-      int p = p0;
-      int seg2docOffset = 0;
+      int p0Adj = p0;
       if (!lexerValid) {
         //System.out.println( "# lexer invalid");
         // adjust categorizer's starting point (to start of line)
-        p = lexer.getAdjustedStart( doc, p0);
+        p0Adj = lexer.getAdjustedStart( doc, p0);
         p1 = Math.min( doc.getLength(), p1);
-        doc.getText( p, p1 - p, lexerInput);
-        seg2docOffset = lexerInput.offset - p;
+        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
+        seg2docOffset = lexerInput.offset - p0Adj;
         lexer.setInput( lexerInput);
         lexerValid = true;
         //System.out.println( "# validated lexer");
@@ -363,10 +346,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           // print current token
           String txt = new String( lexerInput.array, token.start
               + seg2docOffset, token.length);
-          System.out.println( "tok=" + token + ", '" + txt + "'");
+          System.out.println( "tok=" + token + ", '" + txt + "', seg2docoffs="+seg2docOffset);
         }
-        p = token.start + token.length;
-      } while (p <= p0 && token.length > 0);
+        p0Adj = token.start + token.length;
+      } while (p0Adj <= p0 && token.length > 0);
 
       return token;
     }
