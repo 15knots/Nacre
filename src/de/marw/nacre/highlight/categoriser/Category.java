@@ -8,8 +8,8 @@ import swing.text.highlight.categoriser.CategoryConstants;
 
 
 /**
- * Represents a lexical token category. This wraps the constants used by
- * the categoriser to provide a convenient class that can be stored as a attribute
+ * Represents a lexical token category. This wraps the constants used by the
+ * categoriser to provide a convenient class that can be stored as a attribute
  * value.
  * 
  * @author weber

@@ -3,9 +3,12 @@
 package swing.text.highlight.categoriser;
 
 import java.text.CharacterIterator;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -14,7 +17,57 @@ import swing.text.highlight.HighlightedDocument;
 
 public class C_Categoriser extends AbstractCategoriser
 {
-  private static final boolean debug = true;
+  /**
+   * Verwaltet die Markierungen für Aufsetzpunkte des <code>Categoriser</code>
+   * s.
+   * 
+   * @author weber
+   */
+  public static class MultilineTokenSupport
+  {
+
+    private List marks = new ArrayList( 50);
+
+    /**
+     * 
+     */
+    public MultilineTokenSupport()
+    {
+      super();
+    }
+
+    public void putMark( Element line)
+    {
+      if (line == null) {
+        throw new NullPointerException( "line is null");
+      }
+      synchronized (this ) {
+        if (marks == null) {
+          marks = new ArrayList( 50);
+        }
+        marks.add( line);
+      }
+    }
+
+    public void removeMark( Element line)
+    {
+      if (line == null) {
+        throw new NullPointerException( "line is null");
+      }
+      synchronized (this ) {
+        if (marks != null) {
+          marks.remove( line);
+        }
+      }
+    }
+
+    public boolean hasMark( Element line)
+    {
+      synchronized (this ) {
+        return marks != null && marks.contains( line);
+      }
+    }
+  }
 
   public static final class RevStringByLengthComparator implements Comparator
   {
@@ -24,23 +77,26 @@ public class C_Categoriser extends AbstractCategoriser
     }
   }
 
-  private static final String[]              kwPredefVal        = { "true",
-      "false"                                                  };
+  private static final String[] kwPredefVal           = { "true", "false" };
 
-  private static final String[]              kwType             = { "char",
-      "double", "enum", "float", "int", "long", "short", "signed", "struct",
-      "typedef", "union", "unsigned", "void", "auto", "const", "extern",
-      "register", "static", "volatile", "far", "huge", "inline", "near",
-      "pascal"                                                 };
+  private static final String[] kwType                = { "char", "double",
+      "enum", "float", "int", "long", "short", "signed", "struct", "typedef",
+      "union", "unsigned", "void", "auto", "const", "extern", "register",
+      "static", "volatile", "far", "huge", "inline", "near", "pascal" };
 
-  private static final String[]              kwStmt             = { "asm",
-      "break", "case", "continue", "default", "do", "else", "for", "goto",
-      "if", "return", "switch", "while"                        };
+  private static final String[] kwStmt                = { "asm", "break",
+      "case", "continue", "default", "do", "else", "for", "goto", "if",
+      "return", "switch", "while"                    };
 
-  private static final String[]              kwOperator         = { "sizeof" };
+  private static final String[] kwOperator            = { "sizeof" };
 
-  private static RevStringByLengthComparator byLenghtDescending = new RevStringByLengthComparator();
+  private int                   seg2docOffset;
 
+  // TODO beim Document halten.
+  private MultilineTokenSupport multilineTokenSupport = new MultilineTokenSupport();
+
+  //private static RevStringByLengthComparator byLenghtDescending = new
+  // RevStringByLengthComparator();
   //  static {
   //    // sort keyword arrays by keyword length (descending)
   //    Arrays.sort( kwPredefVal, byLenghtDescending);
@@ -53,20 +109,55 @@ public class C_Categoriser extends AbstractCategoriser
   {
   }
 
-  public int getAdjustedStart( HighlightedDocument doc, int offset)
+  /**
+   * Fetch a reasonable location to start scanning given the desired start
+   * location. This allows for adjustments needed to accommodate multiline
+   * comments.
+   * 
+   * @param doc
+   *          The document holding the text.
+   * @param lineIndex
+   *          The number of the line to render.
+   * @return adjusted start position which is greater or equal than zero.
+   */
+  private int getAdjustedStart( HighlightedDocument doc, int lineIndex)
   {
-    return offset;
-    //TODO return 0;
+    Element rootElement = doc.getDefaultRootElement();
+    rootElement.getAttributes();
+    // walk backwards until we get a tagged line...
+    System.out.println( "# find start in " + lineIndex + "...");
+    while (lineIndex > 0) {
+      Element line = rootElement.getElement( lineIndex);
+      if (multilineTokenSupport.hasMark( line)) {
+        //        System.out.println( "# found start in " + lineIndex);
+        return line.getStartOffset();
+      }
+      //        System.out.print( " " + lineIndex);
+      lineIndex -= 1;
+    }
+
+    return 0;
   }
 
-  public void setInput( Segment input)
+  public void openInput( HighlightedDocument doc, int lineIndex)
+      throws BadLocationException
   {
-    super.setInput( input);
+    super.openInput( doc, lineIndex);
+
+    Element rootElement = doc.getDefaultRootElement();
+    Element line = rootElement.getElement( lineIndex);
+    int p0 = line.getStartOffset();
+    int p1 = Math.min( doc.getLength(), line.getEndOffset());
+    // adjust categorizer's starting point (to start of line)
+    int p0Adj = getAdjustedStart( doc, lineIndex);
+    Segment lexerInput = super.getInput();
+    doc.getText( p0Adj, p1 - p0Adj, lexerInput);
+    seg2docOffset = lexerInput.offset - p0Adj;
     if (debug) {
-      System.out.println( "setInput() char[0]='" + input.array[input.offset]
-          + "', offset=" + input.offset + ", count=" + input.count);
+      System.out.println( "setInput() char[0]='" + lexerInput.array[lexerInput.offset]
+          + "', offset=" + lexerInput.offset + ", count=" + lexerInput.count);
     }
-    input.first(); // initialize CharIterator
+    lexerInput.first(); // initialize CharIterator
   }
 
   /**
@@ -78,27 +169,15 @@ public class C_Categoriser extends AbstractCategoriser
       token = new Token();
     }
 
-    getToken( token);
+    getToken( doc, token);
+    token.start -= seg2docOffset;
     if (debug) {
       // print current token
       System.out.print( "tok=" + token);
       String txt = new String( input.array, token.start, token.length);
-      System.out.println( ", '" + txt + "'");
+      System.out.println( ", seg2docoffs=" + seg2docOffset + ", '" + txt + "'");
     }
     return token;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see swing.text.highlight.categoriser.Categoriser#closeInput()
-   */
-  public void closeInput()
-  {
-    if (debug) {
-      System.out.println( "closeInput ---------------------------");
-    }
-    input = null;
   }
 
   /**
@@ -107,9 +186,8 @@ public class C_Categoriser extends AbstractCategoriser
   public void insertUpdate( Element elem)
   {
     // TODO Auto-generated method stub
-    //throw new java.lang.UnsupportedOperationException("insertUpdate not
-    // implemented");
-
+    // update multiline token marks
+    Element root = elem.getDocument().getDefaultRootElement();
   }
 
   /**
@@ -130,7 +208,7 @@ public class C_Categoriser extends AbstractCategoriser
    * @param token
    *          the token to initialise.
    */
-  private void getToken( Token token)
+  private void getToken( HighlightedDocument doc, Token token)
   {
     token.categoryId = CategoryConstants.NORMAL;
     int matchLen = matchWhitespace();
@@ -502,7 +580,7 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   ///////////////////////////////////////////////////////////
-  // helper methods
+  // categoriser helper methods
   ///////////////////////////////////////////////////////////
 
   private char LA( int lookAhead)
@@ -522,4 +600,11 @@ public class C_Categoriser extends AbstractCategoriser
     input.setIndex( len + input.getIndex());
   }
 
+  ///////////////////////////////////////////////////////////
+  // other helper methods
+  ///////////////////////////////////////////////////////////
+  private Element elementAtOffset( Document doc, int offset)
+  {
+    return null; //TODO
+  }
 }

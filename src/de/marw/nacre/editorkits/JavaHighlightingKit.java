@@ -1,10 +1,10 @@
-/**
- */
+//$Header$
 
 package swing.text.highlight;
 
 import java.io.IOException;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -21,7 +21,6 @@ import swing.text.highlight.categoriser.Token;
  * 
  * @author Timothy Prinzing
  * @author Martin Weber
- * @version 1.2 05/27/99
  */
 public class JavaHighlightingKit extends HighlightingKit
 {
@@ -53,23 +52,42 @@ public class JavaHighlightingKit extends HighlightingKit
       Categoriser
   {
 
-    protected Segment input;
+    private static boolean debug = false;
+
+    private Segment        input;
+
+    private int            seg2docOffset;
 
     Java_Tokeniser()
     {
       super( new LocalEnvironment());
       scanComments = true;
-      this.input = new Segment();
     }
 
     /**
+     * @see Categoriser#openInput(HighlightedDocument, int)
+     * @throws BadLocationException
      */
-    public void setInput( Segment input)
+    public void openInput( HighlightedDocument doc, int lineIndex)
+        throws BadLocationException
     {
+      if (debug) {
+        System.out.println( "setInput() char[0]='" + input.array[input.offset]
+            + "', offset=" + input.offset + ", count=" + input.count);
+      }
+      Element rootElement = doc.getDefaultRootElement();
+
+      Element line = rootElement.getElement( lineIndex);
+      int p0 = line.getStartOffset();
+      int p1 = Math.min( doc.getLength(), line.getEndOffset());
+      // adjust categorizer's starting point (to start of line)
+      int p0Adj = getAdjustedStart( doc, lineIndex);
+      this.input = new Segment();
+      doc.getText( p0Adj, p1 - p0Adj, input);
+      seg2docOffset = input.offset - p0Adj;
       try {
-        this.input = input;
         /*
-         * Note: This call will scan the first token too!
+         * Note: This call will retrieve the first token too!
          */
         super.useInputStream( new SegmentInputStream( input));
       }
@@ -81,70 +99,7 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * Fetch a reasonable location to start scanning given the desired start
-     * location. This allows for adjustments needed to accommodate multiline
-     * comments.
-     * 
-     * @param doc
-     *          The document holding the text.
-     * @param offset
-     *          The offset relative to the beginning of the document.
-     * @return adjusted start position which is greater or equal than zero.
-     */
-    public int getAdjustedStart( HighlightedDocument doc, int offset)
-    {
-      Element rootElement = doc.getDefaultRootElement();
-      int lineNum = rootElement.getElementIndex( offset);
-      // walk backwards until we get a tagged line...
-      System.out.println( "# find start in " + lineNum + "...");
-      Element line = rootElement.getElement( lineNum);
-      for (; lineNum > 0; line = rootElement.getElement( lineNum), lineNum-- ) {
-        //        System.out.print( " " + lineNum);
-        if (null != doc.getMark( line))
-          break;
-      }
-      System.out.println( "# found start in " + lineNum);
-
-      return line.getStartOffset();
-    }
-
-    /**
-     * @param doc
-     * @param token
-     */
-    private void markLines( HighlightedDocument doc, Token token,
-        boolean locationOK)
-    {
-      Element rootElement = doc.getDefaultRootElement();
-      int lineNum = rootElement.getElementIndex( token.start);
-      if (!locationOK) {
-        // token is a multiline token
-        if (token.length == 0) {
-          return; // empty line
-        }
-        else {
-          int lastLine = rootElement.getElementIndex( token.start
-              + token.length);
-          do {
-            doc
-                .putMark( rootElement.getElement( lineNum),
-                    CategorizerAttribute);
-          } while (lineNum++ <= lastLine);
-        }
-      }
-      else {
-        //        int lastLine= rootElement.getElementIndex( token.start +
-        // token.length);
-        //        do {
-        //          doc.removeMark( lineNum);
-        //        }
-        //        while (lineNum++ <= lastLine);
-      }
-    }
-
-    private static boolean debug = false;
-
-    /**
+     * @see Categoriser#nextToken(HighlightedDocument, Token)
      */
     public Token nextToken( HighlightedDocument doc, Token token)
     {
@@ -153,7 +108,7 @@ public class JavaHighlightingKit extends HighlightingKit
       }
       boolean locationOK = true;
 
-      token.start = getStartOffset();
+      token.start = getStartOffset() - seg2docOffset;
       token.length = getEndOffset() - token.start;
       token.categoryId = CategoryConstants.NORMAL;
       switch (super.token) {
@@ -362,7 +317,15 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * Überschrieben, um
+     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
+     */
+    public void closeInput()
+    {
+      this.input = null;
+    }
+
+    /**
+     * @see Categoriser#insertUpdate(Element)
      */
     public void insertUpdate( Element line)
     {
@@ -373,7 +336,7 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * Überschrieben, um
+     * @see Categoriser#removeUpdate(Element)
      */
     public void removeUpdate( Element line)
     {
@@ -381,6 +344,67 @@ public class JavaHighlightingKit extends HighlightingKit
       int lineNum = rootElement.getElementIndex( line.getStartOffset());
       HighlightedDocument doc = (HighlightedDocument) line.getDocument();
       //TODO doc.putMark( lineNum, CategorizerAttribute);
+    }
+
+    /**
+     * Fetch a reasonable location to start scanning given the desired start
+     * location. This allows for adjustments needed to accommodate multiline
+     * comments.
+     * 
+     * @param doc
+     *          The document holding the text.
+     * @param lineIndex
+     *          The number of the line to render.
+     * @return adjusted start position which is greater or equal than zero.
+     */
+    private int getAdjustedStart( HighlightedDocument doc, int lineNum)
+    {
+      Element rootElement = doc.getDefaultRootElement();
+      // walk backwards until we get a tagged line...
+      System.out.println( "# find start in " + lineNum + "...");
+      Element line = rootElement.getElement( lineNum);
+      for (; lineNum > 0; line = rootElement.getElement( lineNum), lineNum-- ) {
+        //        System.out.print( " " + lineNum);
+        if (null != doc.getMark( line))
+          break;
+      }
+      System.out.println( "# found start in " + lineNum);
+
+      return line.getStartOffset();
+    }
+
+    /**
+     * @param doc
+     * @param token
+     */
+    private void markLines( HighlightedDocument doc, Token token,
+        boolean locationOK)
+    {
+      Element rootElement = doc.getDefaultRootElement();
+      int lineNum = rootElement.getElementIndex( token.start);
+      if (!locationOK) {
+        // token is a multiline token
+        if (token.length == 0) {
+          return; // empty line
+        }
+        else {
+          int lastLine = rootElement.getElementIndex( token.start
+              + token.length);
+          do {
+            doc
+                .putMark( rootElement.getElement( lineNum),
+                    CategorizerAttribute);
+          } while (lineNum++ <= lastLine);
+        }
+      }
+      else {
+        //        int lastLine= rootElement.getElementIndex( token.start +
+        // token.length);
+        //        do {
+        //          doc.removeMark( lineNum);
+        //        }
+        //        while (lineNum++ <= lastLine);
+      }
     }
 
     /**
@@ -399,16 +423,6 @@ public class JavaHighlightingKit extends HighlightingKit
       return (int) (getEndPos() & MAXFILESIZE);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
-     */
-    public void closeInput()
-    {
-      // TODO Auto-generated method stub
-
-    }
   }
 
   static class LocalEnvironment extends sun.tools.java.Environment

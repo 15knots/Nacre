@@ -4,8 +4,8 @@
 
 package swing.text.highlight.categoriser;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
-import javax.swing.text.Segment;
 
 import swing.text.highlight.HighlightedDocument;
 
@@ -19,19 +19,20 @@ public interface Categoriser
 {
 
   /**
-   * <br>
+   * (Re-)Initialises the categoriser to point to the appropriate token for the
+   * given start position needed for rendering. The start position adjustment is
+   * required by text runs that span multiple line (eg Javadoc comments). This
+   * gets called when the View is going to be rendered. <br>
    * bedeutet implizit, dass ein Scanabschnitt beginnt.
    * 
-   * @param input
+   * @param doc
+   *          the document model.
+   * @param lineIndex
+   *          the starting line in the model.
+   * @throws BadLocationException
    */
-  public void setInput( Segment input);
-
-  /**
-   * Notifies the categoriser of the end of the current scanninng process.
-   * 
-   * @see #setInput(Segment)
-   */
-  public void closeInput();
+  public void openInput( HighlightedDocument doc, int lineIndex)
+      throws BadLocationException;
 
   /**
    * This gets called when the View is rendered. The start position of the
@@ -43,22 +44,16 @@ public interface Categoriser
    *          The buffer where the token is returned or <code>null</code> if a
    *          new buffer should be allocated.
    * @return the categorized token.
-   * @see #setInput(Segment)
+   * @see #openInput(HighlightedDocument, int)
    */
   public Token nextToken( HighlightedDocument doc, Token tokenBuf);
 
   /**
-   * Fetch a reasonable location to start scanning given the desired start
-   * location. This allows for adjustments needed to accommodate multiline
-   * comments.
+   * Notifies the categoriser of the end of the current scanninng process.
    * 
-   * @param doc
-   *          The document holding the text.
-   * @param offset
-   *          The offset relative to the beginning of the document.
-   * @return adjusted start position which is greater or equal than zero.
+   * @see #openInput(HighlightedDocument, int)
    */
-  public int getAdjustedStart( HighlightedDocument doc, int offset);
+  public void closeInput();
 
   /**
    * @param elem

@@ -6,8 +6,6 @@
 
 package swing.text.highlight.categoriser;
 
-
-
 /**
  * Constants used to classify a piece of text for syntax highlighting.
  * 

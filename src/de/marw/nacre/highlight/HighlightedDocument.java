@@ -1,3 +1,4 @@
+//$Id$
 /*
  * @(#)HighlightedDocument.java 1.2 99/05/27 Copyright (c) 1998 Sun
  * Microsystems, Inc. All Rights Reserved. This software is the confidential and
@@ -79,81 +80,6 @@ public class HighlightedDocument extends PlainDocument
   public final Categoriser getCategoriser()
   {
     return categoriser;
-  }
-
-  /**
-   * Updates document structure as a result of text insertion. This will happen
-   * within a write lock. The superclass behavior of updating the line map is
-   * executed followed by marking any comment areas that should backtracked
-   * before scanning.
-   * 
-   * @param chng
-   *          the change event
-   * @param attr
-   *          the set of attributes
-   */
-  protected void XinsertUpdate( DefaultDocumentEvent chng, AttributeSet attr)
-  {
-    super.insertUpdate( chng, attr);
-
-    // update multiline token marks
-    Element root = getDefaultRootElement();
-    int offset = chng.getOffset();
-    int length = chng.getLength();
-    // Text in einer Zeile wurde eingefügt...
-    // TODO
-    int lineNum = root.getElementIndex( offset);
-    Element line = root.getElement( lineNum);
-    categoriser.insertUpdate( line);
-
-    DocumentEvent.ElementChange ec = chng.getChange( root);
-    if (ec != null) {
-      // line(s) added
-      Element[] added = ec.getChildrenAdded();
-      for (int i = 0; i < added.length; i++ ) {
-        // TODO eine Zeile wurde eingefügt...
-        Element elem = added[i];
-        categoriser.insertUpdate( elem);
-      }
-    }
-  }
-
-  /**
-   * Updates any document structure as a result of text removal. This will
-   * happen within a write lock. The superclass behavior of updating the line
-   * map is executed followed by placing a lexical update command on the
-   * analyzer queue.
-   * 
-   * @param chng
-   *          the change event
-   */
-  protected void XremoveUpdate( DefaultDocumentEvent chng)
-  {
-    System.out.println( "### removeUpdate()--------------------");
-    super.removeUpdate( chng);
-    System.out.println( "### removeUpdate() DONE --------------------");
-
-    //    // update multiline token marks
-    //    Element root = getDefaultRootElement();
-    //    DocumentEvent.ElementChange ec = chng.getChange( root);
-    //    if (ec != null) {
-    //      Element[] added = ec.getChildrenAdded();
-    //      for (int i = 0; i < added.length; i++ ) {
-    //        Element elem = added[i];
-    //        categoriser.removeUpdate( elem);
-    //      }
-    //    }
-  }
-
-  /**
-   * @see javax.swing.text.AbstractDocument#postRemoveUpdate(javax.swing.text.AbstractDocument.DefaultDocumentEvent)
-   */
-  protected void XpostRemoveUpdate( DefaultDocumentEvent chng)
-  {
-    System.out.println( "### postRemoveUpdate()--------------------");
-    // TODO Auto-generated method stub
-    super.postRemoveUpdate( chng);
-    System.out.println( "### postRemoveUpdate() DONE --------------------");
   }
 
   /**

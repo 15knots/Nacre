@@ -2,11 +2,12 @@
 // /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/AbstractCategoriser.java,v
 // 1.1 2004/09/22 19:05:12 weber Exp $
 
-// Copyright © 2004 Razorcat Development GmbH
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight.categoriser;
 
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -19,53 +20,52 @@ import swing.text.highlight.HighlightedDocument;
 public abstract class AbstractCategoriser implements Categoriser
 {
 
-  /**
-   * Key to be used on lines that contain multiline Tokens.
-   */
-  protected static final Object CategorizerAttribute = new AttributeKey();
+  protected static final boolean debug                = true;
 
-  protected Segment             input;
+  protected Segment              input;
 
   /**
    */
   public AbstractCategoriser()
   {
     super();
-    this.input = new Segment();
   }
 
   /**
    * Überschrieben, um
+   * 
+   * @throws BadLocationException
    */
-  public void setInput( Segment input)
+  public void openInput( HighlightedDocument doc, int lineIndex)
+      throws BadLocationException
+  {
+    if (debug) {
+      System.out
+          .println( "# in AbstractCategoriser.openInput() ---------------------------");
+    }
+    setInput( new Segment());
+  }
+
+  public void closeInput()
+  {
+    if (debug) {
+      System.out
+          .println( "# in AbstractCategoriser.closeInput() ---------------------------");
+    }
+    input = null;
+  }
+
+  protected void setInput( Segment input)
   {
     this.input = input;
   }
 
   /**
-   * Fetch a reasonable location to start scanning given the desired start
-   * location. This allows for adjustments needed to accommodate multiline
-   * comments.
-   * 
-   * @param doc
-   *          The document holding the text.
-   * @param offset
-   *          The offset relative to the beginning of the document.
-   * @return adjusted start position which is greater or equal than zero.
+   * @return The input.
    */
-  public int getAdjustedStart( HighlightedDocument doc, int offset)
+  protected final Segment getInput()
   {
-    Element rootElement = doc.getDefaultRootElement();
-    int lineNum = rootElement.getElementIndex( offset);
-    Element line = rootElement.getElement( lineNum);
-    AttributeSet a = line.getAttributes();
-    // walk backwards until we get an untagged line...
-    while (a.isDefined( CategorizerAttribute) && lineNum > 0) {
-      lineNum -= 1;
-      line = rootElement.getElement( lineNum);
-      a = line.getAttributes();
-    }
-    return line.getStartOffset();
+    return this.input;
   }
 
   /**
@@ -109,18 +109,4 @@ public abstract class AbstractCategoriser implements Categoriser
     return j;
   }
 
-  /** Used as a key on lines that contain multiline Tokens. */
-  protected static class AttributeKey
-  {
-
-    private AttributeKey()
-    {
-    }
-
-    public String toString()
-    {
-      return "multiline token";
-    }
-
-  }
 }

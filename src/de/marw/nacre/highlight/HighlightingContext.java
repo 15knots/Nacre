@@ -201,9 +201,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       //lexerValid = false;
       //      System.out.println( "# invalidate lexer ---------------------------");
       System.out.println( "# drawLine() " + lineIndex + " -------");
-      Element line = getElement().getElement( lineIndex);
       try {
-        tokenQueue.initialise( line);
+        tokenQueue.initialise( lineIndex);
         super.drawLine( lineIndex, g, x, y);
         // notify lexer
         //TODO lexer.closeInput();
@@ -388,6 +387,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // TODO Auto-generated method stub TEST
       System.out.println( "### insertUpdate()--------------------");
       super.insertUpdate( e, a, f);
+
       System.out.println( "### insertUpdate()  DONE --------------------");
     }
 
@@ -423,8 +423,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       private Categoriser         categoriser;
 
-      private int                 seg2docOffset;
-
       private Token               tokenBuf;
 
       private HighlightedDocument doc;
@@ -439,8 +437,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
 
       /**
-       * (Re-)Initialises the categoriser to point to the appropriate token for the
-       * given start position needed for rendering. The start position
+       * (Re-)Initialises the categoriser to point to the appropriate token for
+       * the given start position needed for rendering. The start position
        * adjustment is required by text runs that span multiple line (eg Javadoc
        * comments).
        * 
@@ -449,24 +447,19 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * @param line
        *          the starting line in the model.
        */
-      public void initialise( Element line) throws BadLocationException
+      public void initialise( int lineIndex) throws BadLocationException
       {
         //System.out.println( "# TokenQueue.adjustCategoriser()");
-        categoriser = doc.getCategoriser();
+        Element rootElement = doc.getDefaultRootElement();
+
+        Element line = rootElement.getElement( lineIndex);
         int p0 = line.getStartOffset();
-        int p1 = Math.min( doc.getLength(), line.getEndOffset());
-        // adjust categorizer's starting point (to start of line)
-        int p0Adj = categoriser.getAdjustedStart( doc, p0);
-        Segment lexerInput = new Segment();
-        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-        seg2docOffset = lexerInput.offset - p0Adj;
-        categoriser.setInput( lexerInput);
-        //System.out.println( "# validated lexer");
+        categoriser = doc.getCategoriser(); // remember categoriser
+        categoriser.openInput( doc, lineIndex);
 
         do {
-          remove();
-          p0Adj = tokenBuf.start + tokenBuf.length;
-        } while (p0Adj <= p0 && !isEmpty());
+          tokenBuf = categoriser.nextToken( doc, tokenBuf);
+        } while (!isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
 
       }
 
@@ -487,8 +480,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       {
         if (false) {
           // print current tokenBuf
-          System.out.println( "tok=" + tokenBuf + ", seg2docoffs="
-              + seg2docOffset);
+          System.out.println( "tok=" + tokenBuf);
         }
         return tokenBuf;
       }
@@ -501,7 +493,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       public void remove()
       {
         tokenBuf = categoriser.nextToken( doc, tokenBuf);
-        tokenBuf.start -= seg2docOffset;
       }
     }
   }
