@@ -15,12 +15,8 @@
 
 package swing.text.highlight;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 import javax.swing.text.PlainDocument;
 
@@ -91,63 +87,6 @@ public class HighlightedDocument extends PlainDocument
     // TODO Auto-generated method stub
     super.insertString( offs, str, a);
   }
-
-  //////////////////////////// stuff for categorisers
-  // TODO Zum Interface machen
-  private Map marks = null;
-
-  /**
-   * Adds a mark that specifies a line as a position to safely start the
-   * scanning.
-   * 
-   * @param line
-   * @param value
-   */
-  public void putMark( Element line, Object value)
-  {
-    synchronized (this ) {
-      // lazy creation
-      if (marks == null) {
-        marks = new HashMap();
-      }
-      marks.put( line, value);
-      //      System.out.println( "marks put()=" + marks);
-    }
-  }
-
-  /**
-   * @param line
-   *          TODO
-   * @return
-   */
-  public boolean hasMark( Element line)
-  {
-    synchronized (this ) {
-      if (marks == null) {
-        return false;
-      }
-      return this.marks.containsKey( line);
-    }
-  }
-
-  public Object getMark( Element line)
-  {
-    synchronized (this ) {
-      if (marks == null) {
-        return null;
-      }
-      return marks.get( line);
-    }
-  }
-
-  public Object removeMark( Element line)
-  {
-    synchronized (this ) {
-      if (marks == null) {
-        return null;
-      }
-      return marks.remove( line);
-    }
-  }
+  
 }
 

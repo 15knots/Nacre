@@ -3,18 +3,14 @@
 package swing.text.highlight.categoriser;
 
 import java.text.CharacterIterator;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
 import swing.text.highlight.Category;
 import swing.text.highlight.HighlightedDocument;
-import swing.text.highlight.MultilineTokenSupport;
 
 
 public class C_Categoriser extends AbstractCategoriser

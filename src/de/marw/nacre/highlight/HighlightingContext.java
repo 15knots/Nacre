@@ -7,6 +7,8 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Shape;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -268,12 +270,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
             if (token.start < p1) {
               line = rootElement.getElement( ++lineIndex);
               // the current line is unsafe to restart scanning
-              doc.putMark( line, null);
+              putMark( line, null);
               System.out.println( "#  mark line " + lineIndex);
               while (token.start + token.length > p1) {
                 line = rootElement.getElement( ++lineIndex);
                 // the current line is unsafe to restart scanning
-                doc.putMark( line, null);
+                putMark( line, null);
               }
             }
           }
@@ -304,7 +306,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       System.out.print( "# find start in line " + lineIndex);
       for (; lineIndex > 0; lineIndex-- ) {
         Element line = rootElement.getElement( lineIndex);
-        if (!doc.hasMark( line)) {
+        if (!hasMark( line)) {
           System.out.println( " found start in " + lineIndex);
           return line.getStartOffset();
         }
@@ -534,9 +536,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
     }
 
-    // TODO beim Document halten.
-    private MultilineTokenSupport multilineTokenSupport = new MultilineTokenSupport();
-
     /**
      * Eine Queue für <code>Token</code>s.
      * 
@@ -630,6 +629,57 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
 
     } // TokenQueue
+
+    /**
+     * Hold the marks for lines that are unsafe to restart scanning.
+     */
+    private Map unsafeLineMarks = null;
+
+    private Object getMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return null;
+      }
+      return unsafeLineMarks.get( line);
+    }
+
+    /**
+     * @param line
+     *          TODO
+     * @return
+     */
+    private boolean hasMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return false;
+      }
+      return this.unsafeLineMarks.containsKey( line);
+    }
+
+    /**
+     * Adds a mark that specifies a line as a position to safely start the
+     * scanning.
+     * 
+     * @param line
+     * @param value
+     */
+    private void putMark( Element line, Object value)
+    {
+      // lazy creation
+      if (unsafeLineMarks == null) {
+        unsafeLineMarks = new HashMap();
+      }
+      unsafeLineMarks.put( line, value);
+      //      System.out.println( "unsafeLineMarks put()=" + unsafeLineMarks);
+    }
+
+    private Object removeMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return null;
+      }
+      return unsafeLineMarks.remove( line);
+    }
   }
 
 }

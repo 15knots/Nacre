@@ -71,8 +71,9 @@ public class JavaHighlightingKit extends HighlightingKit
         throws BadLocationException
     {
       if (debug) {
-        System.out.println( "setInput() char[0]='" + lexerInput.array[lexerInput.offset]
-            + "', offset=" + lexerInput.offset + ", count=" + lexerInput.count);
+        System.out.println( "setInput() char[0]='"
+            + lexerInput.array[lexerInput.offset] + "', offset="
+            + lexerInput.offset + ", count=" + lexerInput.count);
       }
       this.lexerInput = lexerInput;
       try {
@@ -293,8 +294,6 @@ public class JavaHighlightingKit extends HighlightingKit
         break;
       }
 
-      markLines( doc, token, locationOK);
-
       try {
         super.scan();
       }
@@ -319,10 +318,6 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void insertUpdate( Element line)
     {
-      Element rootElement = line.getParentElement();
-      int lineNum = rootElement.getElementIndex( line.getStartOffset());
-      HighlightedDocument doc = (HighlightedDocument) line.getDocument();
-      //    TODO doc.putMark( lineNum, CategorizerAttribute);
     }
 
     /**
@@ -330,44 +325,6 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void removeUpdate( Element line)
     {
-      Element rootElement = line.getParentElement();
-      int lineNum = rootElement.getElementIndex( line.getStartOffset());
-      HighlightedDocument doc = (HighlightedDocument) line.getDocument();
-      //TODO doc.putMark( lineNum, CategorizerAttribute);
-    }
-
-    /**
-     * @param doc
-     * @param token
-     */
-    private void markLines( HighlightedDocument doc, Token token,
-        boolean locationOK)
-    {
-      Element rootElement = doc.getDefaultRootElement();
-      int lineNum = rootElement.getElementIndex( token.start);
-      if (!locationOK) {
-        // token is a multiline token
-        if (token.length == 0) {
-          return; // empty line
-        }
-        else {
-          int lastLine = rootElement.getElementIndex( token.start
-              + token.length);
-          do {
-            doc
-                .putMark( rootElement.getElement( lineNum),
-                    CategorizerAttribute);
-          } while (lineNum++ <= lastLine);
-        }
-      }
-      else {
-        //        int lastLine= rootElement.getElementIndex( token.start +
-        // token.length);
-        //        do {
-        //          doc.removeMark( lineNum);
-        //        }
-        //        while (lineNum++ <= lastLine);
-      }
     }
 
     /**
