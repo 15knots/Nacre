@@ -744,7 +744,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (unsafeLineMarks == null || line == null) {
         return null;
       }
-      return unsafeLineMarks.get( line);
+      synchronized (unsafeLineMarks ) {
+        return unsafeLineMarks.get( line);
+      }
     }
 
     /**
@@ -761,7 +763,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (unsafeLineMarks == null || line == null) {
         return false;
       }
-      return this.unsafeLineMarks.containsKey( line);
+      synchronized (unsafeLineMarks ) {
+        return this.unsafeLineMarks.containsKey( line);
+      }
     }
 
     /**
@@ -782,7 +786,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (unsafeLineMarks == null) {
         unsafeLineMarks = new HashMap();
       }
-      unsafeLineMarks.put( line, value);
+      synchronized (unsafeLineMarks ) {
+        unsafeLineMarks.put( line, value);
+      }
     }
 
     /**
@@ -799,7 +805,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (unsafeLineMarks == null || line == null) {
         return null;
       }
-      return unsafeLineMarks.remove( line);
+      synchronized (unsafeLineMarks ) {
+        return unsafeLineMarks.remove( line);
+      }
     }
 
     /**
