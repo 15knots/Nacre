@@ -259,7 +259,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     public void paint( Graphics g, Shape a)
     {
-      System.out.println( "# paint() -------");
       Rectangle alloc = (Rectangle) a;
       JTextComponent host = (JTextComponent) getContainer();
       Color normalColor = (host.isEnabled()) ? host.getForeground() : host
@@ -268,6 +267,16 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
           : normalColor;
       updateMetrics();
+      {
+        // forward host font changes to the default style
+        Font f = host.getFont();
+        if (hostFont != f) {
+          Style root = HighlightingContext.this.getStyle( DEFAULT_STYLE);
+          StyleConstants.setFontFamily( root, f.getFamily());
+          StyleConstants.setFontSize( root, f.getSize());
+          hostFont = f;
+        }
+      }
 
       // If the lines are clipped then we don't expend the effort to
       // try and paint them. Since all of the lines are the same height
@@ -287,11 +296,16 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // update the visible lines
       Element map = getElement();
       int lineCount = map.getElementCount();
+      int startLine = Math.min( requiredScanStart, linesAbove);
       int endLine = Math.min( lineCount, linesTotal - linesBelow);
       endLine = Math.max( endLine - 1, 0);
+
+      System.out.println( "# paint() lines=" + linesAbove + ".." + endLine
+          + "-------");
       Document doc = map.getDocument();
-      Element line1 = map.getElement( linesAbove);
-      Element line2 = map.getElement( endLine);
+      Element line1 = map.getElement( startLine);
+      //      Element line2 = map.getElement( endLine);
+      Element line2 = map.getElement( Math.min( endLine + 5, lineCount - 1));
       int p0 = line1.getStartOffset();
       int p1 = Math.min( doc.getLength(), line2.getEndOffset());
       /*
@@ -300,30 +314,31 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * adjustment is required by text runs that span multiple lines (eg
        * '/*'-comments).
        */
-      int p0Adj = requiredScanStart;
-      if (p0Adj > 0) {
-        p0Adj = Math.min( getAdjustedStart( linesAbove), p0Adj);
-      }
-      Segment lexerInput = new Segment();
       try {
+        int p0Adj = p0;
+        if (startLine > 0) {
+          p0Adj = Math.min( getAdjustedStart( startLine), p0Adj);
+        }
+        Segment lexerInput = new Segment();
         doc.getText( p0Adj, p1 - p0Adj, lexerInput);
         tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
+
+        // mark lines without rendering...
+        while (requiredScanStart < linesAbove) {
+          // scan current line...
+          Element line = map.getElement( requiredScanStart);
+          p0 = line.getStartOffset();
+          p1 = Math.min( doc.getLength(), line.getEndOffset());
+          consumeTokens( p0, p1);
+          // line is scanned, determine marks
+          requiredScanStart = updateMarks( map, requiredScanStart) + 1;
+        }
       }
       catch (BadLocationException ex) {
         // we cannot paint highlighted here, so we will render as normal text.
         // the painting logic in PlainView might raise a BadLocationException on
         // its own.
         throw new /* StateInvariantError */Error( "Can't render", ex);
-      }
-      {
-        // forward host font changes to the default style
-        Font f = host.getFont();
-        if (hostFont != f) {
-          Style root = HighlightingContext.this.getStyle( DEFAULT_STYLE);
-          StyleConstants.setFontFamily( root, f.getFamily());
-          StyleConstants.setFontSize( root, f.getSize());
-          hostFont = f;
-        }
       }
 
       forceRepaintTo = -1; // gets set by drawLine()
@@ -339,6 +354,37 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         System.out.println( "# forced repaint of " + (endLine + 1) + ".."
             + forceRepaintTo);
         damageLineRange( endLine + 1, forceRepaintTo, a, host);
+      }
+    }
+
+    /**
+     * Consumes the Tokens by scanning the text between the specified positions.
+     * 
+     * @param p0
+     *        the beginning position in the model
+     * @param p1
+     *        the ending position in the model
+     */
+    private void consumeTokens( int p0, int p1)
+    {
+      if ( !tokenQueue.isEmpty()) {
+        Token token = null;
+        // scan current line...
+        while (p0 < p1) {
+          // get token
+          token = tokenQueue.peek();
+          if (token.start > p0) {
+            // gap between tokens
+            p0 = Math.min( token.start, p1);
+          }
+          if (token.start <= p0) {
+            p0 = Math.min( token.start + token.length, p1);
+            if (token.start + token.length < p1) {
+              // token was completely consumed: remove from queue
+              tokenQueue.remove();
+            }
+          }
+        }
       }
     }
 
@@ -361,50 +407,61 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       //System.out.println( "# drawLine() " + lineIndex + " -------");
       super.drawLine( lineIndex, g, x, y);
+      int forceRepaintFrom = lineIndex;
 
+      // Check which line(s) following are unsafe to restart scanning and mark
+      // these
+      lineIndex = updateMarks( getElement(), lineIndex);
+      requiredScanStart = lineIndex + 1; // document has been scanned up to here
       /*
-       * check whether the following line(s) are unsafe to restart scanning and
-       * mark these
+       * force the component to repaint the following lines, thus supporting
+       * highlighting tokens that span multiple lines.
        */
-      Token token = null;
+      if (lineIndex > forceRepaintFrom && lineIndex > forceRepaintTo) {
+        //System.out.println( "# forcing repaint up to " + lineIndex);
+        forceRepaintTo = lineIndex;
+      }
+    }
+
+    /**
+     * Checks whether the line(s) following the specified index are unsafe to
+     * restart scanning and marks these. The filed
+     * <code>requiredScanStart</code> is updated.
+     * 
+     * @param rootElement
+     *        the root element of the view.
+     * @param lineIndex
+     *        number of the line where to start.
+     * @return the number of the last line that was checked.
+     */
+    private int updateMarks( Element rootElement, int lineIndex)
+    {
       if ( !tokenQueue.isEmpty()) {
-        Element rootElement = getElement();
-        Document doc = (HighlightedDocument) rootElement.getDocument();
+        Document doc = rootElement.getDocument();
         Element line = rootElement.getElement( lineIndex);
-        int endOffset = Math.min( doc.getLength(), line.getEndOffset());
 
         // get last token highlighted
-        token = tokenQueue.peek();
+        Token token = tokenQueue.peek();
+        int endOffset = Math.min( doc.getLength(), line.getEndOffset());
         if (token.multiline && token.start < endOffset) {
           line = rootElement.getElement( lineIndex);
           // the following line(s) are unsafe to restart scanning
           Object mark = getMark( line);
           if (mark != HighlightingContext.unsafeRestartHere)
             putMark( line, HighlightingContext.unsafeRestartFollows);
-          int forceRepaintFrom = lineIndex;
           // mark following lines as unsafe to restart scanning
-          for (int numLines = rootElement.getElementCount(); token.start
+          for (int numLines = rootElement.getElementCount() - 1; token.start
               + token.length >= endOffset
-              && ++lineIndex < numLines;) {
+              && lineIndex < numLines;) {
+            lineIndex++;
             line = rootElement.getElement( lineIndex);
             putMark( line, HighlightingContext.unsafeRestartHere);
             endOffset = Math.min( doc.getLength(), line.getEndOffset());
           } // while
 
-          requiredScanStart = lineIndex + 1; // document has been scanned up to
-          // here
-
-          /*
-           * force the component to repaint the following lines, thus supporting
-           * highlighting tokens that span mutliple lines.
-           */
-          if (lineIndex > forceRepaintFrom && lineIndex > forceRepaintTo) {
-            // System.out.println( "# force repaint of " + forceRepaintFrom +
-            // ".." + lineIndex);
-            forceRepaintTo = lineIndex;
-          }
         }
       }
+      return lineIndex;
     }
 
     /**
@@ -597,10 +654,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (((added != null) && (added.length > 0))
           || ((removed != null) && (removed.length > 0))) {
         // lines were added or removed...
-        if (added != null) {
-          for (int i = 0; i < added.length; i++) {
-          }
-        }
         if (removed != null) {
           for (int i = 0; i < removed.length; i++) {
             removeMark( removed[i]);
