@@ -13,6 +13,7 @@ import java.io.FileReader;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.text.Document;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
@@ -28,15 +29,7 @@ import de.marw.javax.swing.text.highlight.HighlightingKit;
  * 
  * <pre>
  * 
- *  
- *   
- *    
- *     
- *      java HighlightKitTest filename
- *      
- *     
- *    
- *   
+ *       java HighlightKitTest filename
  *  
  * </pre>
  */
@@ -129,8 +122,10 @@ public class HighlightKitTest
       editor.read( new FileReader( file), file);
       JScrollPane scroller = new JScrollPane();
       scroller.setViewportView( editor);
-
-      JFrame f = new JFrame( "HighlightingKit: " + args[0] + " ("
+      
+      Document doc=editor.getDocument();
+      Object docDesc= doc.getProperty(Document.StreamDescriptionProperty);
+      JFrame f = new JFrame( "HighlightingKit: " + docDesc.toString() + " ("
           + editor.getContentType() + ")");
       f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
       f.getContentPane().setLayout( new BorderLayout());
@@ -142,7 +137,7 @@ public class HighlightKitTest
         // caret in letzte Zeile (test, ob repaint() immer in erster Zeile
         // anfängt)
         f.setSize( 211, 301);
-        editor.setCaretPosition( editor.getDocument().getLength()-1);
+        editor.setCaretPosition( editor.getDocument().getLength() - 1);
         scroller.getViewport().setViewPosition( new Point( 0, 9999));
       }
 
