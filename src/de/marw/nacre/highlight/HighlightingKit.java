@@ -1,4 +1,6 @@
-// $Header$
+// $Header:
+// /home/weber/cvsRepos/highlighting/swing/text/highlight/HighlightingKit.java,v
+// 1.1 2004/09/22 19:05:13 weber Exp $
 
 // Copyright © 2004 Razorcat Development GmbH
 
@@ -9,6 +11,7 @@ import javax.swing.text.Document;
 import javax.swing.text.ViewFactory;
 
 import swing.text.highlight.categoriser.Categoriser;
+
 
 /**
  * This kit supports a fairly minimal handling of editing a programming language
@@ -25,7 +28,8 @@ public abstract class HighlightingKit extends DefaultEditorKit
    * Default constructor used by subclasses.
    */
   protected HighlightingKit()
-  {}
+  {
+  }
 
   /**
    * Creates the Categoriser used for highlighting text of this document or
@@ -36,14 +40,14 @@ public abstract class HighlightingKit extends DefaultEditorKit
   public HighlightingContext getStylePreferences()
   {
     if (preferences == null) {
-      preferences= new HighlightingContext();
+      preferences = new HighlightingContext();
     }
     return preferences;
   }
 
   public void setStylePreferences( HighlightingContext prefs)
   {
-    preferences= prefs;
+    preferences = prefs;
   }
 
   // --- EditorKit methods -------------------------
@@ -77,8 +81,8 @@ public abstract class HighlightingKit extends DefaultEditorKit
    */
   public Object clone()
   {
-    CHighlightingKit kit= new CHighlightingKit();
-    kit.preferences= preferences;
+    CHighlightingKit kit = new CHighlightingKit();
+    kit.preferences = preferences;
     return kit;
   }
 

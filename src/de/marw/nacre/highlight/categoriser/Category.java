@@ -13,9 +13,11 @@
  */
 
 package swing.text.highlight;
+
 import java.io.Serializable;
-import sun.tools.java.Constants;
+
 import swing.text.highlight.categoriser.CategoryConstants;
+
 
 /**
  * Simple class to represent a lexical token. This wraps the Constants used by
@@ -30,7 +32,7 @@ public class Category implements Serializable
 
   private Category( int categoryId)
   {
-    this.categoryId= categoryId;
+    this.categoryId = categoryId;
   }
 
   /**
@@ -47,8 +49,8 @@ public class Category implements Serializable
    */
   public String getName()
   {
-    String nm= getClass().getName();
-    int nmStart= nm.lastIndexOf( '.') + 1; // not found results in 0
+    String nm = getClass().getName();
+    int nmStart = nm.lastIndexOf( '.') + 1; // not found results in 0
     return nm.substring( nmStart, nm.length());
   }
 
@@ -69,14 +71,14 @@ public class Category implements Serializable
    * size as this font.
    * 
    * @param obj
-   *        the object to compare this font with.
+   *          the object to compare this font with.
    * @return <code>true</code> if the objects are equal; <code>false</code>
    *         otherwise.
    */
   public final boolean equals( Object obj)
   {
     if (obj instanceof Category) {
-      Category t= (Category) obj;
+      Category t = (Category) obj;
       return (categoryId == t.categoryId);
     }
     return false;
@@ -228,7 +230,8 @@ public class Category implements Serializable
   {
 
     private AttributeKey()
-    {}
+    {
+    }
 
     public String toString()
     {

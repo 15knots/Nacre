@@ -3,8 +3,6 @@
 
 package swing.text.highlight;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.CharacterIterator;
 
 import javax.swing.text.Element;
@@ -13,10 +11,8 @@ import javax.swing.text.Segment;
 import swing.text.highlight.categoriser.AbstractCategoriser;
 import swing.text.highlight.categoriser.Categoriser;
 import swing.text.highlight.categoriser.CategoryConstants;
-import swing.text.highlight.categoriser.LexerC;
-import swing.text.highlight.categoriser.LexerCTokenTypes;
 import swing.text.highlight.categoriser.Token;
-import antlr.TokenStreamException;
+
 
 /**
  * This kit supports a fairly minimal handling of editing C text content. It
@@ -57,10 +53,9 @@ public class CHighlightingKit extends HighlightingKit
   public class C_Tokeniser extends AbstractCategoriser
   {
 
-    private LexerC lexer;
-
     C_Tokeniser()
-    {}
+    {
+    }
 
     public void setInput( Segment input)
     {
@@ -74,50 +69,10 @@ public class CHighlightingKit extends HighlightingKit
     public Token nextToken( HighlightedDocument doc, Token token)
     {
       if (token == null) {
-        token= new Token();
+        token = new Token();
       }
 
-      if (true) {
-        scan( token);
-      }
-      else {
-        token.start= input.getIndex();
-        antlr.Token lToken= null;
-        tokenLoop: for (;;) {
-          try {
-            lToken= lexer.nextToken();
-            switch (lToken.getType()) {
-              case LexerCTokenTypes.Whitespace:
-              break;
-              case LexerCTokenTypes.Comment:
-                // TODO mark elem for starting location of next scan
-                token.categoryId= CategoryConstants.COMMENT1;
-              break tokenLoop;
-              case LexerCTokenTypes.CPPComment:
-                token.categoryId= CategoryConstants.COMMENT2;
-              break tokenLoop;
-              case LexerCTokenTypes.Number:
-                token.categoryId= CategoryConstants.NUMERICVAL;
-              break tokenLoop;
-              // TODO
-              default:
-                token.categoryId= CategoryConstants.NORMAL;
-              break tokenLoop;
-            }
-          }
-          catch (TokenStreamException e) {
-            // can't adjust scanner... calling logic
-            // will simply render the remaining text.
-            //e.printStackTrace();
-            System.out.println( e);
-            token.length= input.getIndex() - token.start;
-            token.categoryId= CategoryConstants.NORMAL;
-            input.next();
-          }
-        }
-        token.length= lToken.getText().length();
-        //      token.categoryId= bunter++ % CategoryConstants.MaximumId + 1;
-      }
+      scan( token);
       return token;
     }
 
@@ -125,41 +80,41 @@ public class CHighlightingKit extends HighlightingKit
     {
       tokenLoop: for (;;) {
         skipWS();
-        token.start= input.getIndex();
-        char c= nextChar();
+        token.start = input.getIndex();
+        char c = nextChar();
 
         switch (c) {
           case '\"':
             readString();
-            token.categoryId= CategoryConstants.STRINGVAL;
+            token.categoryId = CategoryConstants.STRINGVAL;
           break tokenLoop;
 
           case '\'':
             readCharConst();
-            token.categoryId= CategoryConstants.STRINGVAL;
+            token.categoryId = CategoryConstants.STRINGVAL;
           break tokenLoop;
 
           case '/':
             if (input.array[input.getIndex()] == '*') {
               readMLComment();
-              token.categoryId= CategoryConstants.COMMENT1;
+              token.categoryId = CategoryConstants.COMMENT1;
             }
             else {
-              token.categoryId= CategoryConstants.OPERATOR;
+              token.categoryId = CategoryConstants.OPERATOR;
             }
           break tokenLoop;
           case '#':
             skipWS();
             readWord();
-            token.categoryId= CategoryConstants.KEYWORD2;
+            token.categoryId = CategoryConstants.KEYWORD2;
           break tokenLoop;
           default:
             readWord();
-          token.categoryId= CategoryConstants.NORMAL;
+            token.categoryId = CategoryConstants.NORMAL;
           break tokenLoop;
         }
       }
-      token.length= input.getIndex() - token.start;
+      token.length = input.getIndex() - token.start;
     }
 
     /**
@@ -167,8 +122,9 @@ public class CHighlightingKit extends HighlightingKit
      */
     private void readWord()
     {
-      for (char c= input.current(); Character.isLetterOrDigit( c) || (c == '_');) {
-        c= nextChar();
+      for (char c = input.current(); Character.isLetterOrDigit( c)
+          || (c == '_');) {
+        c = nextChar();
       }
     }
 
@@ -195,7 +151,7 @@ public class CHighlightingKit extends HighlightingKit
      */
     private void readMLComment()
     {
-      char c= nextChar();
+      char c = nextChar();
       for (;;) {
         switch (c) {
           case '*':
@@ -203,12 +159,12 @@ public class CHighlightingKit extends HighlightingKit
               nextChar();
               return;
             }
-            c= nextChar();
+            c = nextChar();
           break;
           case CharacterIterator.DONE:
             return;
           default:
-            c= nextChar();
+            c = nextChar();
         }
       }
     }
@@ -218,7 +174,7 @@ public class CHighlightingKit extends HighlightingKit
      */
     private void readString()
     {
-      char c= nextChar();
+      char c = nextChar();
       for (;;) {
         switch (c) {
           case '\\':
@@ -231,14 +187,14 @@ public class CHighlightingKit extends HighlightingKit
           case CharacterIterator.DONE:
             return;
           default:
-            c= nextChar();
+            c = nextChar();
         }
       }
     }
 
     private char nextChar()
     {
-      char ret= input.current();
+      char ret = input.current();
       input.next();
       return ret;
     }
@@ -248,9 +204,9 @@ public class CHighlightingKit extends HighlightingKit
      */
     public void insertUpdate( Element elem)
     {
-    // TODO Auto-generated method stub
-    //throw new java.lang.UnsupportedOperationException("insertUpdate not
-    // implemented");
+      // TODO Auto-generated method stub
+      //throw new java.lang.UnsupportedOperationException("insertUpdate not
+      // implemented");
 
     }
 
@@ -259,9 +215,20 @@ public class CHighlightingKit extends HighlightingKit
      */
     public void removeUpdate( Element line)
     {
-    // TODO Auto-generated method stub
-    //throw new java.lang.UnsupportedOperationException("removeUpdate not
-    // implemented");
+      // TODO Auto-generated method stub
+      //throw new java.lang.UnsupportedOperationException("removeUpdate not
+      // implemented");
+
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
+     */
+    public void closeInput()
+    {
+      // TODO Auto-generated method stub
 
     }
   }

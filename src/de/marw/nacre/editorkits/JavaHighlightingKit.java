@@ -5,16 +5,14 @@ package swing.text.highlight;
 
 import java.io.IOException;
 
-import javax.swing.SwingUtilities;
-import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.Segment;
 
 import sun.tools.java.Constants;
 import swing.text.highlight.categoriser.Categoriser;
 import swing.text.highlight.categoriser.CategoryConstants;
 import swing.text.highlight.categoriser.Token;
+
 
 /**
  * This kit supports a fairly minimal handling of editing Java text content. It
@@ -51,8 +49,8 @@ public class JavaHighlightingKit extends HighlightingKit
     return new Java_Tokeniser();
   }
 
-  public static class Java_Tokeniser extends sun.tools.java.Scanner
-      implements Categoriser
+  public static class Java_Tokeniser extends sun.tools.java.Scanner implements
+      Categoriser
   {
 
     protected Segment input;
@@ -60,8 +58,8 @@ public class JavaHighlightingKit extends HighlightingKit
     Java_Tokeniser()
     {
       super( new LocalEnvironment());
-      scanComments= true;
-      this.input= new Segment();
+      scanComments = true;
+      this.input = new Segment();
     }
 
     /**
@@ -69,7 +67,7 @@ public class JavaHighlightingKit extends HighlightingKit
     public void setInput( Segment input)
     {
       try {
-        this.input= input;
+        this.input = input;
         /*
          * Note: This call will scan the first token too!
          */
@@ -88,22 +86,23 @@ public class JavaHighlightingKit extends HighlightingKit
      * comments.
      * 
      * @param doc
-     *        The document holding the text.
-     * @param pos
+     *          The document holding the text.
+     * @param offset
+     *          The offset relative to the beginning of the document.
      * @return adjusted start position which is greater or equal than zero.
      */
-    public int getAdjustedStart( HighlightedDocument doc, int pos)
+    public int getAdjustedStart( HighlightedDocument doc, int offset)
     {
-      Element rootElement= doc.getDefaultRootElement();
-      int lineNum= rootElement.getElementIndex( pos);
+      Element rootElement = doc.getDefaultRootElement();
+      int lineNum = rootElement.getElementIndex( offset);
       // walk backwards until we get a tagged line...
       System.out.println( "# find start in " + lineNum + "...");
-      while ((null != doc.getMark( lineNum)) && lineNum > 0) {
+      Element line = rootElement.getElement( lineNum);
+      for (; lineNum > 0; line = rootElement.getElement( lineNum), lineNum-- ) {
         //        System.out.print( " " + lineNum);
-        lineNum-= 1;
+        if (null != doc.getMark( line)) break;
       }
       System.out.println( "# found start in " + lineNum);
-      Element line= rootElement.getElement( lineNum);
 
       return line.getStartOffset();
     }
@@ -115,20 +114,21 @@ public class JavaHighlightingKit extends HighlightingKit
     private void markLines( HighlightedDocument doc, Token token,
         boolean locationOK)
     {
-      Element rootElement= doc.getDefaultRootElement();
-      int lineNum= rootElement.getElementIndex( token.start);
+      Element rootElement = doc.getDefaultRootElement();
+      int lineNum = rootElement.getElementIndex( token.start);
       if (!locationOK) {
         // token is a multiline token
         if (token.length == 0) {
           return; // empty line
         }
         else {
-          int lastLine= rootElement
-              .getElementIndex( token.start + token.length);
+          int lastLine = rootElement.getElementIndex( token.start
+              + token.length);
           do {
-            doc.putMark( lineNum, CategorizerAttribute);
-          }
-          while (lineNum++ <= lastLine);
+            doc
+                .putMark( rootElement.getElement( lineNum),
+                    CategorizerAttribute);
+          } while (lineNum++ <= lastLine);
         }
       }
       else {
@@ -148,13 +148,13 @@ public class JavaHighlightingKit extends HighlightingKit
     public Token nextToken( HighlightedDocument doc, Token token)
     {
       if (token == null) {
-        token= new Token();
+        token = new Token();
       }
-      boolean locationOK= true;
+      boolean locationOK = true;
 
-      token.start= getStartOffset();
-      token.length= getEndOffset() - token.start;
-      token.categoryId= CategoryConstants.NORMAL;
+      token.start = getStartOffset();
+      token.length = getEndOffset() - token.start;
+      token.categoryId = CategoryConstants.NORMAL;
       switch (super.token) {
         default:
         break;
@@ -215,14 +215,14 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.EXPR:
         case Constants.ARRAY:
         case Constants.GOTO:
-          token.categoryId= CategoryConstants.OPERATOR;
+          token.categoryId = CategoryConstants.OPERATOR;
           if (debug)
               System.out.println( "cat=" + token.categoryId + ", '<op>'");
         break;
 
         //  values
         case Constants.IDENT:
-          token.categoryId= CategoryConstants.IDENTIFIER1;
+          token.categoryId = CategoryConstants.IDENTIFIER1;
           if (debug)
               System.out.println( "cat=" + token.categoryId + ", '"
                   + super.idValue + "'");
@@ -234,13 +234,13 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.LONGVAL:
         case Constants.FLOATVAL:
         case Constants.DOUBLEVAL:
-          token.categoryId= CategoryConstants.NUMERICVAL;
+          token.categoryId = CategoryConstants.NUMERICVAL;
           if (debug)
               System.out.println( "cat=" + token.categoryId + ", '<numval>'");
         break;
         case Constants.CHARVAL:
         case Constants.STRINGVAL:
-          token.categoryId= CategoryConstants.STRINGVAL;
+          token.categoryId = CategoryConstants.STRINGVAL;
           if (debug)
               System.out
                   .println( "cat=" + token.categoryId + ", '<Stringval>'");
@@ -256,7 +256,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.DOUBLE:
         case Constants.VOID:
         case Constants.BOOLEAN:
-          token.categoryId= CategoryConstants.TYPE;
+          token.categoryId = CategoryConstants.TYPE;
         break;
         // expressions
         case Constants.TRUE:
@@ -264,7 +264,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.THIS:
         case Constants.SUPER:
         case Constants.NULL:
-          token.categoryId= CategoryConstants.PREDEFVAL;
+          token.categoryId = CategoryConstants.PREDEFVAL;
         break;
         // statements
         case Constants.IF:
@@ -286,7 +286,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.EXPRESSION:
         case Constants.DECLARATION:
         case Constants.VARDECLARATION:
-          token.categoryId= CategoryConstants.KEYWORD1;
+          token.categoryId = CategoryConstants.KEYWORD1;
         break;
 
         // declarations
@@ -296,7 +296,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.IMPLEMENTS:
         case Constants.INTERFACE:
         case Constants.PACKAGE:
-          token.categoryId= CategoryConstants.KEYWORD2;
+          token.categoryId = CategoryConstants.KEYWORD2;
         break;
 
         // modifiers = {
@@ -311,7 +311,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.FINAL:
         case Constants.VOLATILE:
         case Constants.ABSTRACT:
-          token.categoryId= CategoryConstants.TYPE;
+          token.categoryId = CategoryConstants.TYPE;
         break;
 
         // punctuations = {
@@ -325,26 +325,26 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.LSQBRACKET:
         case Constants.RSQBRACKET:
         case Constants.THROWS:
-          token.categoryId= CategoryConstants.NORMAL;
+          token.categoryId = CategoryConstants.NORMAL;
         break;
 
         // specials = {
         case Constants.COMMENT:
           // mark elem for starting location of next scan
-          token.categoryId= CategoryConstants.COMMENT1;
+          token.categoryId = CategoryConstants.COMMENT1;
           if (debug)
               System.out.println( "cat=" + token.categoryId + ", '<comment>'");
-          locationOK= false;
+          locationOK = false;
         break;
         case Constants.ERROR:
-          locationOK= false;
+          locationOK = false;
         // fall thru
         case Constants.TYPE:
         case Constants.LENGTH:
         case Constants.INLINERETURN:
         case Constants.INLINEMETHOD:
         case Constants.INLINENEWINSTANCE:
-          token.categoryId= CategoryConstants.NORMAL;
+          token.categoryId = CategoryConstants.NORMAL;
         break;
       }
 
@@ -366,10 +366,10 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void insertUpdate( Element line)
     {
-      Element rootElement= line.getParentElement();
-      int lineNum= rootElement.getElementIndex( line.getStartOffset());
-      HighlightedDocument doc= (HighlightedDocument) line.getDocument();
-      doc.putMark( lineNum, CategorizerAttribute);
+      Element rootElement = line.getParentElement();
+      int lineNum = rootElement.getElementIndex( line.getStartOffset());
+      HighlightedDocument doc = (HighlightedDocument) line.getDocument();
+      //    TODO doc.putMark( lineNum, CategorizerAttribute);
     }
 
     /**
@@ -377,10 +377,10 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void removeUpdate( Element line)
     {
-      Element rootElement= line.getParentElement();
-      int lineNum= rootElement.getElementIndex( line.getStartOffset());
-      HighlightedDocument doc= (HighlightedDocument) line.getDocument();
-      doc.putMark( lineNum, CategorizerAttribute);
+      Element rootElement = line.getParentElement();
+      int lineNum = rootElement.getElementIndex( line.getStartOffset());
+      HighlightedDocument doc = (HighlightedDocument) line.getDocument();
+      //TODO doc.putMark( lineNum, CategorizerAttribute);
     }
 
     /**
@@ -397,6 +397,17 @@ public class JavaHighlightingKit extends HighlightingKit
     private int getEndOffset()
     {
       return (int) (getEndPos() & MAXFILESIZE);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
+     */
+    public void closeInput()
+    {
+      // TODO Auto-generated method stub
+
     }
   }
 
@@ -417,7 +428,8 @@ public class JavaHighlightingKit extends HighlightingKit
   {
 
     private AttributeKey()
-    {}
+    {
+    }
 
     public String toString()
     {

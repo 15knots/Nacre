@@ -14,7 +14,6 @@
 
 package swing.text.highlight;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -22,11 +21,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
-import javax.swing.text.MutableAttributeSet;
 import javax.swing.text.PlainDocument;
 
-import swing.text.highlight.categoriser.AbstractCategoriser;
 import swing.text.highlight.categoriser.Categoriser;
+
 
 /**
  * A document to represent text in the form of the a programming language. This
@@ -46,13 +44,13 @@ public class HighlightedDocument extends PlainDocument
 
   /**
    * @param categoriser
-   *        the Categoriser used for highlighting text of this document or
-   *        <code>null</code> if no highlighting is to be done.
+   *          the Categoriser used for highlighting text of this document or
+   *          <code>null</code> if no highlighting is to be done.
    */
   public HighlightedDocument( Categoriser categoriser)
   {
     super( new GapContent( 1024));
-    this.categoriser= categoriser;
+    this.categoriser = categoriser;
   }
 
   /**
@@ -71,31 +69,31 @@ public class HighlightedDocument extends PlainDocument
    * before scanning.
    * 
    * @param chng
-   *        the change event
+   *          the change event
    * @param attr
-   *        the set of attributes
+   *          the set of attributes
    */
   protected void insertUpdate( DefaultDocumentEvent chng, AttributeSet attr)
   {
     super.insertUpdate( chng, attr);
 
     // update multiline token marks
-    Element root= getDefaultRootElement();
-    int offset= chng.getOffset();
-    int length= chng.getLength();
+    Element root = getDefaultRootElement();
+    int offset = chng.getOffset();
+    int length = chng.getLength();
     // Text in einer Zeile wurde eingefügt...
     // TODO
-    int lineNum= root.getElementIndex( offset);
-    Element line= root.getElement( lineNum);
+    int lineNum = root.getElementIndex( offset);
+    Element line = root.getElement( lineNum);
     categoriser.insertUpdate( line);
 
-    DocumentEvent.ElementChange ec= chng.getChange( root);
+    DocumentEvent.ElementChange ec = chng.getChange( root);
     if (ec != null) {
       // line(s) added
-      Element[] added= ec.getChildrenAdded();
-      for (int i= 0; i < added.length; i++) {
+      Element[] added = ec.getChildrenAdded();
+      for (int i = 0; i < added.length; i++ ) {
         // TODO eine Zeile wurde eingefügt...
-        Element elem= added[i];
+        Element elem = added[i];
         categoriser.insertUpdate( elem);
       }
     }
@@ -108,19 +106,19 @@ public class HighlightedDocument extends PlainDocument
    * analyzer queue.
    * 
    * @param chng
-   *        the change event
+   *          the change event
    */
   protected void removeUpdate( DefaultDocumentEvent chng)
   {
     super.removeUpdate( chng);
 
     // update multiline token marks
-    Element root= getDefaultRootElement();
-    DocumentEvent.ElementChange ec= chng.getChange( root);
+    Element root = getDefaultRootElement();
+    DocumentEvent.ElementChange ec = chng.getChange( root);
     if (ec != null) {
-      Element[] added= ec.getChildrenAdded();
-      for (int i= 0; i < added.length; i++) {
-        Element elem= added[i];
+      Element[] added = ec.getChildrenAdded();
+      for (int i = 0; i < added.length; i++ ) {
+        Element elem = added[i];
         categoriser.removeUpdate( elem);
       }
     }
@@ -134,40 +132,34 @@ public class HighlightedDocument extends PlainDocument
    * Adds a mark that specifies a line as a position to safely start the
    * scanning.
    * 
-   * @todo Statt Zeilennummer das line-Element speichern, um die Markierungen
-   *       sicher gegen das Einfügen/Löschen von Zeilen zu machen.
-   * @param lineNum
+   * @param line
    * @param value
    */
-  public void putMark( int lineNum, Object value)
+  public void putMark( Element line, Object value)
   {
-    synchronized (this) {
+    synchronized (this ) {
       // lazy creation
       if (marks == null) {
-        marks= new HashMap();
+        marks = new HashMap();
       }
-      marks.put( new Integer( lineNum), value);
+      marks.put( line, value);
       //      System.out.println( "marks put()=" + marks);
     }
   }
 
-  public Object getMark( int lineNum)
+  public Object getMark( Element line)
   {
-    synchronized (this) {
-      if (marks == null) {
-        return null;
-      }
-      return marks.get( new Integer( lineNum));
+    synchronized (this ) {
+      if (marks == null) { return null; }
+      return marks.get( line);
     }
   }
 
-  public Object removeMark( int lineNum)
+  public Object removeMark( Element line)
   {
-    synchronized (this) {
-      if (marks == null) {
-        return null;
-      }
-      return marks.remove( new Integer( lineNum));
+    synchronized (this ) {
+      if (marks == null) { return null; }
+      return marks.remove( line);
     }
   }
 }

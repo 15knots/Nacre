@@ -31,6 +31,7 @@ import swing.text.highlight.HighlightingKit;
 import swing.text.highlight.JavaHighlightingKit;
 import swing.text.highlight.categoriser.CategoryConstants;
 
+
 /**
  * Simple wrapper around JEditorPane to browse java text using the JavaEditorKit
  * plug-in. java HighlightKitTest filename
@@ -45,16 +46,16 @@ public class HighlightKitTest
       System.exit( 1);
     }
     try {
-      JEditorPane editor= new JEditorPane();
+      JEditorPane editor = new JEditorPane();
 
-      HighlightingKit kit= new CHighlightingKit();
+      HighlightingKit kit = new CHighlightingKit();
       editor.setEditorKitForContentType( kit.getContentType(), kit);
-      kit= new JavaHighlightingKit();
+      kit = new JavaHighlightingKit();
       editor.setEditorKitForContentType( kit.getContentType(), kit);
       // add more EditorKits to support different content types here...
 
       // 
-//      editor.setContentType( "text/x-c-src");
+      //      editor.setContentType( "text/x-c-src");
       editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
       editor.setFont( new Font( "Courier", 0, 12));
@@ -62,45 +63,45 @@ public class HighlightKitTest
 
       // PENDING(prinz) This should have a customizer and
       // be serialized. This is a bogus initialization.
-      HighlightingContext styles= kit.getStylePreferences();
+      HighlightingContext styles = kit.getStylePreferences();
       Style s;
-      s= styles.getStyleForCategory( CategoryConstants.COMMENT1);
+      s = styles.getStyleForCategory( CategoryConstants.COMMENT1);
       StyleConstants.setForeground( s, new Color( 0, 128, 0));
-      s= styles.getStyleForCategory( CategoryConstants.COMMENT2);
+      s = styles.getStyleForCategory( CategoryConstants.COMMENT2);
       StyleConstants.setForeground( s, new Color( 0, 153, 153));
-      
-      s= styles.getStyleForCategory( CategoryConstants.IDENTIFIER1);
+
+      s = styles.getStyleForCategory( CategoryConstants.IDENTIFIER1);
       StyleConstants.setForeground( s, Color.YELLOW.darker());
-      s= styles.getStyleForCategory( CategoryConstants.STRINGVAL);
+      s = styles.getStyleForCategory( CategoryConstants.STRINGVAL);
       StyleConstants.setForeground( s, new Color( 102, 153, 102));
-//      StyleConstants.setItalic(s, true);
-//      StyleConstants.setUnderline(s, true);
+      //      StyleConstants.setItalic(s, true);
+      //      StyleConstants.setUnderline(s, true);
 
-      s= styles.getStyleForCategory( CategoryConstants.OPERATOR);
+      s = styles.getStyleForCategory( CategoryConstants.OPERATOR);
       StyleConstants.setForeground( s, Color.MAGENTA);
-//      StyleConstants.setUnderline(s, true);
+      //      StyleConstants.setUnderline(s, true);
 
-      Color keyword= new Color( 102, 102, 255);
-      s= styles.getStyleForCategory( CategoryConstants.KEYWORD1);
+      Color keyword = new Color( 102, 102, 255);
+      s = styles.getStyleForCategory( CategoryConstants.KEYWORD1);
       StyleConstants.setForeground( s, keyword);
-//      StyleConstants.setBold( s, true);
-      s= styles.getStyleForCategory( CategoryConstants.KEYWORD2);
+      //      StyleConstants.setBold( s, true);
+      s = styles.getStyleForCategory( CategoryConstants.KEYWORD2);
       StyleConstants.setForeground( s, keyword);
-      s= styles.getStyleForCategory( CategoryConstants.TYPE);
-//      StyleConstants.setStrikeThrough(s, true);
+      s = styles.getStyleForCategory( CategoryConstants.TYPE);
+      //      StyleConstants.setStrikeThrough(s, true);
       StyleConstants.setForeground( s, keyword.brighter());
       StyleConstants.setBold( s, true);
-      s= styles.getStyleForCategory( CategoryConstants.PREDEFVAL);
+      s = styles.getStyleForCategory( CategoryConstants.PREDEFVAL);
       StyleConstants.setForeground( s, keyword.darker());
       StyleConstants.setBold( s, true);
 
-      File file= new File( args[0]);
+      File file = new File( args[0]);
       editor.read( new FileReader( file), file);
-      JScrollPane scroller= new JScrollPane();
-      JViewport vp= scroller.getViewport();
+      JScrollPane scroller = new JScrollPane();
+      JViewport vp = scroller.getViewport();
       vp.add( editor);
 
-      JFrame f= new JFrame( "JavaEditorKit: " + args[0]);
+      JFrame f = new JFrame( "JavaEditorKit: " + args[0]);
       f.getContentPane().setLayout( new BorderLayout());
       f.getContentPane().add( "Center", scroller);
       f.pack();

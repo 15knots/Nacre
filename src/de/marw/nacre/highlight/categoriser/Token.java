@@ -1,4 +1,6 @@
-// $Header$
+// $Header:
+// /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/Token.java,v
+// 1.1 2004/09/22 19:05:12 weber Exp $
 
 // Copyright © 2004 Razorcat Development GmbH
 

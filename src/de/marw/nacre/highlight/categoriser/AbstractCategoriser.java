@@ -1,4 +1,6 @@
-// $Header$
+// $Header:
+// /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/AbstractCategoriser.java,v
+// 1.1 2004/09/22 19:05:12 weber Exp $
 
 // Copyright © 2004 Razorcat Development GmbH
 
@@ -8,8 +10,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
-import swing.text.highlight.Category;
 import swing.text.highlight.HighlightedDocument;
+
 
 /**
  * 
@@ -29,7 +31,7 @@ public abstract class AbstractCategoriser implements Categoriser
   public AbstractCategoriser()
   {
     super();
-    this.input= new Segment();
+    this.input = new Segment();
   }
 
   /**
@@ -37,7 +39,7 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   public void setInput( Segment input)
   {
-    this.input= input;
+    this.input = input;
   }
 
   /**
@@ -46,21 +48,22 @@ public abstract class AbstractCategoriser implements Categoriser
    * comments.
    * 
    * @param doc
-   *        The document holding the text.
-   * @param pos
+   *          The document holding the text.
+   * @param offset
+   *          The offset relative to the beginning of the document.
    * @return adjusted start position which is greater or equal than zero.
    */
-  public int getAdjustedStart( HighlightedDocument doc, int pos)
+  public int getAdjustedStart( HighlightedDocument doc, int offset)
   {
-    Element rootElement= doc.getDefaultRootElement();
-    int lineNum= rootElement.getElementIndex( pos);
-    Element line= rootElement.getElement( lineNum);
-    AttributeSet a= line.getAttributes();
+    Element rootElement = doc.getDefaultRootElement();
+    int lineNum = rootElement.getElementIndex( offset);
+    Element line = rootElement.getElement( lineNum);
+    AttributeSet a = line.getAttributes();
     // walk backwards until we get an untagged line...
     while (a.isDefined( CategorizerAttribute) && lineNum > 0) {
-      lineNum-= 1;
-      line= rootElement.getElement( lineNum);
-      a= line.getAttributes();
+      lineNum -= 1;
+      line = rootElement.getElement( lineNum);
+      a = line.getAttributes();
     }
     return line.getStartOffset();
   }
@@ -70,7 +73,8 @@ public abstract class AbstractCategoriser implements Categoriser
   {
 
     private AttributeKey()
-    {}
+    {
+    }
 
     public String toString()
     {
