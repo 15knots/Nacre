@@ -2,8 +2,6 @@
 // /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/Categoriser.java,v
 // 1.1 2004/09/22 19:05:12 weber Exp $
 
-//Copyright © 2004 Razorcat Development GmbH
-
 package swing.text.highlight.categoriser;
 
 import javax.swing.text.Element;
@@ -38,7 +36,7 @@ public interface Categoriser
   /**
    * This gets called when the View is rendered. The start position of the
    * returned token is expected to be relative to the start of the <strong>input
-   * segment </strong>.
+   * segment </strong> set with <code>setInput()</code>.
    * 
    * @param doc
    * @param tokenBuf
