@@ -50,14 +50,4 @@ public interface Categoriser
    */
   public void closeInput();
 
-  /**
-   * @param elem
-   */
-  public void insertUpdate( Element line);
-
-  /**
-   * @param elem
-   */
-  public void removeUpdate( Element line);
-
 }

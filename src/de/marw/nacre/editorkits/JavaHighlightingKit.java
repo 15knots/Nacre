@@ -304,20 +304,6 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * @see Categoriser#insertUpdate(Element)
-     */
-    public void insertUpdate( Element line)
-    {
-    }
-
-    /**
-     * @see Categoriser#removeUpdate(Element)
-     */
-    public void removeUpdate( Element line)
-    {
-    }
-
-    /**
      * This fetches the starting location of the current token in the segment.
      */
     private int getStartOffset()

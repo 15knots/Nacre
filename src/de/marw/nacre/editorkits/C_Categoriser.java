@@ -14,7 +14,6 @@ import de.marw.javax.swing.text.highlight.Category;
 import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
-
 public class C_Categoriser extends AbstractCategoriser
 {
   public static final class RevStringByLengthComparator implements Comparator
@@ -68,20 +67,6 @@ public class C_Categoriser extends AbstractCategoriser
     return token;
   }
 
-  /**
-   * Überschrieben, um
-   */
-  public void insertUpdate( Element elem)
-  {
-  }
-
-  /**
-   * Überschrieben, um
-   */
-  public void removeUpdate( Element line)
-  {
-  }
-
   ///////////////////////////////////////////////////////////
   // categoriser methods
   ///////////////////////////////////////////////////////////
@@ -94,7 +79,6 @@ public class C_Categoriser extends AbstractCategoriser
     token.category = Category.NORMAL;
     consumeChars( matchWhitespace());
 
-    int matchLen = 0;
     token.multiline = false;
     token.start = input.getIndex();
     char c = input.current();
@@ -105,29 +89,29 @@ public class C_Categoriser extends AbstractCategoriser
         return;
       case '\"':
         // String
-        readString();
+        consumeString();
         token.category = Category.STRINGVAL;
       break;
 
       case '\'':
         // char const. we allow constants of arbitraty length here
-        readCharConst();
+        consumeCharConst();
         token.category = Category.STRINGVAL;
       break;
 
       case '/':
         // comments or operator?
         switch (LA( 1)) {
-          case '*':
-            readMLComment();
+          case '*': // '/*' comment
+            consumeMLComment();
             token.category = Category.COMMENT_1;
             token.multiline = true; // mark as multiline token
           break;
-          case '/':
-            readEOLComment();
+          case '/': // '//' comment
+            consumeEOLComment();
             token.category = Category.COMMENT_2;
           break;
-          default:
+          default: // division operator
             input.next(); // consume '/'
             token.category = Category.OPERATOR;
           break;
@@ -136,17 +120,13 @@ public class C_Categoriser extends AbstractCategoriser
       case '#': // preprocessor directive
         input.next(); // consume '#'
         consumeChars( matchWhitespaceNoNL());
-        matchLen = matchWord();
-        consumeChars( matchLen);
+        consumeChars( matchWord());
         token.category = Category.KEYWORD;
       break;
 
       default:
-        //        if ((matchLen = matchWhitespace()) > 0) {
-        //          token.category = Category.NORMAL;
-        //          consumeChars( matchLen);
-        //        }
-        //        else
+        int matchLen = 0;
+
         if ((matchLen = matchNumber()) > 0) {
           token.category = Category.NUMERICVAL;
         }
@@ -195,17 +175,6 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * @param lenght
-   *        the length of the region that must match.
-   * @return <code>true</code> if a match was found, otherwise
-   *         <code>false</code>.
-   */
-  private boolean isKW_stmt( int length)
-  {
-    return matchInWordlist( length, kwStmt);
-  }
-
-  /**
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
@@ -245,84 +214,6 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * @param lenght
-   *        the length of the region that must match.
-   * @return <code>true</code> if a match was found, otherwise
-   *         <code>false</code>.
-   */
-  private boolean isKW_Type( int length)
-  {
-    return matchInWordlist( length, kwType);
-  }
-
-  /**
-   * @param lenght
-   *        the length of the region that must match.
-   * @return <code>true</code> if a match was found, otherwise
-   *         <code>false</code>.
-   */
-  protected boolean isKW_PredefVal( int length)
-  {
-    /* C++ kennt true, false */
-    return matchInWordlist( length, kwPredefVal);
-  }
-
-  /**
-   * Looks if a region starting at the current scanner input position equals a
-   * String in <code>wordlist</code>.
-   * 
-   * @param lenght
-   *        the length of the region that must match.
-   * @param wordlist
-   *        the strings that may match.
-   * @return <code>true</code> if a match was found, otherwise
-   *         <code>false</code>.
-   */
-  private boolean matchInWordlist( int length, final String[] wordlist)
-  {
-    for (int i = 0; i < wordlist.length; i++ ) {
-      if (wordlist[i].length() == length
-          && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
-              wordlist[i]) > 0)
-        return true;
-    }
-    return false; // no match
-
-  }
-
-  /**
-   * @param identifierLen
-   *        the length of the region that must match.
-   * @return the length of the matching text or <code>0</code> if no match was
-   *         found.
-   */
-  private boolean isIdentifier1( int identifierLen)
-  {
-    // TODO Auto-generated method stub
-    /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
-     * matchen
-     */
-    return false; // no match
-  }
-
-  /**
-   * @param identifierLen
-   *        the length of the region that must match.
-   * @return the length of the matching text or <code>0</code> if no match was
-   *         found.
-   */
-  private boolean isIdentifier2( int identifierLen)
-  {
-    // TODO Auto-generated method stub
-    /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
-     * matchen
-     */
-    return false; // no match
-  }
-
-  /**
    * Matches an Identifer or a keyword.
    * 
    * @return the length of the matching text or <code>0</code> if no match was
@@ -342,39 +233,41 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
+   * Matches white space.
+   * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
   private int matchWhitespace()
   {
     int len = 0;
-    char c = LA( len);
-    // match WS until end of line..
-    while (Character.isWhitespace( c) /* && c !='\n' */) {
-      c = LA( ++len);
+    while (Character.isWhitespace( LA( len))) {
+      len++ ;
     }
     return len;
   }
 
   /**
-   * Matches WS until end of line.
+   * Matches white space until end of line.
    * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
   private int matchWhitespaceNoNL()
   {
-    int len;
+    int len = 0;
+    char c = LA( len);
     // match WS until end of line..
-    for (len = 0; Character.isWhitespace( LA( len)); len++ ) {
+    while (Character.isWhitespace( c) && c != '\n') {
+      c = LA( ++len);
     }
     return len;
   }
 
   /**
-   * 
+   * Consumes a character literal until end of line.
    */
-  private void readCharConst()
+  private void consumeCharConst()
   {
     char c = input.next();
     for (; c != CharacterIterator.DONE; c = input.next()) {
@@ -391,52 +284,9 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * @return <code>true</code> if the comment spans multiple lines.
+   * Consumes a string literal until end of line.
    */
-  private boolean readMLComment()
-  {
-    boolean isMultiline = false;
-
-    input.next(); // consume '/'
-    char c = input.next(); // consume '*'
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '*':
-          if (LA( 1) == '/') {
-            input.next(); // consume '*'
-            input.next(); // consume '/'
-            return isMultiline;
-          }
-        break;
-        case '\n':
-          isMultiline = true;
-        break;
-      }
-    }
-    return isMultiline;
-  }
-
-  /**
-   */
-  private void readEOLComment()
-  {
-
-    input.next(); // consume '/'
-    char c = input.next(); // consume '/'
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '\n':
-          input.next(); // consume '/'
-          return;
-      }
-    }
-    return;
-  }
-
-  /**
-   * 
-   */
-  private void readString()
+  private void consumeString()
   {
     char c = input.next();
     for (; c != CharacterIterator.DONE; c = input.next()) {
@@ -452,28 +302,136 @@ public class C_Categoriser extends AbstractCategoriser
     }
   }
 
+  /**
+   * Consumes a multiline comment which is started by '/*''.
+   */
+  private void consumeMLComment()
+  {
+
+    input.next(); // consume '/'
+    char c = input.next(); // consume '*'
+    for (; c != CharacterIterator.DONE; c = input.next()) {
+      switch (c) {
+        case '*':
+          if (LA( 1) == '/') {
+            consumeChars( 2); // consume '*/'
+            return;
+          }
+        break;
+      }
+    }
+  }
+
+  /**
+   * Consumes a multiline comment which is started by '/*''.
+   */
+  private void consumeEOLComment()
+  {
+
+    input.next(); // consume '/'
+    char c = input.next(); // consume '/'
+    for (; c != CharacterIterator.DONE; c = input.next()) {
+      switch (c) {
+        case '\n':
+          input.next(); // consume '\n'
+          return;
+      }
+    }
+    return;
+  }
+
+  /**
+   * Checks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is a keyword used in statements.
+   * 
+   * @see Category#KEYWORD_STATEMENT
+   * @param lenght
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  private boolean isKW_stmt( int length)
+  {
+    return matchInWordlist( length, kwStmt);
+  }
+
+  /**
+   * Checks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is a keyword used for types.
+   * 
+   * @see Category#KEYWORD_TYPE
+   * @param lenght
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  private boolean isKW_Type( int length)
+  {
+    return matchInWordlist( length, kwType);
+  }
+
+  /**
+   * Checks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is a keyword used for predefined value literals.
+   * 
+   * @see Category#PREDEFVAL
+   * @param lenght
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  protected boolean isKW_PredefVal( int length)
+  {
+    /* C++ kennt true, false */
+    return matchInWordlist( length, kwPredefVal);
+  }
+
+  /**
+   * Checks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is a custom identifier.
+   * 
+   * @see Category#IDENTIFIER_1
+   * @param identifierLen
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  private boolean isIdentifier1( int identifierLen)
+  {
+    // TODO Auto-generated method stub
+    /*
+     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * matchen
+     */
+    return false; // no match
+  }
+
+  /**
+   * Checks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is a custom identifier.
+   * 
+   * @see Category#IDENTIFIER_2
+   * @param identifierLen
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  private boolean isIdentifier2( int identifierLen)
+  {
+    // TODO Auto-generated method stub
+    /*
+     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * matchen
+     */
+    return false; // no match
+  }
+
   ///////////////////////////////////////////////////////////
   // categoriser helper methods
   ///////////////////////////////////////////////////////////
 
-  private char LA( int lookAhead)
-  {
-    int offset = input.getIndex();
-    if (offset + lookAhead >= input.offset + input.count) {
-      return CharacterIterator.DONE;
-    }
-    return input.array[lookAhead + offset];
-  }
-
-  /**
-   * @param len
-   */
-  private void consumeChars( int len)
-  {
-    input.setIndex( len + input.getIndex());
-  }
-
   ///////////////////////////////////////////////////////////
   // other helper methods
   ///////////////////////////////////////////////////////////
+
 }

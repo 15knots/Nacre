@@ -4,8 +4,9 @@
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
-import javax.swing.text.Segment;
+import java.text.CharacterIterator;
 
+import javax.swing.text.Segment;
 
 
 /**
@@ -35,7 +36,7 @@ public abstract class AbstractCategoriser implements Categoriser
           + lexerInput.array[lexerInput.offset] + "', offset="
           + lexerInput.offset + ", count=" + lexerInput.count);
     }
-    setInput( lexerInput);
+    this.input = lexerInput;
     lexerInput.first(); // initialize CharIterator
   }
 
@@ -48,30 +49,84 @@ public abstract class AbstractCategoriser implements Categoriser
     input = null;
   }
 
-  protected void setInput( Segment input)
-  {
-    this.input = input;
-  }
-
   /**
-   * @return The input.
+   * @return The input segment.
    */
   protected final Segment getInput()
   {
     return this.input;
   }
 
+  ///////////////////////////////////////////////////////////
+  // categoriser helper methods
+  ///////////////////////////////////////////////////////////
+
+  /**
+   * Fetches the lookahead character at the specified position.
+   * 
+   * @return the lookahead character or <code>CharacterIterator.DONE</code> at
+   *         end of input is reached.
+   */
+  protected final char LA( int lookAhead)
+  {
+    int offset = input.getIndex();
+    if (offset + lookAhead >= input.offset + input.count) {
+      return CharacterIterator.DONE;
+    }
+    return input.array[lookAhead + offset];
+  }
+
+  /**
+   * Consumes the specified number of character from the input.
+   * 
+   * @param len
+   *        the number of character to consume.
+   */
+  protected final void consumeChars( int len)
+  {
+    input.setIndex( len + input.getIndex());
+  }
+
+  ///////////////////////////////////////////////////////////
+  // other helper methods
+  ///////////////////////////////////////////////////////////
+
+  /**
+   * Looks if a subregion in the <code>input</code> starting at the current
+   * scanner input position is equal to one of the Strings in
+   * <code>wordlist</code>.
+   * 
+   * @see AbstractCategoriser#input
+   * @param lenght
+   *        the length of the region that must match.
+   * @param wordlist
+   *        the strings that may match.
+   * @return <code>true</code> if a match was found, otherwise
+   *         <code>false</code>.
+   */
+  protected final boolean matchInWordlist( int length, final String[] wordlist)
+  {
+    for (int i = 0; i < wordlist.length; i++ ) {
+      if (wordlist[i].length() == length
+          && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
+              wordlist[i]) > 0)
+        return true;
+    }
+    return false; // no match
+
+  }
+
   /**
    * Checks if a subregion of a <code>Segment</code> is equal to a string.
    * 
    * @param ignoreCase
-   *        True if case should be ignored, false otherwise
+   *        True if case should be ignored, false otherwise.
    * @param text
-   *        The source of the text
+   *        The source of the text.
    * @param offset
-   *        The offset into the segment to start the matching
+   *        The offset into the segment to start the matching.
    * @param match
-   *        The string to match
+   *        The string to match.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
