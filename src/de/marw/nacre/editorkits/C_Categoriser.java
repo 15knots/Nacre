@@ -14,7 +14,7 @@ import swing.text.highlight.HighlightedDocument;
 
 public class C_Categoriser extends AbstractCategoriser
 {
-  private static final boolean debug = false;
+  private static final boolean debug = true;
 
   public static final class RevStringByLengthComparator implements Comparator
   {
@@ -56,7 +56,7 @@ public class C_Categoriser extends AbstractCategoriser
   public int getAdjustedStart( HighlightedDocument doc, int offset)
   {
     return offset;
-    //return 0;
+    //TODO return 0;
   }
 
   public void setInput( Segment input)
@@ -82,7 +82,7 @@ public class C_Categoriser extends AbstractCategoriser
     if (debug) {
       // print current token
       System.out.print( "tok=" + token);
-      String txt= new String(input.array, token.start, token.length);
+      String txt = new String( input.array, token.start, token.length);
       System.out.println( ", '" + txt + "'");
     }
     return token;
@@ -174,15 +174,12 @@ public class C_Categoriser extends AbstractCategoriser
       break;
       case '#': // preprocessor directive
         input.next(); // consume '#'
-        matchLen = matchWhitespace();
+        matchLen = matchWhitespaceNoNL();
         matchLen += matchWord();
         consumeChars( matchLen);
         token.categoryId = CategoryConstants.KEYWORD2;
       break;
 
-      case ' ':
-      case '\t':
-      break;
       default:
         //        if ((matchLen = matchWhitespace()) > 0) {
         //          token.categoryId = CategoryConstants.NORMAL;
@@ -393,8 +390,6 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * *
-   * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
@@ -405,6 +400,21 @@ public class C_Categoriser extends AbstractCategoriser
     // match WS until end of line..
     while (Character.isWhitespace( c) /* && c !='\n' */) {
       c = LA( ++len);
+    }
+    return len;
+  }
+
+  /**
+   * Matches WS until end of line.
+   * 
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  private int matchWhitespaceNoNL()
+  {
+    int len;
+    // match WS until end of line..
+    for (len = 0; Character.isWhitespace( LA( len)); len++ ) {
     }
     return len;
   }
