@@ -81,10 +81,12 @@ public abstract class AbstractCategoriser implements Categoriser
    * <pre>
    * 
    *  
-   *    Number 
-   *       : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *       | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *       | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *   
+   *     Number 
+   *        : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *        | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *        | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *    
    *   
    *  
    * </pre>
@@ -104,7 +106,7 @@ public abstract class AbstractCategoriser implements Categoriser
         len += 2;
         len += matchHexDecimal( 3);
         // match trailing LongSuffix and UnsignedSuffix...
-        len+=matchIntSuffix( len);
+        len += matchIntSuffix( len);
         // matched '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )?
         return len;
       }
@@ -260,12 +262,15 @@ public abstract class AbstractCategoriser implements Categoriser
   /**
    * Consumes the specified number of character from the input.
    * 
-   * @param len
-   *        the number of character to consume.
+   * @param num
+   *        the positive number of character to consume.
+   * @throws IllegalArgumentException
+   *         if an invalid value is supplied or if the input segment does not
+   *         contain the specified number of characters.
    */
-  protected final void consumeChars( int len)
+  protected final void consumeChars( int num)
   {
-    input.setIndex( len + input.getIndex());
+    input.setIndex( num + input.getIndex());
   }
 
   ///////////////////////////////////////////////////////////
@@ -280,17 +285,17 @@ public abstract class AbstractCategoriser implements Categoriser
    * @see AbstractCategoriser#input
    * @param lenght
    *        the length of the region that must match.
-   * @param wordlist
+   * @param matches
    *        the strings that may match.
    * @return <code>true</code> if a match was found, otherwise
    *         <code>false</code>.
    */
-  protected final boolean matchInWordlist( int length, final String[] wordlist)
+  protected final boolean matchOneOfStrings( int length, final String[] matches)
   {
-    for (int i = 0; i < wordlist.length; i++) {
-      if (wordlist[i].length() == length
+    for (int i = 0; i < matches.length; i++) {
+      if (matches[i].length() == length
           && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
-              wordlist[i]) > 0)
+              matches[i]) > 0)
         return true;
     }
     return false; // no match

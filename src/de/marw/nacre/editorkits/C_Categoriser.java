@@ -232,7 +232,7 @@ public class C_Categoriser extends C_likeCategoriser
     int len = 0;
     int kwLen = matchWord();
     if (kwLen > 0) {
-      if (matchInWordlist( kwLen, kwOperator)) {
+      if (matchOneOfStrings( kwLen, kwOperator)) {
         // got a keyword operator
         len += kwLen;
       }
@@ -281,7 +281,7 @@ public class C_Categoriser extends C_likeCategoriser
    */
   private boolean isKW_stmt( int length)
   {
-    return matchInWordlist( length, kwStmt);
+    return matchOneOfStrings( length, kwStmt);
   }
 
   /**
@@ -296,7 +296,7 @@ public class C_Categoriser extends C_likeCategoriser
    */
   private boolean isKW_Type( int length)
   {
-    return matchInWordlist( length, kwType);
+    return matchOneOfStrings( length, kwType);
   }
 
   /**
@@ -313,7 +313,7 @@ public class C_Categoriser extends C_likeCategoriser
   protected boolean isKW_PredefVal( int length)
   {
     /* C++ kennt true, false */
-    return matchInWordlist( length, kwPredefVal);
+    return matchOneOfStrings( length, kwPredefVal);
   }
 
   /**
