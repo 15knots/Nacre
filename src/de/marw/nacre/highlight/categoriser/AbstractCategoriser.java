@@ -79,13 +79,15 @@ public abstract class AbstractCategoriser implements Categoriser
    *          The offset into the segment
    * @param match
    *          The string to match
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
    */
   public static int regionMatches( boolean ignoreCase, Segment text,
       int offset, String match)
   {
     int endpos = offset + match.length();
     char[] textArray = text.array;
-  
+
     if (endpos > (text.offset + text.count)) {
       return 0; // no match
     }
@@ -93,17 +95,17 @@ public abstract class AbstractCategoriser implements Categoriser
     for (int i = offset; i < endpos; i++ , j++ ) {
       char c1 = textArray[i];
       char c2 = match.charAt( j);
-  
+
       if (ignoreCase) {
         c1 = Character.toUpperCase( c1);
         c2 = Character.toUpperCase( c2);
       }
-  
+
       if (c1 != c2) {
         return 0; // no match
       }
     }
-  
+
     return j;
   }
 
