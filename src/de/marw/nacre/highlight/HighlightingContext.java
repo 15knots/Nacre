@@ -77,7 +77,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
     Color c = null;
     //code--; // no mapping for Category.NORMAL
-    int categoryCode= category.ordinal();
+    int categoryCode = category.ordinal();
     if ((categoryCode >= 0) && (categoryCode < categoryColors.length)) {
       c = categoryColors[categoryCode];
       if (c == null) {
@@ -101,7 +101,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
     //code--; // no mapping for Category.NORMAL
     Font f = null;
-    int categoryCode= category.ordinal();
+    int categoryCode = category.ordinal();
     if (categoryCode >= 0 && categoryCode < categoryFonts.length) {
       f = categoryFonts[categoryCode];
       if (f == null) {
@@ -122,7 +122,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    */
   public Style getStyleForCategory( Category category)
   {
-    int categoryCode= category.ordinal();
+    int categoryCode = category.ordinal();
     if (categoryCode >= 0 && categoryCode < categoryStyles.length) {
       Style s = categoryStyles[categoryCode];
       return s;
@@ -168,13 +168,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     private TokenQueue tokenQueue;
 
     /**
-     * the color used to render selected text or <code>null</code>.
+     * the color used to render selected text.
      */
     private Color selectedColor;
-
-    private Font normalFont;
-
-    private Color normalColor;
 
     /**
      * Construct a simple colorized view of java text.
@@ -202,12 +198,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       System.out.println( "# paint() -------");
       super.paint( g, a);
       JTextComponent host = (JTextComponent) getContainer();
-      normalColor = (host.isEnabled()) ? host.getForeground() : host
+      Color normalColor = (host.isEnabled()) ? host.getForeground() : host
           .getDisabledTextColor();
       Caret c = host.getCaret();
       selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
           : normalColor;
-      normalFont = host.getFont();
     }
 
     /**
@@ -388,14 +383,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         Color fg = selected ? selectedColor : getForeground( category);
         Font font = getFont( category);
 
-        if (fg == null) {
-          fg = normalColor;
+        if (!g.getColor().equals( fg)) {
+          g.setColor( fg);
         }
-        if (font == null) {
-          font = normalFont;
+        if (!g.getFont().equals( font)) {
+          g.setFont( font);
         }
-        g.setColor( fg);
-        g.setFont( font);
 
         if (false) {
           System.out.print( "painting '" + text + "', offs=" + startOffset
