@@ -88,10 +88,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     Style root = getStyle( DEFAULT_STYLE);
     // configure the default style
-    StyleConstants.setFontFamily( root, "Monospaced");
-    StyleConstants.setFontSize( root, 12);
+    //    StyleConstants.setFontFamily( root, "Monospaced");
+    //    StyleConstants.setFontSize( root, 12);
     root.addChangeListener( cacheInvalidator);
 
+    // all styles for categories are children of the default style
     Category[] categories = Category.values();
     categoryStyles = new Style[Category.values().length];
     for (int i = 0; i < categories.length; i++) {
@@ -103,9 +104,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
       // add attributes for category style...
       Style style = addStyle( null, parent);
-      categoryStyles[cat.ordinal()] = style;
       style.addAttribute( CATEGORY_ATTRIBUTE, cat);
       style.addChangeListener( cacheInvalidator);
+      categoryStyles[cat.ordinal()] = style;
     }
 
   }
@@ -169,14 +170,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
   public View create( Element elem)
   {
-    //    String kind = elem.getName();
     return categoriser != null ? new HiliteView( elem) : new PlainView( elem);
   }
 
   // --- classes -----------------------------------------------
 
   /**
-   * Instances of this class serve as a key in AttributeSet's. 
+   * Instances of this class serve as a key in AttributeSet's.
    */
   private static class CategoryAttribKey
   {
@@ -204,9 +204,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    * characteristics of the text that it renders. This simply colorizes the
    * various categories and assumes a constant font family and size. <br>
    * The view represents each child element as a line of text.
-   * 
-   * @todo super.updateMetrics verwendet den FOnt aus der JTextComponent statt
-   *       der Style-Attribute
    */
   private class HiliteView extends PlainView
   {
@@ -214,12 +211,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     /**
      * 
      */
-    private TokenQueue tokenQueue;
+    private final TokenQueue tokenQueue;
 
     /**
      * the color used to render selected text.
      */
     private Color selectedColor;
+
+    /**
+     * last known host's (the text component's) font.
+     */
+    private Font hostFont;
 
     /**
      * number of the line we have to start scanning. This will be updated due to
@@ -295,7 +297,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       /*
        * (Re-)Initialise the categoriser to point to the appropriate token for
        * the given start position needed for rendering. The start position
-       * adjustment is required by text runs that span multiple line (eg
+       * adjustment is required by text runs that span multiple lines (eg
        * '/*'-comments).
        */
       int p0Adj = requiredScanStart;
@@ -313,6 +315,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         // its own.
         throw new /* StateInvariantError */Error( "Can't render", ex);
       }
+      {
+        // forward host font changes to the default style
+        Font f = host.getFont();
+        if (hostFont != f) {
+          Style root = HighlightingContext.this.getStyle( DEFAULT_STYLE);
+          StyleConstants.setFontFamily( root, f.getFamily());
+          StyleConstants.setFontSize( root, f.getSize());
+          hostFont = f;
+        }
+      }
+
       forceRepaintTo = -1; // gets set by drawLine()
       super.paint( g, a);
       // rendering complete, notify categoriser
@@ -370,12 +383,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
             putMark( line, HighlightingContext.unsafeRestartFollows);
           int forceRepaintFrom = lineIndex;
           // mark following lines as unsafe to restart scanning
-          while (token.start + token.length >= endOffset) {
-            lineIndex++;
+          for (int numLines = rootElement.getElementCount(); token.start
+              + token.length >= endOffset
+              && ++lineIndex < numLines;) {
             line = rootElement.getElement( lineIndex);
-            if (line == null) {
-              break; // end of document
-            }
             putMark( line, HighlightingContext.unsafeRestartHere);
             endOffset = Math.min( doc.getLength(), line.getEndOffset());
           } // while
@@ -394,33 +405,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           }
         }
       }
-    }
-
-    /**
-     * Fetch a reasonable location to start scanning given the desired start
-     * location. This allows for adjustments needed to accommodate multiline
-     * comments.
-     * 
-     * @param lineIndex
-     *        The number of the line to render.
-     * @return the adjusted start position in the document model which is
-     *         greater or equal than zero.
-     */
-    private int getAdjustedStart( int lineIndex)
-    {
-      Element element = getElement();
-      // walk backwards until we get an untagged line...
-      //System.out.print( "# find start in line " + lineIndex);
-      for (; lineIndex > 0; lineIndex--) {
-        Element line = element.getElement( lineIndex);
-        if ( !hasMark( line)) {
-          //  System.out.println( " found start in " + lineIndex);
-          return line.getStartOffset();
-        }
-        //System.out.print( "," + lineIndex);
-      }
-      //System.out.println( " not found (0)");
-      return 0;
     }
 
     /**
@@ -639,6 +623,33 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         }
       }
       super.updateDamage( changes, a, f);
+    }
+
+    /**
+     * Fetch a reasonable location to start scanning given the desired start
+     * location. This allows for adjustments needed to accommodate multiline
+     * comments.
+     * 
+     * @param lineIndex
+     *        The number of the line to render.
+     * @return the adjusted start position in the document model which is
+     *         greater or equal than zero.
+     */
+    private int getAdjustedStart( int lineIndex)
+    {
+      Element element = getElement();
+      // walk backwards until we get an untagged line...
+      //System.out.print( "# find start in line " + lineIndex);
+      for (; lineIndex > 0; lineIndex--) {
+        Element line = element.getElement( lineIndex);
+        if ( !hasMark( line)) {
+          //  System.out.println( " found start in " + lineIndex);
+          return line.getStartOffset();
+        }
+        //System.out.print( "," + lineIndex);
+      }
+      //System.out.println( " not found (0)");
+      return 0;
     }
 
     /**
