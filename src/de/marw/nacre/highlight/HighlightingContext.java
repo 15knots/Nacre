@@ -22,7 +22,6 @@ import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.Token;
 
 
-
 /**
  * A collection of styles used to render highlighted text. This class also acts
  * as a factory for the views used to represent the documents. Since the
@@ -88,7 +87,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     Category[] categories = Category.values();
     categoryStyles = new Style[Category.values().length];
-    for (int i = 0; i < categories.length; i++ ) {
+    for (int i = 0; i < categories.length; i++) {
       Category cat = categories[i];
       Style parent = getStyle( cat.getName());
       if (parent == null) {
@@ -208,6 +207,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     private int requiredScanStart;
 
     /**
+     * Used to communicate between <code>drawLine()</code> and
+     * <code>paint()</code> about lines that need to be rendered due to
+     * multiline tokens determined by drawLine().
+     */
+    private int forceRepaintTo;
+
+    /**
      * Construct a simple colorized view of java text.
      */
     HiliteView( Element elem)
@@ -219,9 +225,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * Renders using the given rendering surface and area on that surface. This
-     * is implemented to invalidate the lexical scanner after rendering so that
-     * the next request to drawUnselectedText will set a new range for the
-     * scanner.
+     * is implemented to first initialise the lexical scanner, then having the
+     * superclass doing the rendering and finally invalidating the scanner.
      * 
      * @param g
      *        the rendering surface to use
@@ -254,7 +259,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       int linesTotal = alloc.height / fontHeight;
 
       if (alloc.height % fontHeight != 0) {
-        linesTotal++ ;
+        linesTotal++;
       }
       // update the visible lines
       Element map = getElement();
@@ -287,9 +292,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         // its own.
         throw new /* StateInvariantError */Error( "Can't render", ex);
       }
+      forceRepaintTo = -1; // gets set by drawLine()
       super.paint( g, a);
       // drawing complete, notify categoriser
       tokenQueue.close();
+
+      /*
+       * force the component to repaint the following lines, thus supporting
+       * highlighting tokens that span mutliple lines.
+       */
+      if (forceRepaintTo > endLine) {
+        System.out.println( "# forced repaint of " + (endLine + 1) + ".."
+            + forceRepaintTo);
+        //XXX
+        damageLineRange( endLine + 1, forceRepaintTo, a, host);
+      }
     }
 
     /**
@@ -309,7 +326,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     protected void drawLine( int lineIndex, Graphics g, int x, int y)
     {
-      System.out.println( "# drawLine() " + lineIndex + " -------");
+      //System.out.println( "# drawLine() " + lineIndex + " -------");
       super.drawLine( lineIndex, g, x, y);
 
       /*
@@ -317,11 +334,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * mark these
        */
       Token token = null;
-      if (!tokenQueue.isEmpty()) {
+      if ( !tokenQueue.isEmpty()) {
         Element rootElement = getElement();
         Document doc = (HighlightedDocument) rootElement.getDocument();
         Element line = rootElement.getElement( lineIndex);
         int endOffset = Math.min( doc.getLength(), line.getEndOffset());
+
         // get last token highlighted
         token = tokenQueue.peek();
         if (token.multiline && token.start < endOffset) {
@@ -330,27 +348,29 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           Object mark = getMark( line);
           if (mark != HighlightingContext.unsafeRestartHere)
             putMark( line, HighlightingContext.unsafeRestartFollows);
-          int l0 = lineIndex;
+          int forceRepaintFrom = lineIndex;
           // mark following lines as unsafe to restart scanning
           while (token.start + token.length >= endOffset) {
-            line = rootElement.getElement( ++lineIndex);
+            lineIndex++;
+            line = rootElement.getElement( lineIndex);
+            if (line == null) {
+              break; // end of document
+            }
             putMark( line, HighlightingContext.unsafeRestartHere);
             endOffset = Math.min( doc.getLength(), line.getEndOffset());
           } // while
 
           requiredScanStart = lineIndex + 1; // document has been scanned up to
-                                             // here
+          // here
 
           /*
            * force the component to repaint the following lines, thus supporting
            * highlighting tokens that span mutliple lines.
            */
-          if (metrics != null && lineIndex > l0) {
-            System.out.println( "# force repaint of " + l0 + ".." + lineIndex);
-            Component host = getContainer();
-            host.repaint( x, y + l0 * metrics.getHeight(),
-                g.getClipBounds().width, ((lineIndex - l0) * metrics
-                    .getHeight()));
+          if (lineIndex > forceRepaintFrom && lineIndex > forceRepaintTo) {
+            // System.out.println( "# force repaint of " + forceRepaintFrom +
+            // ".." + lineIndex);
+            forceRepaintTo = lineIndex;
           }
         }
       }
@@ -371,9 +391,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       Element element = getElement();
       // walk backwards until we get an untagged line...
       //System.out.print( "# find start in line " + lineIndex);
-      for (; lineIndex > 0; lineIndex-- ) {
+      for (; lineIndex > 0; lineIndex--) {
         Element line = element.getElement( lineIndex);
-        if (!hasMark( line)) {
+        if ( !hasMark( line)) {
           //  System.out.println( " found start in " + lineIndex);
           return line.getStartOffset();
         }
@@ -463,7 +483,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       while (p0 < p1) {
         Category category = Category.NORMAL;
         int flushTo = p1;
-        if (!tokenQueue.isEmpty()) {
+        if ( !tokenQueue.isEmpty()) {
           // get token
           token = tokenQueue.peek();
           if (token.start > p0) {
@@ -520,10 +540,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         Color fg = selected ? selectedColor : getForeground( category);
         Font font = getFont( category);
 
-        if (!g.getColor().equals( fg)) {
+        if ( !g.getColor().equals( fg)) {
           g.setColor( fg);
         }
-        if (!g.getFont().equals( font)) {
+        if ( !g.getFont().equals( font)) {
           g.setFont( font);
         }
 
@@ -577,11 +597,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           || ((removed != null) && (removed.length > 0))) {
         // lines were added or removed...
         if (added != null) {
-          for (int i = 0; i < added.length; i++ ) {
+          for (int i = 0; i < added.length; i++) {
           }
         }
         if (removed != null) {
-          for (int i = 0; i < removed.length; i++ ) {
+          for (int i = 0; i < removed.length; i++) {
             removeMark( removed[i]);
           }
         }
@@ -610,9 +630,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     private int removeConsecutiveMarks( int lineIndex)
     {
       Element element = getElement();
-      for (;; lineIndex++ ) {
+      for (;; lineIndex++) {
         Element line = element.getElement( lineIndex);
-        if (!hasMark( line)) {
+        if ( !hasMark( line)) {
           break;
         }
         removeMark( line);
@@ -720,7 +740,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
         do {
           remove();
-        } while (!isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
+        } while ( !isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
       }
 
       /**
