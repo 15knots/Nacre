@@ -83,6 +83,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    */
   private transient Font[] categoryFonts;
 
+  static {
+    // initialize the static key registry with the CATEGORY_ATTRIBUTE keys
+    StyleContext.registerStaticAttributeKey( CATEGORY_ATTRIBUTE);
+  }
+
   /**
    * Constructs a set of styles to represent lexical tokenBuf categories. By
    * default there are no colors or fonts specified.
@@ -96,33 +101,27 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     this.categoriser = categoriser;
     ChangeListener cacheInvalidator = new CacheInvalidator();
 
-    Style root = getStyle( DEFAULT_STYLE);
-    // configure the default style
-    //    StyleConstants.setFontFamily( root, "Monospaced");
-    //    StyleConstants.setFontSize( root, 12);
-    root.addChangeListener( cacheInvalidator);
-
+    Style root = getStyle( StyleContext.DEFAULT_STYLE);
     // all styles for categories are children of the default style
     Category[] categories = Category.values();
-    categoryStyles = new Style[Category.values().length];
     for (int i = 0; i < categories.length; i++) {
       Category cat = categories[i];
-      Style parent = getStyle( cat.getName());
-      if (parent == null) {
+      Style style = getStyle( cat.getName());
+      if (style == null) {
         // add style for category
-        parent = addStyle( cat.getName(), root);
+        style = addStyle( cat.getName(), root);
       }
-      // add attributes for category style...
-      Style style = addStyle( null, parent);
+      // add attributes to style for category...
       style.addAttribute( CATEGORY_ATTRIBUTE, cat);
       style.addChangeListener( cacheInvalidator);
-      categoryStyles[cat.ordinal()] = style;
     }
-
+    root.addChangeListener( cacheInvalidator);
   }
 
   /**
-   * Fetches the foreground color to use for a text run with the given category .
+   * Fetches the foreground color to use for a text run with the given category.
+   * The color is cached in a table to facilitate relatively fast access to use
+   * in conjunction with the categoriser.
    */
   private Color getForeground( Category category)
   {
@@ -134,7 +133,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     if ((categoryCode >= 0) && (categoryCode < categoryColors.length)) {
       c = categoryColors[categoryCode];
       if (c == null) {
-        Style s = categoryStyles[categoryCode];
+        Style s = getStyleForCategory( category);
         c = super.getForeground( s);
         categoryColors[categoryCode] = c;
       }
@@ -143,7 +142,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   }
 
   /**
-   * Fetches the font to use for a text run with the given category.
+   * Fetches the font to use for a text run with the given category. The font is
+   * stored in a table to facilitate relatively fast access to use in
+   * conjunction with the categoriser.
    */
   private Font getFont( Category category)
   {
@@ -155,7 +156,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     if (categoryCode >= 0 && categoryCode < categoryFonts.length) {
       f = categoryFonts[categoryCode];
       if (f == null) {
-        Style s = categoryStyles[categoryCode];
+        Style s = getStyleForCategory( category);
         f = super.getFont( s);
         categoryFonts[categoryCode] = f;
       }
@@ -164,18 +165,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   }
 
   /**
-   * Fetches the attribute set to use for the given category. The set is stored
-   * in a table to facilitate relatively fast access to use in conjunction with
-   * the scanner.
+   * Fetches the style to use for the given category.
    */
   public Style getStyleForCategory( Category category)
   {
-    int categoryCode = category.ordinal();
-    if (categoryCode >= 0 && categoryCode < categoryStyles.length) {
-      Style s = categoryStyles[categoryCode];
-      return s;
-    }
-    return null;
+    return super.getStyle( category.getName());
   }
 
   public View create( Element elem)
@@ -192,7 +186,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   {
     public String toString()
     {
-      return "highlighting category";
+      return "highlightingCategory";
     }
   }
 
@@ -279,7 +273,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         // forward host font changes to the default style
         Font f = host.getFont();
         if (hostFont != f) {
-          Style root = HighlightingContext.this.getStyle( DEFAULT_STYLE);
+          Style root = HighlightingContext.this.getStyle( StyleContext.DEFAULT_STYLE);
           StyleConstants.setFontFamily( root, f.getFamily());
           StyleConstants.setFontSize( root, f.getSize());
           hostFont = f;
