@@ -9,9 +9,9 @@ import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 
 
 /**
- * This kit supports a handling of editing C text content. It supports syntax
- * highlighting and produces the lexical structure of the document as best it
- * can.
+ * This kit supports a handling of editing text content wriiten in the C
+ * programming language. It supports syntax highlighting and produces the
+ * lexical structure of the document as best it can.
  * 
  * @author Martin Weber
  * @version $Revision$
@@ -30,7 +30,6 @@ public class CHighlightingKit extends HighlightingKit
    */
   public String getContentType()
   {
-    // TODO check whether this MIME type is apprpriate
     return "text/x-c-src";
   }
 

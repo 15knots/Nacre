@@ -9,7 +9,6 @@ import java.io.Serializable;
 import de.marw.javax.swing.text.highlight.categoriser.Token;
 
 
-
 /**
  * Represents a lexical token category used to classify a piece of text for
  * syntax highlighting.
@@ -29,30 +28,32 @@ public class Category implements Serializable
   public static final Category NORMAL = new Category( "normal", 0);
 
   /**
-   * Comment 1 category. This can be used to mark a comment.
+   * Comment 1 category. This can be used to mark a comment. (eg, Java and C
+   * modes use this to mark a multiple comment.)
    */
   public static final Category COMMENT_1 = new Category( "comment1", 1);
 
   /**
-   * Comment 2 category. This can be used to mark a comment.
+   * Comment 2 category. This can be used to mark a comment.(eg, Java and C++
+   * modes use this to mark a single line comment.)
    */
   public static final Category COMMENT_2 = new Category( "comment2", 2);
 
   /**
-   * Literal string category. This can be used to mark a string literal (eg, C
-   * mode uses this to mark "..." literals)
+   * Literal string category. This can be used to mark a string literal (eg,
+   * Java and C modes use this to mark "..." literals.)
    */
   public static final Category STRINGVAL = new Category( "stringVal", 3);
 
   /**
    * Literal predefined value category. This can be used to mark an object
-   * literal (eg, Java mode uses this to mark true, false, none, super, this,
-   * etc)
+   * literal (eg, Java mode uses this to mark <code>true</code>,
+   * <code>false</code>,<code>null</code>.)
    */
   public static final Category PREDEFVAL = new Category( "predefVal", 4);
 
   /**
-   * Number category. Used to mark number values.
+   * Number category. Used to mark literal numbers.
    */
   public static final Category NUMERICVAL = new Category( "numericVal", 5);
 
@@ -62,39 +63,38 @@ public class Category implements Serializable
   public static final Category LABEL = new Category( "label", 6);
 
   /**
-   * Statement Keyword category. This can be used to mark a keyword. This should
-   * be used for statements.
+   * Statement Keyword category. This can be used to mark a keyword for
+   * statement. (eg, for, if, while)
    */
   public static final Category KEYWORD_STATEMENT = new Category(
       "keywordStatement", 7);
 
   /**
-   * Keyword 2 category. This can be used to mark a keyword. This should be used
-   * for preprocessor directives.
+   * Type keyword category. This can be used to mark a keyword for data types.
    */
-  public static final Category KEYWORD = new Category( "keyword", 8);
+  public static final Category KEYWORD_TYPE = new Category( "type", 8);
 
   /**
-   * Type keyword category. This can be used to mark a keyword. This should be
-   * used for data types.
+   * Alternative keyword category. This can be used to mark a keyword. (C mode uses this 
+   * for preprocessor directives.)
    */
-  public static final Category KEYWORD_TYPE = new Category( "type", 9);
+  public static final Category KEYWORD = new Category( "keyword", 9);
 
   /**
-   * Operator category. This can be used to mark an operator. (eg, SQL mode
+   * Operator category. This can be used to mark an operator. (eg, Java mode
    * marks +, -, etc with this token type)
    */
   public static final Category OPERATOR = new Category( "operator", 10);
 
   /**
-   * Identifier1 category. This can be used to mark identifers of interest, so
-   * the user can easily spot them.
+   * Custom identifier 1 category. This can be used to mark identifiers of
+   * interest, so the user can easily spot them.
    */
   public static final Category IDENTIFIER_1 = new Category( "identifier1", 11);
 
   /**
-   * Identifier2 category. This can be used to mark identifers of interest, so
-   * the user can easily spot them.
+   * Custom identifier 2 category. This can be used to mark identifiers of
+   * interest, so the user can easily spot them.
    */
   public static final Category IDENTIFIER_2 = new Category( "identifier2", 12);
 
@@ -108,11 +108,6 @@ public class Category implements Serializable
   private static final Category[] all = { NORMAL, COMMENT_1, COMMENT_2,
       STRINGVAL, PREDEFVAL, NUMERICVAL, LABEL, KEYWORD_STATEMENT, KEYWORD,
       KEYWORD_TYPE, OPERATOR, IDENTIFIER_1, IDENTIFIER_2, DOC };
-
-  /**
-   * Key to be used in AttributeSet's holding a value of Category type.
-   */
-  public static final Object CategoryAttribute = new AttributeKey();
 
   /**
    * Numeric value of this Category.
@@ -188,21 +183,6 @@ public class Category implements Serializable
   public static Category[] values()
   {
     return all;
-  }
-
-  //----------------------------------------------------------
-  static class AttributeKey
-  {
-
-    protected AttributeKey()
-    {
-    }
-
-    public String toString()
-    {
-      return "category";
-    }
-
   }
 
 }

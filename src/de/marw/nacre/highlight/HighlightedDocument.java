@@ -41,16 +41,5 @@ public class HighlightedDocument extends PlainDocument
     super( c);
   }
 
-  /**
-   * @see javax.swing.text.Document#insertString(int, java.lang.String,
-   *      javax.swing.text.AttributeSet)
-   */
-  public void insertString( int offs, String str, AttributeSet a)
-      throws BadLocationException
-  {
-    // TODO Auto-generated method stub
-    super.insertString( offs, str, a);
-  }
-
 }
 

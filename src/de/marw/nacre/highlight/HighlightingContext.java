@@ -32,9 +32,16 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
  * 
  * @author Timothy Prinzing (1.2 05/27/99)
  * @author Martin Weber
+ * @version $Revision$
  */
 public class HighlightingContext extends StyleContext implements ViewFactory
 {
+
+  /**
+   * Key to be used in AttributeSets of styles holding a value of the
+   * <code>Category</code> type.
+   */
+  public static final Object CATEGORY_ATTRIBUTE = new CategoryAttribKey();
 
   private static final Object unsafeRestartHere = new Object();
 
@@ -97,7 +104,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // add attributes for category style...
       Style style = addStyle( null, parent);
       categoryStyles[cat.ordinal()] = style;
-      style.addAttribute( Category.CategoryAttribute, cat);
+      style.addAttribute( CATEGORY_ATTRIBUTE, cat);
       style.addChangeListener( cacheInvalidator);
     }
 
@@ -168,6 +175,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
   // --- classes -----------------------------------------------
 
+  /**
+   * Instances of this class serve as a key in AttributeSet's. 
+   */
+  private static class CategoryAttribKey
+  {
+    public String toString()
+    {
+      return "category";
+    }
+  }
+
+  /**
+   * Invalidates the cached fonts and colors.
+   */
   private class CacheInvalidator implements ChangeListener
   {
     public void stateChanged( ChangeEvent e)
@@ -179,7 +200,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   };
 
   /**
-   * View that uses the lexical information to determine the style
+   * A View that uses the lexical information to determine the style
    * characteristics of the text that it renders. This simply colorizes the
    * various categories and assumes a constant font family and size. <br>
    * The view represents each child element as a line of text.
@@ -266,7 +287,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       int lineCount = map.getElementCount();
       int endLine = Math.min( lineCount, linesTotal - linesBelow);
       endLine = Math.max( endLine - 1, 0);
-      Document doc = (HighlightedDocument) map.getDocument();
+      Document doc = map.getDocument();
       Element line1 = map.getElement( linesAbove);
       Element line2 = map.getElement( endLine);
       int p0 = line1.getStartOffset();
@@ -294,7 +315,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
       forceRepaintTo = -1; // gets set by drawLine()
       super.paint( g, a);
-      // drawing complete, notify categoriser
+      // rendering complete, notify categoriser
       tokenQueue.close();
 
       /*
@@ -304,7 +325,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (forceRepaintTo > endLine) {
         System.out.println( "# forced repaint of " + (endLine + 1) + ".."
             + forceRepaintTo);
-        //XXX
         damageLineRange( endLine + 1, forceRepaintTo, a, host);
       }
     }
@@ -557,29 +577,26 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       return x;
     }
 
-    /**
+    /*
      * @see javax.swing.text.View#insertUpdate(javax.swing.event.DocumentEvent,
      *      java.awt.Shape, javax.swing.text.ViewFactory)
      */
-    public void insertUpdate( DocumentEvent e, Shape a, ViewFactory f)
-    {
-      // TODO Auto-generated method stub TEST
-      System.out.println( "### insertUpdate()--------------------");
-      super.insertUpdate( e, a, f);
-      System.out.println( "### insertUpdate()  DONE --------------------");
-    }
-
-    /**
+    /*
+     * public void insertUpdate( DocumentEvent e, Shape a, ViewFactory f) {
+     * System.out.println( "### insertUpdate()--------------------");
+     * super.insertUpdate( e, a, f); System.out.println( "### insertUpdate()
+     * DONE --------------------"); }
+     */
+    /*
      * @see javax.swing.text.View#removeUpdate(javax.swing.event.DocumentEvent,
      *      java.awt.Shape, javax.swing.text.ViewFactory)
      */
-    public void removeUpdate( DocumentEvent e, Shape a, ViewFactory f)
-    {
-      // TODO Auto-generated method stub TEST
-      System.out.println( "### removeUpdate()--------------------");
-      super.removeUpdate( e, a, f);
-      System.out.println( "### removeUpdate()  DONE --------------------");
-    }
+    /*
+     * public void removeUpdate( DocumentEvent e, Shape a, ViewFactory f) {
+     * System.out.println( "### removeUpdate()--------------------");
+     * super.removeUpdate( e, a, f); System.out.println( "### removeUpdate()
+     * DONE --------------------"); }
+     */
 
     /**
      * Repaint the region of change covered by the given document event. If
@@ -625,7 +642,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
-     * @param line
+     * @param lineIndex
+     *        the line number where to start removing line marks.
      */
     private int removeConsecutiveMarks( int lineIndex)
     {
@@ -648,6 +666,15 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private Map unsafeLineMarks = null;
 
+    /**
+     * Gets the mark that specifies a line as a position where to start the
+     * scanning is <strong>unsafe </strong>.
+     * 
+     * @param line
+     *        The line to get the mark for.
+     * @return The marking object or <code>null</code> if the line is not
+     *         marked.
+     */
     private Object getMark( Element line)
     {
       if (unsafeLineMarks == null || line == null) {
@@ -657,9 +684,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
+     * Returns whether a line is marked as a position where to start the
+     * scanning is <strong>unsafe </strong>.
+     * 
      * @param line
-     *        TODO
-     * @return
+     *        The line to get the mark for.
+     * @return <code>true</code> if the line is marked, otherwise
+     *         <code>false</code>.
      */
     private boolean hasMark( Element line)
     {
@@ -674,7 +705,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * scanning is <strong>unsafe </strong>.
      * 
      * @param line
+     *        The line to mark.
      * @param value
+     *        The marking object.
      */
     private void putMark( Element line, Object value)
     {
@@ -686,9 +719,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         unsafeLineMarks = new HashMap();
       }
       unsafeLineMarks.put( line, value);
-      //      System.out.println( "unsafeLineMarks put()=" + unsafeLineMarks);
     }
 
+    /**
+     * Removes a mark that specifies a line as a position where to start the
+     * scanning is <strong>unsafe </strong>.
+     * 
+     * @param line
+     *        The line to unmark.
+     * @return The marking object or <code>null</code> if the line is not
+     *         marked.
+     */
     private Object removeMark( Element line)
     {
       if (unsafeLineMarks == null || line == null) {
@@ -726,10 +767,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * comments).
        * 
        * @param p0
-       * @param doc
-       *        the document model.
-       * @param line
-       *        the starting line in the model.
+       *        the beginning position in the model >= 0
+       * @param lexerInput
+       *        the input for the categoriser.
+       * @param seg2docOffset
+       *        the offset of the segment relative to the document the segement
+       *        comes from.
        */
       public void open( int p0, Segment lexerInput, int seg2docOffset)
       {
