@@ -8,6 +8,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Shape;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Caret;
@@ -47,10 +49,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   public HighlightingContext()
   {
     super();
+    ChangeListener cacheInvalidator = new ChangeListener() {
+      public void stateChanged( ChangeEvent e)
+      {
+        // invalidate caches
+        HighlightingContext.this.categoryColors = null;
+        HighlightingContext.this.categoryFonts = null;
+      }
+    };
+
     Style root = getStyle( DEFAULT_STYLE);
     // configure the default style
     StyleConstants.setFontFamily( root, "Monospaced");
-    StyleConstants.setFontSize( root, 16);
+    StyleConstants.setFontSize( root, 10);
+    root.addChangeListener( cacheInvalidator);
 
     Category[] categories = Category.values();
     categoryStyles = new Style[Category.values().length];
@@ -58,67 +70,64 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       Category cat = categories[i];
       Style parent = getStyle( cat.getName());
       if (parent == null) {
+        // add style for category
         parent = addStyle( cat.getName(), root);
       }
-      Style s = addStyle( null, parent);
-      s.addAttribute( Category.CategoryAttribute, cat);
-      categoryStyles[cat.ordinal()] = s;
+      // add attributes for category style...
+      Style style = addStyle( null, parent);
+      categoryStyles[cat.ordinal()] = style;
+      style.addAttribute( Category.CategoryAttribute, cat);
+      style.addChangeListener( cacheInvalidator);
     }
+
   }
 
   /**
-   * Fetch the foreground color to use for a text run with the given category
-   * id.
+   * Fetch the foreground color to use for a text run with the given category .
    */
-  public Color getForeground( Category category)
+  public final Color getForeground( Category category)
   {
     if (categoryColors == null) {
       categoryColors = new Color[Category.values().length];
     }
     Color c = null;
-    //code--; // no mapping for Category.NORMAL
     int categoryCode = category.ordinal();
     if ((categoryCode >= 0) && (categoryCode < categoryColors.length)) {
       c = categoryColors[categoryCode];
       if (c == null) {
         Style s = categoryStyles[categoryCode];
-        if (s != null) {
-          c = super.getForeground( s);
-          categoryColors[categoryCode] = c;
-        }
+        c = super.getForeground( s);
+        categoryColors[categoryCode] = c;
       }
     }
     return c;
   }
 
   /**
-   * Fetch the font to use for a text run with the given category id.
+   * Fetch the font to use for a text run with the given category.
    */
-  public Font getFont( Category category)
+  public final Font getFont( Category category)
   {
     if (categoryFonts == null) {
       categoryFonts = new Font[Category.values().length];
     }
-    //code--; // no mapping for Category.NORMAL
     Font f = null;
     int categoryCode = category.ordinal();
     if (categoryCode >= 0 && categoryCode < categoryFonts.length) {
       f = categoryFonts[categoryCode];
       if (f == null) {
         Style s = categoryStyles[categoryCode];
-        if (s != null) {
-          f = super.getFont( s);
-          categoryFonts[categoryCode] = f;
-        }
+        f = super.getFont( s);
+        categoryFonts[categoryCode] = f;
       }
     }
     return f;
   }
 
   /**
-   * Fetches the attribute set to use for the given category code. The set is
-   * stored in a table to facilitate relatively fast access to use in
-   * conjunction with the scanner.
+   * Fetches the attribute set to use for the given category. The set is stored
+   * in a table to facilitate relatively fast access to use in conjunction with
+   * the scanner.
    */
   public Style getStyleForCategory( Category category)
   {
@@ -158,6 +167,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    * View that uses the lexical information to determine the style
    * characteristics of the text that it renders. This simply colorizes the
    * various categories and assumes a constant font family and size.
+   * 
+   * @todo super.updateMetrics verwendet den FOnt aus der JTextComponent statt
+   *       der Style-Attribute
    */
   private class HiliteView extends PlainView
   {
@@ -196,13 +208,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     public void paint( Graphics g, Shape a)
     {
       System.out.println( "# paint() -------");
-      super.paint( g, a);
       JTextComponent host = (JTextComponent) getContainer();
       Color normalColor = (host.isEnabled()) ? host.getForeground() : host
           .getDisabledTextColor();
       Caret c = host.getCaret();
       selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
           : normalColor;
+      super.paint( g, a);
     }
 
     /**

@@ -14,6 +14,8 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Font;
+import java.awt.GraphicsEnvironment;
 import java.io.File;
 import java.io.FileReader;
 
@@ -23,6 +25,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 
 import swing.text.highlight.CHighlightingKit;
 import swing.text.highlight.Category;
@@ -44,6 +47,12 @@ public class HighlightKitTest
       System.exit( 1);
     }
     try {
+      GraphicsEnvironment env =
+        GraphicsEnvironment.getLocalGraphicsEnvironment();
+      String names[]=env.getAvailableFontFamilyNames();
+      for (int i = 0; i < names.length; i++ ) {
+        System.out.println("- "+i+": "+names[i]);
+      }
       JEditorPane editor = new JEditorPane();
 
       HighlightingKit kit = new CHighlightingKit();
@@ -56,12 +65,17 @@ public class HighlightKitTest
       editor.setContentType( "text/x-c-src");
       //      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
-      //     editor.setFont( new Font( "Monospaced", 0, 12));
+//      editor.setFont( new Font( "Monospaced", Font.PLAIN, 30));
+//      editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
       //      editor.setEditable( true);
 
       // PENDING(prinz) This should have a customizer and
       // be serialized. This is a bogus initialization.
       HighlightingContext styles = kit.getStylePreferences();
+      Style root = styles.getStyle( StyleContext.DEFAULT_STYLE);
+      StyleConstants.setFontFamily( root, "Monospaced");
+      StyleConstants.setFontSize( root, 32);
+      
       Style s;
       s = styles.getStyleForCategory( Category.COMMENT_1);
       StyleConstants.setForeground( s, new Color( 0, 128, 0));
