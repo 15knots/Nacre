@@ -37,7 +37,8 @@ public class C_Categoriser extends C_likeCategoriser
   {
   }
 
-  /* interface Categoriser
+  /*
+   * interface Categoriser
    */
   public Token nextToken( Document doc, Token token)
   {
@@ -131,8 +132,11 @@ public class C_Categoriser extends C_likeCategoriser
             else if (isKW_Type( matchLen)) {
               token.category = Category.KEYWORD_TYPE;
             }
-            else if (isKW_stmt( matchLen)) {
+            else if (isKW_Statement( matchLen)) {
               token.category = Category.KEYWORD_STATEMENT;
+            }
+            else if (isKW_Operator(matchLen)) {
+              token.category = Category.KEYWORD_OPERATOR;
             }
             else if (isIdentifier1( matchLen)) {
               token.category = Category.IDENTIFIER_1;
@@ -213,7 +217,8 @@ public class C_Categoriser extends C_likeCategoriser
   }
 
   /**
-   * Matches an operator keyword.
+   * Matches an operator. This implementation greedyly matches anything that
+   * looks like a sequence of operators.
    * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
@@ -221,17 +226,6 @@ public class C_Categoriser extends C_likeCategoriser
   private int matchOperator()
   {
     int len = 0;
-    int kwLen = matchWord();
-    if (kwLen > 0) {
-      if (matchOneOfStrings( kwLen, kwOperator)) {
-        // got a keyword operator
-        len += kwLen;
-      }
-      else {
-        // got a word, but not an operator keyword
-        return len;
-      }
-    }
     // non keyword operators
     // greedyly match anything that looks like a sequence of operators...
     for (char c = LA( len); c != CharacterIterator.DONE; c = LA( ++len)) {
@@ -270,7 +264,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isKW_stmt( int length)
+  private boolean isKW_Statement( int length)
   {
     return matchOneOfStrings( length, kwStmt);
   }
@@ -288,6 +282,21 @@ public class C_Categoriser extends C_likeCategoriser
   private boolean isKW_Type( int length)
   {
     return matchOneOfStrings( length, kwType);
+  }
+
+  /**
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a keyword used as operator.
+   * 
+   * @see Category#KEYWORD_OPERATOR
+   * @param lenght
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  private boolean isKW_Operator( int length)
+  {
+    return matchOneOfStrings( length, kwOperator);
   }
 
   /**

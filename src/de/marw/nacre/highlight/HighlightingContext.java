@@ -193,7 +193,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   {
     public String toString()
     {
-      return "category";
+      return "highlighting category";
     }
   }
 

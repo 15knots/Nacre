@@ -21,6 +21,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 public abstract class HighlightingKit extends DefaultEditorKit
 {
 
+  private HighlightingContext preferences;
+
   /**
    * Default constructor used by subclasses.
    */
@@ -71,6 +73,4 @@ public abstract class HighlightingKit extends DefaultEditorKit
   //    kit.preferences = preferences;
   //    return kit;
   //  }
-  protected HighlightingContext preferences;
-
 }

@@ -63,51 +63,59 @@ public class Category implements Serializable
   public static final Category LABEL = new Category( "label", 6);
 
   /**
+   * Alternative keyword category. This can be used to mark a keyword. (C mode
+   * uses this for preprocessor directives.)
+   */
+  public static final Category KEYWORD = new Category( "keyword", 7);
+
+  /**
    * Statement Keyword category. This can be used to mark a keyword for
    * statement. (eg, for, if, while)
    */
   public static final Category KEYWORD_STATEMENT = new Category(
-      "keywordStatement", 7);
+      "keywordStatement", 8);
 
   /**
    * Type keyword category. This can be used to mark a keyword for data types.
    */
-  public static final Category KEYWORD_TYPE = new Category( "type", 8);
+  public static final Category KEYWORD_TYPE = new Category( "type", 9);
 
   /**
-   * Alternative keyword category. This can be used to mark a keyword. (C mode uses this 
-   * for preprocessor directives.)
+   * Operator keyword category. This can be used to mark an operator. (eg, C++
+   * mode marks 'new' and 'sizeof' with this token type)
    */
-  public static final Category KEYWORD = new Category( "keyword", 9);
+  public static final Category KEYWORD_OPERATOR = new Category(
+      "keywordOperator", 10);
 
   /**
-   * Operator category. This can be used to mark an operator. (eg, Java mode
-   * marks +, -, etc with this token type)
+   * Operator category. This can be used to mark an operator other than those
+   * marked as <code>KEYWORD_OPERATOR</code>. (eg, Java mode marks +, -, etc
+   * with this token type)
    */
-  public static final Category OPERATOR = new Category( "operator", 10);
-
-  /**
-   * Custom identifier 1 category. This can be used to mark identifiers of
-   * interest, so the user can easily spot them.
-   */
-  public static final Category IDENTIFIER_1 = new Category( "identifier1", 11);
-
-  /**
-   * Custom identifier 2 category. This can be used to mark identifiers of
-   * interest, so the user can easily spot them.
-   */
-  public static final Category IDENTIFIER_2 = new Category( "identifier2", 12);
+  public static final Category OPERATOR = new Category( "operator", 11);
 
   /**
    * Documentation category. Used to mark special documentation (eg Javadoc
    * comments, Python's autodoc)
    */
-  public static final Category DOC = new Category( "doc", 13);
+  public static final Category DOC = new Category( "doc", 12);
+
+  /**
+   * Custom identifier 1 category. This can be used to mark identifiers of
+   * interest, so the user can easily spot them.
+   */
+  public static final Category IDENTIFIER_1 = new Category( "identifier1", 13);
+
+  /**
+   * Custom identifier 2 category. This can be used to mark identifiers of
+   * interest, so the user can easily spot them.
+   */
+  public static final Category IDENTIFIER_2 = new Category( "identifier2", 14);
 
   //----------------------------------------------------------
   private static final Category[] all = { NORMAL, COMMENT_1, COMMENT_2,
-      STRINGVAL, PREDEFVAL, NUMERICVAL, LABEL, KEYWORD_STATEMENT, KEYWORD,
-      KEYWORD_TYPE, OPERATOR, IDENTIFIER_1, IDENTIFIER_2, DOC };
+      STRINGVAL, PREDEFVAL, NUMERICVAL, LABEL, KEYWORD, KEYWORD_STATEMENT,
+      KEYWORD_TYPE, KEYWORD_OPERATOR, OPERATOR, DOC, IDENTIFIER_1, IDENTIFIER_2 };
 
   /**
    * Numeric value of this Category.
