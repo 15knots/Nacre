@@ -11,11 +11,13 @@ import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 
 
 /**
- * This kit supports a handling of editing text content wriiten in the C
+ * This kit supports a handling of editing text content written in the C
  * programming language. It supports syntax highlighting and produces the
  * lexical structure of the document as best it can.
  * 
  * @author Martin Weber
+ * @see de.marw.javax.swing.text.highlight.HighlightingKit for sample usage
+ *      code.
  * @version $Revision$
  */
 public class CHighlightingKit extends HighlightingKit
@@ -32,7 +34,7 @@ public class CHighlightingKit extends HighlightingKit
 
   /**
    * Gets the MIME type of the data that this kit represents support for. This
-   * kit supports the type <code>text/x-c-src</code>.
+   * kit supports the type <strong>text/x-c-src </strong>.
    */
   public String getContentType()
   {
@@ -40,8 +42,12 @@ public class CHighlightingKit extends HighlightingKit
   }
 
   /**
-   * Creates a Categoriser used for highlighting text of this document or
-   * <code>null</code>.
+   * Creates a <code>C_Categoriser</code> for highlighting text of the C
+   * programming language.
+   * 
+   * @return An object of type {@link C_Categoriser C_Categoriser}to map
+   *         lexical elements to categories.
+   * @see C_Categoriser
    */
   protected Categoriser createCategoriser()
   {
@@ -60,8 +66,8 @@ public class CHighlightingKit extends HighlightingKit
   }
 
   /**
-   * Creates a built-in set of color and font style informations used used to
-   * render highlighted text written in the C programming language.
+   * Creates a built-in set of color and font style informations used to render
+   * highlighted text written in the C programming language.
    */
   private CategoryStyles createDefaultStyles()
   {
