@@ -175,7 +175,8 @@ public class C_Categoriser extends AbstractCategoriser
       case '#': // preprocessor directive
         input.next(); // consume '#'
         matchLen = matchWhitespaceNoNL();
-        matchLen += matchWord();
+        consumeChars( matchLen);
+        matchLen = matchWord();
         consumeChars( matchLen);
         token.categoryId = CategoryConstants.KEYWORD2;
       break;

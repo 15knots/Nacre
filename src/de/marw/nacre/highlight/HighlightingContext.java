@@ -11,7 +11,6 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainView;
 import javax.swing.text.Segment;
 import javax.swing.text.Style;
@@ -41,7 +40,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 {
 
   /**
-   * Constructs a set of styles to represent lexical token categories. By
+   * Constructs a set of styles to represent lexical tokenBuf categories. By
    * default there are no colors or fonts specified.
    */
   public HighlightingContext()
@@ -151,13 +150,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   {
 
     /**
-     * used for text runs that spans multiple line (eg Javadoc comments). Set to
-     * <code>false</code> if the categorizer needs to adjust it's starting
-     * point.
+     * 
      */
-    private boolean lexerValid;
-
-    private int     seg2docOffset;
+    private TokenQueue tokenQueue;
 
     /**
      * Construct a simple colorized view of java text.
@@ -165,7 +160,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     HiliteView( Element elem)
     {
       super( elem);
-      lexerValid = false;
+      tokenQueue = new TokenQueue( (HighlightedDocument) elem.getDocument());
     }
 
     /**
@@ -206,10 +201,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       //lexerValid = false;
       //      System.out.println( "# invalidate lexer ---------------------------");
       System.out.println( "# drawLine() " + lineIndex + " -------");
-      lexerValid = false;
-      super.drawLine( lineIndex, g, x, y);
-      // notify lexer
-      //TODO lexer.closeInput();
+      Element line = getElement().getElement( lineIndex);
+      try {
+        tokenQueue.initialise( line);
+        super.drawLine( lineIndex, g, x, y);
+        // notify lexer
+        //TODO lexer.closeInput();
+      }
+      catch (BadLocationException ex) {
+        throw new /* StateInvariantError */Error( "Can't render line: "
+            + lineIndex);
+      }
     }
 
     /**
@@ -266,11 +268,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
-     * Renders the given range in the model as unselected or unselected text.
-     * This is implemented to paint colors based upon the category-to-color
-     * translations. To reduce the number of calls to the Graphics object, text
-     * is batched up until a color change is detected or the entire requested
-     * range has been reached.
+     * Renders the given range in the model as selected or unselected text. This
+     * is implemented to paint colors based upon the category-to-color
+     * translations.
      * 
      * @param g
      *          the graphics context
@@ -282,7 +282,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      *          the beginning position in the model
      * @param p1
      *          the ending position in the model
-     * @returns the location of the end of the range
+     * @returns the X coordinate of the end of the range
      * @exception BadLocationException
      *              if the range is invalid
      */
@@ -290,41 +290,46 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         boolean selected) throws BadLocationException
     {
       HighlightedDocument doc = (HighlightedDocument) getDocument();
-      Categoriser cato = doc.getCategoriser();
 
       Color lastColor = g.getColor();
       Font lastFont = g.getFont();
 
-      Token token = new Token();
       Segment text = getLineBuffer();
+      Token token = null;
       while (p0 < p1) {
-        // get token
-        token = adjustCategoriser( doc, p0, p1, cato, token);
-        if (false) {
-          // print current token
-          Segment txt = new Segment();
-          System.out.print( "tok= " + token);
-          doc.getText( token.start, token.length, txt);
-          System.out.println( ", '" + txt + "'");
+        int category = CategoryConstants.NORMAL;
+        int flushTo = p1;
+        if (!tokenQueue.isEmpty()) {
+          // get token
+          token = tokenQueue.peek();
+          if (false) {
+            // print current token
+            Segment txt = new Segment();
+            System.out.print( "tok= " + token);
+            doc.getText( token.start, token.length, txt);
+            System.out.println( ", '" + txt + "'");
+          }
+          if (token.start > p0) {
+            // gap between tokens: draw as normal text
+            category = CategoryConstants.NORMAL;
+            flushTo = token.start;
+            doc.getText( p0, flushTo - p0, text);
+            x = drawHighlightedText( category, selected, text, x, y, g, p0);
+            p0 = flushTo;
+          }
+          if (token.start <= p0) {
+            // draw current token
+            category = token.categoryId;
+            flushTo = Math.min( token.start + token.length, p1);
+            if (token.start + token.length < p1) {
+              // token was completely consumed: remove from queue
+              tokenQueue.remove();
+            }
+          }
         }
-        int tokenEnd = token.start + token.length;
-
-        if (token.start > p0) {
-          // gap between tokens: draw as normal text
-          doc.getText( p0, Math.min( token.start, p1) - p0, text);
-          x = drawHighlightedText( CategoryConstants.NORMAL, selected, text, x,
-              y, g, p0);
-          p0 = token.start;
-        }
-        if (token.start <= p0) {
-          // draw current token
-          doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
-          x = drawHighlightedText( token.categoryId, selected, text, x, y, g,
-              p0);
-          p0 = tokenEnd;
-        }
-        if (token.length <= 0)
-          break;
+        doc.getText( p0, flushTo - p0, text);
+        x = drawHighlightedText( category, selected, text, x, y, g, p0);
+        p0 = flushTo;
       }
 
       g.setColor( lastColor);
@@ -375,47 +380,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
-     * Update the scanner (if necessary) to point to the appropriate token for
-     * the given start position needed for rendering and return the first token.
-     * 
-     * @param doc
-     * @param p0
-     *          the beginning position in the model >= 0
-     * @param lexer
-     * @param token
-     * @return
-     */
-    private Token adjustCategoriser( HighlightedDocument doc, int p0, int p1,
-        Categoriser lexer, Token token) throws BadLocationException
-    {
-      int p0Adj = p0;
-      if (!lexerValid) {
-        //System.out.println( "# lexer invalid");
-        // adjust categorizer's starting point (to start of line)
-        p0Adj = lexer.getAdjustedStart( doc, p0);
-        p1 = Math.min( doc.getLength(), p1);
-        Segment lexerInput = new Segment();
-        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-        seg2docOffset = lexerInput.offset - p0Adj;
-        lexer.setInput( lexerInput);
-        lexerValid = true;
-        //System.out.println( "# validated lexer");
-      }
-      do {
-        token = lexer.nextToken( doc, token);
-        token.start -= seg2docOffset;
-        if (true) {
-          // print current token
-          System.out
-              .println( "tok=" + token + ", seg2docoffs=" + seg2docOffset);
-        }
-        p0Adj = token.start + token.length;
-      } while (p0Adj <= p0 && token.length > 0);
-
-      return token;
-    }
-
-    /**
      * @see javax.swing.text.View#insertUpdate(javax.swing.event.DocumentEvent,
      *      java.awt.Shape, javax.swing.text.ViewFactory)
      */
@@ -448,6 +412,97 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // TODO Auto-generated method stub TEST
       System.out.println( "changedUpdate()--------------------");
       super.changedUpdate( e, a, f);
+    }
+
+    /**
+     * Eine Queue für <code>Token</code>s.
+     * 
+     * @author weber
+     */
+    private final class TokenQueue
+    {
+      private Categoriser         categoriser;
+
+      private int                 seg2docOffset;
+
+      private Token               tokenBuf;
+
+      private HighlightedDocument doc;
+
+      /**
+       * @param doc
+       */
+      public TokenQueue( HighlightedDocument doc)
+      {
+        super();
+        this.doc = doc;
+      }
+
+      /**
+       * (Re-)Initialises the categoriser to point to the appropriate token for the
+       * given start position needed for rendering. The start position
+       * adjustment is required by text runs that span multiple line (eg Javadoc
+       * comments).
+       * 
+       * @param doc
+       *          the document model.
+       * @param line
+       *          the starting line in the model.
+       */
+      public void initialise( Element line) throws BadLocationException
+      {
+        //System.out.println( "# TokenQueue.adjustCategoriser()");
+        categoriser = doc.getCategoriser();
+        int p0 = line.getStartOffset();
+        int p1 = Math.min( doc.getLength(), line.getEndOffset());
+        // adjust categorizer's starting point (to start of line)
+        int p0Adj = categoriser.getAdjustedStart( doc, p0);
+        Segment lexerInput = new Segment();
+        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
+        seg2docOffset = lexerInput.offset - p0Adj;
+        categoriser.setInput( lexerInput);
+        //System.out.println( "# validated lexer");
+
+        do {
+          remove();
+          p0Adj = tokenBuf.start + tokenBuf.length;
+        } while (p0Adj <= p0 && !isEmpty());
+
+      }
+
+      /**
+       * Returns <code>true</code> if this queue contains no elements.
+       * 
+       * @return <code>true</code> if this queue contains no elements
+       */
+      public boolean isEmpty()
+      {
+        return tokenBuf.length <= 0;
+      }
+
+      /**
+       * Retrieves, but does not remove, the head of this queue.
+       */
+      public Token peek()
+      {
+        if (false) {
+          // print current tokenBuf
+          System.out.println( "tok=" + tokenBuf + ", seg2docoffs="
+              + seg2docOffset);
+        }
+        return tokenBuf;
+      }
+
+      /**
+       * Removes the head of this queue and retrieves the next token. Obtains
+       * the next token from the categoriser and adjusts the token's start
+       * position relative to the document.
+       */
+      public void remove()
+      {
+        tokenBuf = categoriser.nextToken( doc, tokenBuf);
+        tokenBuf.start -= seg2docOffset;
+      }
     }
   }
 
