@@ -184,8 +184,14 @@ public class C_Categoriser extends C_likeCategoriser
   {
     int len = 0;
     char c = Character.toUpperCase( LA( lookahead));
-    if (c == 'F' || c == 'L') {
+    char seen = '\0';
+    if (c == 'L' || c == 'F') {
+      seen = c;
       len++;
+      c = Character.toUpperCase( LA( lookahead + 1));
+      if ((c == 'L' || c == 'F') && c != seen) {
+        len++;
+      }
     }
     return len;
   }
@@ -203,10 +209,12 @@ public class C_Categoriser extends C_likeCategoriser
   {
     int len = 0;
     char c = Character.toUpperCase( LA( lookahead));
+    char seen = '\0';
     if (c == 'L' || c == 'U') {
+      seen = c;
       len++;
       c = Character.toUpperCase( LA( lookahead + 1));
-      if (c == 'L' || c == 'U') {
+      if ((c == 'L' || c == 'U') && c != seen) {
         len++;
       }
     }

@@ -28,15 +28,14 @@ kk+=sizeof++(
 	char 
 	float 
 	unsigned 
-	far 
-	huge 
+	far huge 
 	pascal 
-	register 
+	register
 	volatile 
-	int 
-	long 
-	double 
+	int long double 
 	char float unsigned far huge pascal register 
 	*/
  ++volatile "hu";
  
+ 1234lu 1234l 1234
+ x= .11E3+ 3e-5;

@@ -15,7 +15,7 @@ import javax.swing.text.Segment;
 public abstract class AbstractCategoriser implements Categoriser
 {
 
-  protected static final boolean debug = false;
+  protected static final boolean debug = true;
 
   protected Segment input;
 
@@ -32,8 +32,7 @@ public abstract class AbstractCategoriser implements Categoriser
   public void openInput( Segment lexerInput)
   {
     if (debug) {
-      System.out.println( "# AbstractCategoriser.openInput() char[0]='"
-          + lexerInput.array[lexerInput.offset] + "', offset="
+      System.out.println( "# AbstractCategoriser.openInput(), offset="
           + lexerInput.offset + ", count=" + lexerInput.count);
     }
     this.input = lexerInput;
@@ -76,15 +75,17 @@ public abstract class AbstractCategoriser implements Categoriser
     return len;
   }
 
- /**
+  /**
    * Matches a number. <br>
    * 
    * <pre>
    * 
-   *   Number 
-   *      : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *      | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *      | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *  
+   *    Number 
+   *       : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *       | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *       | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *   
    *  
    * </pre>
    * 
@@ -101,9 +102,9 @@ public abstract class AbstractCategoriser implements Categoriser
       if (LA( 0) == '0' && Character.toUpperCase( LA( 1)) == 'X'
           && isHexDigit( LA( 2))) {
         len += 2;
-        len += matchHexDecimal( 2);
+        len += matchHexDecimal( 3);
         // match trailing LongSuffix and UnsignedSuffix...
-        matchIntSuffix( len + 1);
+        len+=matchIntSuffix( len);
         // matched '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )?
         return len;
       }
@@ -120,9 +121,6 @@ public abstract class AbstractCategoriser implements Categoriser
           // matched ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
           return len;
         }
-        else {
-          return 0;// no match
-        }
       }
     }
 
@@ -130,15 +128,16 @@ public abstract class AbstractCategoriser implements Categoriser
       // if we ran here, we matched Decimal, either an integer or float
       // match trailing suffixes...
       // try suffixes for float
-      int suflen = matchExponent( len + 1);
+      int expolen = matchExponent( len);
       // matched Decimal (Exponent)?
-      suflen += matchFloatSuffix( len + suflen);
-      if (suflen == 0) {
-        // no suffixes for float, try suffixes for integer
+      int suflen_f = matchFloatSuffix( len + expolen);
+      int suflen_i = 0;
+      if (expolen == 0) {
+        // no exponent, try suffixes for integer
         // match trailing LongSuffix and UnsignedSuffix...
-        suflen = matchIntSuffix( len + 1);
+        suflen_i = matchIntSuffix( len);
       }
-      len += suflen;
+      len += Math.max( suflen_i, suflen_f) + expolen;
     }
     return len;
   }
