@@ -185,7 +185,7 @@ public class Category implements Serializable
 
   public String toString()
   {
-    return getName() + ",ord=" + categoryId;
+    return repr;
   }
 
   public static Category[] values()
