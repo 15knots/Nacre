@@ -1,8 +1,6 @@
 // $Header:
 // /home/weber/cvsRepos/highlighting/swing/text/highlight/CHighlightingKit.java,v
 // 1.5 2004/09/27 18:53:14 weber Exp $
-/**
- */
 
 package swing.text.highlight;
 
@@ -15,9 +13,8 @@ import swing.text.highlight.categoriser.Categoriser;
  * highlighting and produces the lexical structure of the document as best it
  * can.
  * 
- * @author Timothy Prinzing
  * @author Martin Weber
- * @version 1.2 05/27/99
+ * @version $Revision$
  */
 public class CHighlightingKit extends HighlightingKit
 {
@@ -33,12 +30,12 @@ public class CHighlightingKit extends HighlightingKit
    */
   public String getContentType()
   {
-    // check whether MIME type is apprpriate
+    // TODO check whether this MIME type is apprpriate
     return "text/x-c-src";
   }
 
   /**
-   * Creates a Categoriser used for highlighting text of this document of
+   * Creates a Categoriser used for highlighting text of this document or
    * <code>null</code>.
    */
   protected Categoriser createCategoriser()

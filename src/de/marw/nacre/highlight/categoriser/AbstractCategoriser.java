@@ -38,17 +38,19 @@ public abstract class AbstractCategoriser implements Categoriser
       throws BadLocationException
   {
     if (debug) {
-      System.out
-          .println( "# in AbstractCategoriser.openInput() ---------------------------");
+      System.out.println( "# AbstractCategoriser.openInput() char[0]='"
+          + lexerInput.array[lexerInput.offset] + "', offset="
+          + lexerInput.offset + ", count=" + lexerInput.count);
     }
     setInput( lexerInput);
+    lexerInput.first(); // initialize CharIterator
   }
 
   public void closeInput()
   {
     if (debug) {
       System.out
-          .println( "# in AbstractCategoriser.closeInput() ---------------------------");
+          .println( "# AbstractCategoriser.closeInput() ---------------------------");
     }
     input = null;
   }

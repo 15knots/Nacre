@@ -18,7 +18,6 @@ import swing.text.highlight.categoriser.Token;
  * supports syntax highlighting and produces the lexical structure of the
  * document as best it can.
  * 
- * @author Timothy Prinzing
  * @author Martin Weber
  */
 public class JavaHighlightingKit extends HighlightingKit

@@ -2,7 +2,7 @@
 // /home/weber/cvsRepos/highlighting/swing/text/highlight/SegmentInputStream.java,v
 // 1.1 2004/09/22 19:05:13 weber Exp $
 
-// Copyright © 2004 Razorcat Development GmbH
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight;
 
@@ -41,7 +41,6 @@ class SegmentInputStream extends InputStream
    *         stream is reached.
    * @exception IOException
    *              if an I/O error occurs.
-   * @since JDK1.0
    */
   public int read() throws IOException
   {
@@ -55,7 +54,7 @@ class SegmentInputStream extends InputStream
     return ret;
   }
 
-  Segment segment;
+  private Segment segment;
 
-  int index; // index into array of the segment
+  private int index; // index into array of the segment
 }

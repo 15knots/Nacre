@@ -47,12 +47,6 @@ public class C_Categoriser extends AbstractCategoriser
   {
     super.openInput( doc, lexerInput);
 
-    if (debug) {
-      System.out.println( "setInput() char[0]='"
-          + lexerInput.array[lexerInput.offset] + "', offset="
-          + lexerInput.offset + ", count=" + lexerInput.count);
-    }
-    lexerInput.first(); // initialize CharIterator
   }
 
   /**
