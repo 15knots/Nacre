@@ -142,7 +142,7 @@ public class Category implements Serializable
   /**
    * Returns the numeric value of this Category.
    */
-  public int ordinal()
+  public final int ordinal()
   {
     return categoryId;
   }
