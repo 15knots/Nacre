@@ -1,13 +1,10 @@
-// $Header:
-// /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/AbstractCategoriser.java,v
-// 1.1 2004/09/22 19:05:12 weber Exp $
+/* $Header$ */
 
 // Copyright © 2004 Martin Weber
 
 package swing.text.highlight.categoriser;
 
 import javax.swing.text.Segment;
-
 
 
 /**
@@ -67,13 +64,13 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks if a subregion of a <code>Segment</code> is equal to a string.
    * 
    * @param ignoreCase
-   *          True if case should be ignored, false otherwise
+   *        True if case should be ignored, false otherwise
    * @param text
-   *          The source of the text
+   *        The source of the text
    * @param offset
-   *          The offset into the segment to start the matching
+   *        The offset into the segment to start the matching
    * @param match
-   *          The string to match
+   *        The string to match
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */

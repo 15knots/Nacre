@@ -1,4 +1,6 @@
-//$Id$
+/* $Header$ */
+
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight;
 
@@ -102,9 +104,9 @@ public class Category implements Serializable
   public static final Category DOC = new Category( "doc", 13);
 
   //----------------------------------------------------------
-  private static final Category[] all = { NORMAL, COMMENT_1, COMMENT_2, STRINGVAL,
-      PREDEFVAL, NUMERICVAL, LABEL, KEYWORD_STATEMENT, KEYWORD, KEYWORD_TYPE,
-      OPERATOR, IDENTIFIER_1, IDENTIFIER_2, DOC };
+  private static final Category[] all = { NORMAL, COMMENT_1, COMMENT_2,
+      STRINGVAL, PREDEFVAL, NUMERICVAL, LABEL, KEYWORD_STATEMENT, KEYWORD,
+      KEYWORD_TYPE, OPERATOR, IDENTIFIER_1, IDENTIFIER_2, DOC };
 
   /**
    * Key to be used in AttributeSet's holding a value of Category type.
@@ -123,10 +125,9 @@ public class Category implements Serializable
 
   /**
    * @param repr
-   *          The name of this enum constant, as declared in the enum
-   *          declaration.
+   *        The name of this enum constant, as declared in the enum declaration.
    * @param category
-   *          the numeric value of the category.
+   *        the numeric value of the category.
    */
   private Category( String repr, int categoryId)
   {
@@ -166,7 +167,7 @@ public class Category implements Serializable
    * and is a <code>Category</code> object with the same numeric value.
    * 
    * @param obj
-   *          the object to compare this category with.
+   *        the object to compare this category with.
    * @return <code>true</code> if the objects are equal; <code>false</code>
    *         otherwise.
    */

@@ -1,4 +1,6 @@
-// $Id$
+/* $Header$ */
+
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight.categoriser;
 
@@ -44,7 +46,6 @@ public class C_Categoriser extends AbstractCategoriser
   public void openInput( Segment lexerInput)
   {
     super.openInput( lexerInput);
-
   }
 
   /**
@@ -85,7 +86,7 @@ public class C_Categoriser extends AbstractCategoriser
   ///////////////////////////////////////////////////////////
   /**
    * @param token
-   *          the token to initialise.
+   *        the token to initialise.
    */
   private void getToken( HighlightedDocument doc, Token token)
   {
@@ -194,7 +195,7 @@ public class C_Categoriser extends AbstractCategoriser
 
   /**
    * @param lenght
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @return <code>true</code> if a match was found, otherwise
    *         <code>false</code>.
    */
@@ -244,7 +245,7 @@ public class C_Categoriser extends AbstractCategoriser
 
   /**
    * @param lenght
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @return <code>true</code> if a match was found, otherwise
    *         <code>false</code>.
    */
@@ -255,7 +256,7 @@ public class C_Categoriser extends AbstractCategoriser
 
   /**
    * @param lenght
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @return <code>true</code> if a match was found, otherwise
    *         <code>false</code>.
    */
@@ -270,9 +271,9 @@ public class C_Categoriser extends AbstractCategoriser
    * String in <code>wordlist</code>.
    * 
    * @param lenght
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @param wordlist
-   *          the strings that may match.
+   *        the strings that may match.
    * @return <code>true</code> if a match was found, otherwise
    *         <code>false</code>.
    */
@@ -290,7 +291,7 @@ public class C_Categoriser extends AbstractCategoriser
 
   /**
    * @param identifierLen
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
@@ -306,7 +307,7 @@ public class C_Categoriser extends AbstractCategoriser
 
   /**
    * @param identifierLen
-   *          the length of the region that must match.
+   *        the length of the region that must match.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */

@@ -1,6 +1,6 @@
-// $Header:
-// /home/weber/cvsRepos/highlighting/swing/text/highlight/categoriser/Categoriser.java,v
-// 1.1 2004/09/22 19:05:12 weber Exp $
+/* $Header$ */
+
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight.categoriser;
 
@@ -19,11 +19,12 @@ public interface Categoriser
 {
 
   /**
-   * (Re-)Initialises the categoriser to scan the specified <code>Segment</code>. This
-   * gets called when the View is going to be rendered. <br>
+   * (Re-)Initialises the categoriser to scan the specified <code>Segment</code>.
+   * This gets called when the View is going to be rendered. <br>
    * bedeutet implizit, dass ein Scanabschnitt beginnt.
+   * 
    * @param lexerInput
-   *          the run of text to categorise.
+   *        the run of text to categorise.
    */
   public void openInput( Segment lexerInput);
 
@@ -34,8 +35,8 @@ public interface Categoriser
    * 
    * @param doc
    * @param tokenBuf
-   *          The buffer where the token is returned or <code>null</code> if a
-   *          new buffer should be allocated.
+   *        The buffer where the token is returned or <code>null</code> if a
+   *        new buffer should be allocated.
    * @return the categorized token.
    * @see #openInput(int)
    */

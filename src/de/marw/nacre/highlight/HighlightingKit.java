@@ -1,8 +1,6 @@
-// $Header:
-// /home/weber/cvsRepos/highlighting/swing/text/highlight/HighlightingKit.java,v
-// 1.1 2004/09/22 19:05:13 weber Exp $
+/* $Header$ */
 
-// Copyright © 2004 Razorcat Development GmbH
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight;
 
@@ -16,9 +14,8 @@ import swing.text.highlight.categoriser.Categoriser;
 /**
  * This kit supports a fairly minimal handling of editing a programming language
  * text content. It supports syntax highlighting and produces the lexical
- * structure of the document as best it can.
+ * structure of the document as best it can. 
  * 
- * @author Timothy Prinzing (1.2 05/27/99)
  * @author Martin Weber
  */
 public abstract class HighlightingKit extends DefaultEditorKit
@@ -40,7 +37,7 @@ public abstract class HighlightingKit extends DefaultEditorKit
   public HighlightingContext getStylePreferences()
   {
     if (preferences == null) {
-      preferences = new HighlightingContext();
+      preferences = new HighlightingContext( createCategoriser());
     }
     return preferences;
   }
@@ -60,7 +57,7 @@ public abstract class HighlightingKit extends DefaultEditorKit
    */
   public Document createDefaultDocument()
   {
-    return new HighlightedDocument( createCategoriser());
+    return new HighlightedDocument();
   }
 
   /**

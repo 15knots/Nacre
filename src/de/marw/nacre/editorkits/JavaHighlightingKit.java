@@ -1,4 +1,6 @@
-//$Id$
+/* $Header$ */
+
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight;
 
@@ -15,7 +17,7 @@ import swing.text.highlight.categoriser.Token;
 /**
  * This kit supports a fairly minimal handling of editing Java text content. It
  * supports syntax highlighting and produces the lexical structure of the
- * document as best it can.
+ * document as best it can. 
  * 
  * @author Martin Weber
  */
@@ -88,7 +90,6 @@ public class JavaHighlightingKit extends HighlightingKit
       if (token == null) {
         token = new Token();
       }
-      boolean locationOK = true;
 
       token.start = getStartOffset();
       token.length = getEndOffset() - token.start;
@@ -271,10 +272,8 @@ public class JavaHighlightingKit extends HighlightingKit
           token.category = Category.COMMENT_1;
           if (debug)
             System.out.println( "cat=" + token.category + ", '<comment>'");
-          locationOK = false;
         break;
         case Constants.ERROR:
-          locationOK = false;
         // fall thru
         case Constants.TYPE:
         case Constants.LENGTH:
@@ -346,26 +345,6 @@ public class JavaHighlightingKit extends HighlightingKit
       System.err.println( "location: " + (where & MAXFILESIZE));
     }
   }
-
-  /** Used as a key on lines that contain multiline Tokens. */
-  protected static class AttributeKey
-  {
-
-    private AttributeKey()
-    {
-    }
-
-    public String toString()
-    {
-      return "scanner start pos";
-    }
-
-  }
-
-  /**
-   * Key to be used on lines that contain multiline Tokens.
-   */
-  protected static final Object CategorizerAttribute = new AttributeKey();
 
 }
 

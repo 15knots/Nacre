@@ -1,4 +1,6 @@
-// $Id$
+/* $Header$ */
+
+// Copyright © 2004 Martin Weber
 
 package swing.text.highlight;
 
@@ -6,7 +8,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,20 +47,43 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 {
 
   /**
+   * the Categoriser used for highlighting text of this document or
+   * <code>null</code> if no highlighting is to be done.
+   */
+  private final Categoriser categoriser;
+
+  /**
+   * The styles representing the actual categories.
+   */
+  private Style[] categoryStyles;
+
+  /**
+   * Cache of foreground colors to represent the various categories.
+   * 
+   * @see #getForeground(Category)
+   */
+  private transient Color[] categoryColors;
+
+  /**
+   * Cache of fonts to represent the various categories.
+   * 
+   * @see #getFont(Category)
+   */
+  private transient Font[] categoryFonts;
+
+  /**
    * Constructs a set of styles to represent lexical tokenBuf categories. By
    * default there are no colors or fonts specified.
+   * 
+   * @param categoriser
+   *        the Categoriser used for highlighting text of this document or
+   *        <code>null</code> if no highlighting is to be done.
    */
-  public HighlightingContext()
+  public HighlightingContext( Categoriser categoriser)
   {
     super();
-    ChangeListener cacheInvalidator = new ChangeListener() {
-      public void stateChanged( ChangeEvent e)
-      {
-        // invalidate caches
-        categoryColors = null;
-        categoryFonts = null;
-      }
-    };
+    this.categoriser = categoriser;
+    ChangeListener cacheInvalidator = new CacheInvalidator();
 
     Style root = getStyle( DEFAULT_STYLE);
     // configure the default style
@@ -142,30 +166,23 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     return null;
   }
 
-  // --- ViewFactory methods -------------------------------------
-
   public View create( Element elem)
   {
     //    String kind = elem.getName();
-    return new HiliteView( elem);
+    return categoriser != null ? new HiliteView( elem) : new PlainView( elem);
   }
 
-  // --- variables -----------------------------------------------
+  // --- classes -----------------------------------------------
 
-  /**
-   * The styles representing the actual categories.
-   */
-  private Style[] categoryStyles;
-
-  /**
-   * Cache of foreground colors to represent the various categories.
-   */
-  private transient Color[] categoryColors;
-
-  /**
-   * Cache of fonts to represent the various categories.
-   */
-  private transient Font[] categoryFonts;
+  private class CacheInvalidator implements ChangeListener
+  {
+    public void stateChanged( ChangeEvent e)
+    {
+      // invalidate caches
+      HighlightingContext.this.categoryColors = null;
+      HighlightingContext.this.categoryFonts = null;
+    }
+  };
 
   /**
    * View that uses the lexical information to determine the style
@@ -260,7 +277,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         super.drawLine( lineIndex, g, x, y);
 
         // drawing complete, notify categoriser
-        doc.getCategoriser().closeInput();
+        HighlightingContext.this.categoriser.closeInput();
 
         // check and mark whether the next line is unsafe to restart scanning
         Token token = null;
@@ -278,7 +295,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
                  * highlighting tokens that span mutliple lines.
                  */
                 if (metrics != null) {
-                  System.out.println("# force repaint of "+lineIndex);
+                  System.out.println( "# force repaint of " + lineIndex);
                   Component host = getContainer();
                   host.repaint( x, y + (lineIndex * metrics.getHeight()), g
                       .getClipBounds().width, metrics.getHeight());
@@ -525,7 +542,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
       else {
         if (changes.getType() == DocumentEvent.EventType.INSERT) {
+          int i = 0;
         }
+        else if (changes.getType() == DocumentEvent.EventType.REMOVE) {
+          // TODO wenn man in einem multiline comment das erster Sternchen
+          // löscht, klappts nich mit den folgezeilen
+          int i = 0;
+        }
+
       }
       super.updateDamage( changes, a, f);
     }
@@ -568,6 +592,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private void putMark( Element line, Object value)
     {
+      if (line == null) {
+        throw new NullPointerException( "line");
+      }
       // lazy creation
       if (unsafeLineMarks == null) {
         unsafeLineMarks = new HashMap();
@@ -592,8 +619,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     private final class TokenQueue
     {
       private final HighlightedDocument doc;
-
-      private transient Categoriser categoriser;
 
       private transient Token tokenBuf;
 
@@ -625,8 +650,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         //System.out.println( "# TokenQueue.initialise()");
 
         this.seg2docOffset = seg2docOffset;
-        categoriser = doc.getCategoriser(); // remember categoriser
-        categoriser.openInput( lexerInput);
+        HighlightingContext.this.categoriser.openInput( lexerInput);
 
         do {
           remove();
@@ -671,7 +695,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        */
       public void remove()
       {
-        tokenBuf = categoriser.nextToken( doc, tokenBuf);
+        tokenBuf = HighlightingContext.this.categoriser.nextToken( doc,
+            tokenBuf);
         tokenBuf.start -= seg2docOffset;
       }
 
