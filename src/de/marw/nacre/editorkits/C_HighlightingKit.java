@@ -5,6 +5,7 @@ package swing.text.highlight;
 
 import javax.swing.text.Segment;
 
+import swing.text.highlight.categoriser.C_Categoriser;
 import swing.text.highlight.categoriser.Categoriser;
 
 
@@ -41,7 +42,7 @@ public class CHighlightingKit extends HighlightingKit
    */
   protected Categoriser createCategoriser()
   {
-    return new C_Tokeniser();
+    return new C_Categoriser();
   }
 
   /**
