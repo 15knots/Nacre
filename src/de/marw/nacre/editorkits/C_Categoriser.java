@@ -1,7 +1,4 @@
-// $Header:
-// /home/weber/cvsRepos/highlighting/swing/text/highlight/C_Categoriser.java,v
-// 1.1
-// 2004/09/26 13:36:30 weber Exp $
+// $Id$
 
 package swing.text.highlight.categoriser;
 
@@ -17,7 +14,7 @@ import swing.text.highlight.HighlightedDocument;
 
 public class C_Categoriser extends AbstractCategoriser
 {
-  private static final boolean debug = true;
+  private static final boolean debug = false;
 
   public static final class RevStringByLengthComparator implements Comparator
   {
@@ -84,15 +81,9 @@ public class C_Categoriser extends AbstractCategoriser
     getToken( token);
     if (debug) {
       // print current token
-      Segment txt = new Segment();
       System.out.print( "tok=" + token);
-      try {
-        doc.getText( token.start, token.length, txt);
-        System.out.println( ", '" + txt + "'");
-      }
-      catch (BadLocationException ex) {
-        System.err.println( ex);
-      }
+      String txt= new String(input.array, token.start, token.length);
+      System.out.println( ", '" + txt + "'");
     }
     return token;
   }
@@ -517,7 +508,7 @@ public class C_Categoriser extends AbstractCategoriser
    */
   private void consumeChars( int len)
   {
-    input.setIndex( len + input.getIndex());// consume match
+    input.setIndex( len + input.getIndex());
   }
 
 }
