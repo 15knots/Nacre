@@ -22,7 +22,6 @@ public interface Categoriser
   /**
    * (Re-)Initialises the categoriser to scan the specified <code>Segment</code>.
    * This gets called when the View is going to be rendered. <br>
-   * bedeutet implizit, dass ein Scanabschnitt beginnt.
    * 
    * @param lexerInput
    *        the run of text to categorise.
@@ -32,7 +31,7 @@ public interface Categoriser
   /**
    * This gets called when the View is rendered. The start position of the
    * returned token is expected to be relative to the start of the <strong>input
-   * segment </strong> set with <code>setInput()</code>.
+   * segment </strong> set with <code>setInput()</code> earlier.
    * 
    * @param doc
    * @param tokenBuf
