@@ -100,7 +100,8 @@ public class JavaHighlightingKit extends HighlightingKit
       Element line = rootElement.getElement( lineNum);
       for (; lineNum > 0; line = rootElement.getElement( lineNum), lineNum-- ) {
         //        System.out.print( " " + lineNum);
-        if (null != doc.getMark( line)) break;
+        if (null != doc.getMark( line))
+          break;
       }
       System.out.println( "# found start in " + lineNum);
 
@@ -217,15 +218,15 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.GOTO:
           token.categoryId = CategoryConstants.OPERATOR;
           if (debug)
-              System.out.println( "cat=" + token.categoryId + ", '<op>'");
+            System.out.println( "cat=" + token.categoryId + ", '<op>'");
         break;
 
         //  values
         case Constants.IDENT:
           token.categoryId = CategoryConstants.IDENTIFIER1;
           if (debug)
-              System.out.println( "cat=" + token.categoryId + ", '"
-                  + super.idValue + "'");
+            System.out.println( "cat=" + token.categoryId + ", '"
+                + super.idValue + "'");
         break;
         case Constants.BOOLEANVAL:
         case Constants.BYTEVAL:
@@ -236,14 +237,13 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.DOUBLEVAL:
           token.categoryId = CategoryConstants.NUMERICVAL;
           if (debug)
-              System.out.println( "cat=" + token.categoryId + ", '<numval>'");
+            System.out.println( "cat=" + token.categoryId + ", '<numval>'");
         break;
         case Constants.CHARVAL:
         case Constants.STRINGVAL:
           token.categoryId = CategoryConstants.STRINGVAL;
           if (debug)
-              System.out
-                  .println( "cat=" + token.categoryId + ", '<Stringval>'");
+            System.out.println( "cat=" + token.categoryId + ", '<Stringval>'");
         break;
 
         // types
@@ -333,7 +333,7 @@ public class JavaHighlightingKit extends HighlightingKit
           // mark elem for starting location of next scan
           token.categoryId = CategoryConstants.COMMENT1;
           if (debug)
-              System.out.println( "cat=" + token.categoryId + ", '<comment>'");
+            System.out.println( "cat=" + token.categoryId + ", '<comment>'");
           locationOK = false;
         break;
         case Constants.ERROR:

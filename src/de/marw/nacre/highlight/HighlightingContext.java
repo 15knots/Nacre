@@ -19,6 +19,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Shape;
 
+import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
@@ -212,12 +213,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       Categoriser cato = doc.getCategoriser();
       Segment text = getLineBuffer();
 
+      System.out.println();
       Token token = null;
       Segment catoInput = new Segment();
 
       Color lastColor = null;
       Font lastFont = null;
       int mark = p0;
+      //      System.out.println("paintloop ---------------------------------");
       for (; p0 < p1;) {
         // get token
         token = adjustScanner( doc, p0, cato, catoInput, token);
@@ -275,13 +278,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           // adjust categorizer's starting point (to start of line)
           p = lexer.getAdjustedStart( doc, p0);
           doc.getText( p, doc.getLength() - p, lexerInput);
-          //System.err.println("scanning \n'"+lexerInput+"'");
+          /*
+           * Bug in 1.41? Wenn das erste Zeichen gelöscht wird, kommt im
+           * doc.getText() ein falscher Segmentoffset zu Stande.
+           */
+          if (p == 0 && lexerInput.offset >= doc.getLength()) {
+            lexerInput.offset = 0;
+          }
+
+          //          System.err.println("scanning \n'"+lexerInput+"'");
           lexer.setInput( lexerInput);
           lexerValid = true;
         }
         while (p <= p0) {
           token = lexer.nextToken( doc, token);
-          if (true) {
+          if (false) {
             // print current token
             Segment txt = new Segment();
             doc.getText( token.start, token.length, txt);
@@ -299,11 +310,46 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
+     * @see javax.swing.text.View#insertUpdate(javax.swing.event.DocumentEvent,
+     *      java.awt.Shape, javax.swing.text.ViewFactory)
+     */
+    public void XXXinsertUpdate( DocumentEvent e, Shape a, ViewFactory f)
+    {
+      // TODO Auto-generated method stub TEST
+      System.out.println( "### insertUpdate()--------------------");
+      super.insertUpdate( e, a, f);
+      System.out.println( "### insertUpdate()  DONE --------------------");
+    }
+
+    /**
+     * @see javax.swing.text.View#removeUpdate(javax.swing.event.DocumentEvent,
+     *      java.awt.Shape, javax.swing.text.ViewFactory)
+     */
+    public void removeUpdate( DocumentEvent e, Shape a, ViewFactory f)
+    {
+      // TODO Auto-generated method stub TEST
+      System.out.println( "### removeUpdate()--------------------");
+      super.removeUpdate( e, a, f);
+      System.out.println( "### removeUpdate()  DONE --------------------");
+    }
+
+    /**
      * used for text runs that span multiple line (eg Javadoc comments). Set to
      * <code>false</code> if the categorizer needs to adjust it's starting
      * point.
      */
     private boolean lexerValid;
+
+    /**
+     * @see javax.swing.text.View#changedUpdate(javax.swing.event.DocumentEvent,
+     *      java.awt.Shape, javax.swing.text.ViewFactory)
+     */
+    public void XXXchangedUpdate( DocumentEvent e, Shape a, ViewFactory f)
+    {
+      // TODO Auto-generated method stub TEST
+      System.out.println( "changedUpdate()--------------------");
+      super.changedUpdate( e, a, f);
+    }
   }
 
 }

@@ -62,8 +62,7 @@ public interface CategoryConstants
 
   /**
    * Keyword 1 category id. This can be used to mark a keyword. This should be
-   * used for statements.
-   *TODO umbenennen in STATEMENT
+   * used for statements. TODO umbenennen in STATEMENT
    */
   public static final int KEYWORD1    = 7;
 

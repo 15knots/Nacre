@@ -9,6 +9,7 @@ import java.text.CharacterIterator;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -55,9 +56,15 @@ public class C_Categoriser extends AbstractCategoriser
     Comparator byLength = new RevStringByLengthComparator();
   }
 
+  public int getAdjustedStart( HighlightedDocument doc, int offset)
+  {
+    return 0;
+  }
+
   public void setInput( Segment input)
   {
     super.setInput( input);
+    System.out.println( "setInput ---------------------------");
     input.setIndex( input.getBeginIndex()); // initialize CharIterator
   }
 
@@ -71,7 +78,31 @@ public class C_Categoriser extends AbstractCategoriser
     }
 
     getToken( token);
+    if (true) {
+      // print current token
+      Segment txt = new Segment();
+      System.out.print( "tok=" + token);
+      try {
+        doc.getText( token.start, token.length, txt);
+        System.out.println( ", '" + txt + "'");
+      }
+      catch (BadLocationException ex) {
+        // ex.printStackTrace();
+        System.err.println( ex);
+      }
+    }
     return token;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see swing.text.highlight.categoriser.Categoriser#closeInput()
+   */
+  public void closeInput()
+  {
+    System.out.println( "closeInput ---------------------------");
+    // TODO Auto-generated method stub
   }
 
   /**
@@ -96,16 +127,6 @@ public class C_Categoriser extends AbstractCategoriser
 
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see swing.text.highlight.categoriser.Categoriser#closeInput()
-   */
-  public void closeInput()
-  {
-    // TODO Auto-generated method stub
-  }
-
   ///////////////////////////////////////////////////////////
   // categoriser methods
   ///////////////////////////////////////////////////////////
@@ -119,7 +140,6 @@ public class C_Categoriser extends AbstractCategoriser
     token.start = input.getIndex();
     int matchLen;
     char c = input.current();
-
     switch (c) {
       case CharacterIterator.DONE:
       // will return a zero length token
@@ -251,26 +271,23 @@ public class C_Categoriser extends AbstractCategoriser
   private int matchOperator()
   {
     int len = 0;
-    greedyLoop: while (true) {
-      int kwLen = matchWord();
-      if (kwLen > 0) {
-        if (matchInWordlist( kwLen, kwOperator)) {
-          // got a keyword operator
-          len += kwLen;
-        }
-        else {
-          // got a word, but not an operator keyword
-          break greedyLoop;
-        }
+    int kwLen = matchWord();
+    if (kwLen > 0) {
+      if (matchInWordlist( kwLen, kwOperator)) {
+        // got a keyword operator
+        len += kwLen;
       }
       else {
-        // didnt get a word--> non keyword operators
-        // greedyly match anything that looks like a sequence of operators...
-        for (char c = LA( len); c != CharacterIterator.DONE; c = LA( ++len)) {
-          if (";(){}'".indexOf( c) >= 0) {
-            break greedyLoop;
-          }
-        }
+        // got a word, but not an operator keyword
+        return len;
+      }
+    }
+    // non keyword operators
+    // greedyly match anything that looks like a sequence of operators...
+    for (char c = LA( len); c != CharacterIterator.DONE; c = LA( ++len)) {
+      if (Character.isJavaIdentifierPart( c) || Character.isWhitespace( c)
+          || "/;(){}'\"".indexOf( c) >= 0) {
+        break;
       }
     }
     return len;

@@ -1,5 +1,4 @@
-  
-  true;
+ true;
 falsee;
 
 ja >>>all;

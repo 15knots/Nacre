@@ -79,13 +79,12 @@ public abstract class HighlightingKit extends DefaultEditorKit
    * Create a copy of the editor kit. This allows an implementation to serve as
    * a prototype for others, so that they can be quickly created.
    */
-  public Object clone()
-  {
-    CHighlightingKit kit = new CHighlightingKit();
-    kit.preferences = preferences;
-    return kit;
-  }
-
+  //  public Object clone()
+  //  {
+  //    HighlightingKit kit = new HighlightingKit();
+  //    kit.preferences = preferences;
+  //    return kit;
+  //  }
   protected HighlightingContext preferences;
 
 }

@@ -28,7 +28,6 @@ import javax.swing.text.StyleConstants;
 import swing.text.highlight.CHighlightingKit;
 import swing.text.highlight.HighlightingContext;
 import swing.text.highlight.HighlightingKit;
-import swing.text.highlight.JavaHighlightingKit;
 import swing.text.highlight.categoriser.CategoryConstants;
 
 
@@ -50,13 +49,13 @@ public class HighlightKitTest
 
       HighlightingKit kit = new CHighlightingKit();
       editor.setEditorKitForContentType( kit.getContentType(), kit);
- //     kit = new JavaHighlightingKit();
- //     editor.setEditorKitForContentType( kit.getContentType(), kit);
+      //     kit = new JavaHighlightingKit();
+      //     editor.setEditorKitForContentType( kit.getContentType(), kit);
       // add more EditorKits to support different content types here...
 
       // 
       editor.setContentType( "text/x-c-src");
-//      editor.setContentType( "text/x-java");
+      //      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
       editor.setFont( new Font( "Courier", 0, 12));
       editor.setEditable( true);
@@ -71,14 +70,14 @@ public class HighlightKitTest
       StyleConstants.setForeground( s, new Color( 0, 153, 153));
 
       s = styles.getStyleForCategory( CategoryConstants.IDENTIFIER1);
-      StyleConstants.setForeground( s, Color.YELLOW.darker());
+      StyleConstants.setForeground( s, Color.cyan.darker());
       s = styles.getStyleForCategory( CategoryConstants.STRINGVAL);
       StyleConstants.setForeground( s, new Color( 102, 153, 102));
       //      StyleConstants.setItalic(s, true);
       //      StyleConstants.setUnderline(s, true);
 
       s = styles.getStyleForCategory( CategoryConstants.OPERATOR);
-      StyleConstants.setForeground( s, Color.MAGENTA);
+      StyleConstants.setForeground( s, Color.darkGray);
       //      StyleConstants.setUnderline(s, true);
 
       Color keyword = new Color( 102, 102, 255);
@@ -105,7 +104,7 @@ public class HighlightKitTest
       f.getContentPane().setLayout( new BorderLayout());
       f.getContentPane().add( "Center", scroller);
       f.pack();
-      f.setSize( 400, 751);
+      f.setSize( 200, 751);
       f.setVisible( true);
     }
     catch (Throwable e) {

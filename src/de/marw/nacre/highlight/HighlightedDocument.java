@@ -19,6 +19,7 @@ import java.util.Map;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 import javax.swing.text.PlainDocument;
@@ -110,18 +111,42 @@ public class HighlightedDocument extends PlainDocument
    */
   protected void removeUpdate( DefaultDocumentEvent chng)
   {
+    System.out.println( "### removeUpdate()--------------------");
     super.removeUpdate( chng);
+    System.out.println( "### removeUpdate() DONE --------------------");
 
-    // update multiline token marks
-    Element root = getDefaultRootElement();
-    DocumentEvent.ElementChange ec = chng.getChange( root);
-    if (ec != null) {
-      Element[] added = ec.getChildrenAdded();
-      for (int i = 0; i < added.length; i++ ) {
-        Element elem = added[i];
-        categoriser.removeUpdate( elem);
-      }
-    }
+    //    // update multiline token marks
+    //    Element root = getDefaultRootElement();
+    //    DocumentEvent.ElementChange ec = chng.getChange( root);
+    //    if (ec != null) {
+    //      Element[] added = ec.getChildrenAdded();
+    //      for (int i = 0; i < added.length; i++ ) {
+    //        Element elem = added[i];
+    //        categoriser.removeUpdate( elem);
+    //      }
+    //    }
+  }
+
+  /**
+   * @see javax.swing.text.AbstractDocument#postRemoveUpdate(javax.swing.text.AbstractDocument.DefaultDocumentEvent)
+   */
+  protected void postRemoveUpdate( DefaultDocumentEvent chng)
+  {
+    System.out.println( "### postRemoveUpdate()--------------------");
+    // TODO Auto-generated method stub
+    super.postRemoveUpdate( chng);
+    System.out.println( "### postRemoveUpdate() DONE --------------------");
+  }
+
+  /**
+   * @see javax.swing.text.Document#insertString(int, java.lang.String,
+   *      javax.swing.text.AttributeSet)
+   */
+  public void insertString( int offs, String str, AttributeSet a)
+      throws BadLocationException
+  {
+    // TODO Auto-generated method stub
+    super.insertString( offs, str, a);
   }
 
   //////////////////////////// stuff for categorisers
@@ -150,7 +175,9 @@ public class HighlightedDocument extends PlainDocument
   public Object getMark( Element line)
   {
     synchronized (this ) {
-      if (marks == null) { return null; }
+      if (marks == null) {
+        return null;
+      }
       return marks.get( line);
     }
   }
@@ -158,7 +185,9 @@ public class HighlightedDocument extends PlainDocument
   public Object removeMark( Element line)
   {
     synchronized (this ) {
-      if (marks == null) { return null; }
+      if (marks == null) {
+        return null;
+      }
       return marks.remove( line);
     }
   }
