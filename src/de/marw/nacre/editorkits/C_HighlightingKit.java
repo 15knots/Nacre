@@ -1,4 +1,6 @@
-// $Header$
+// $Header:
+// /home/weber/cvsRepos/highlighting/swing/text/highlight/CHighlightingKit.java,v
+// 1.5 2004/09/27 18:53:14 weber Exp $
 /**
  */
 

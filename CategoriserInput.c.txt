@@ -1,6 +1,5 @@
- 		/* comments
-*/ true;
-falsee;
+ 	/* comments*/ true ;
+falsee  ;
 
-ja >>>all;
+Xa >>>all ;
 kk+=sizeof++( int);

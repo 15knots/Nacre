@@ -23,7 +23,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 import javax.swing.text.PlainDocument;
-import javax.swing.text.AbstractDocument.Content;
 
 import swing.text.highlight.categoriser.Categoriser;
 

@@ -6,7 +6,6 @@
 
 package swing.text.highlight.categoriser;
 
-import swing.text.highlight.HighlightedDocument;
 
 
 /**

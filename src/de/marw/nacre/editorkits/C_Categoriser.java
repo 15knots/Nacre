@@ -6,7 +6,6 @@
 package swing.text.highlight.categoriser;
 
 import java.text.CharacterIterator;
-import java.util.Arrays;
 import java.util.Comparator;
 
 import javax.swing.text.BadLocationException;
@@ -18,7 +17,7 @@ import swing.text.highlight.HighlightedDocument;
 
 public class C_Categoriser extends AbstractCategoriser
 {
-  private static final boolean               debug              = true;
+  private static final boolean debug = true;
 
   public static final class RevStringByLengthComparator implements Comparator
   {
@@ -53,22 +52,22 @@ public class C_Categoriser extends AbstractCategoriser
   //    Arrays.sort( kwOperator, byLenghtDescending);
   //  }
 
-
   public C_Categoriser()
   {
-    Comparator byLength = new RevStringByLengthComparator();
   }
 
   public int getAdjustedStart( HighlightedDocument doc, int offset)
   {
-    return 0;
+    return offset;
+    //return 0;
   }
 
   public void setInput( Segment input)
   {
     super.setInput( input);
     if (debug) {
-      System.out.println( "setInput ---------------------------");
+      System.out.println( "setInput() char[0]='" + input.array[input.offset]
+          + "', offset=" + input.offset + ", count=" + input.count);
     }
     input.first(); // initialize CharIterator
   }
@@ -92,7 +91,6 @@ public class C_Categoriser extends AbstractCategoriser
         System.out.println( ", '" + txt + "'");
       }
       catch (BadLocationException ex) {
-        // ex.printStackTrace();
         System.err.println( ex);
       }
     }
@@ -108,7 +106,8 @@ public class C_Categoriser extends AbstractCategoriser
   {
     if (debug) {
       System.out.println( "closeInput ---------------------------");
-    } // TODO Auto-generated method stub
+    }
+    input = null;
   }
 
   /**
@@ -143,13 +142,15 @@ public class C_Categoriser extends AbstractCategoriser
   private void getToken( Token token)
   {
     token.categoryId = CategoryConstants.NORMAL;
+    int matchLen = matchWhitespace();
+    consumeChars( matchLen);
     token.start = input.getIndex();
-    int matchLen;
     char c = input.current();
     switch (c) {
       case CharacterIterator.DONE:
-      // will return a zero length token
-      break;
+        // will return a zero length token
+        token.length = 0;
+        return;
       case '\"':
         // String
         readString();
@@ -188,12 +189,16 @@ public class C_Categoriser extends AbstractCategoriser
         token.categoryId = CategoryConstants.KEYWORD2;
       break;
 
+      case ' ':
+      case '\t':
+      break;
       default:
-        if ((matchLen = matchWhitespace()) > 0) {
-          token.categoryId = CategoryConstants.NORMAL;
-          consumeChars( matchLen);
-        }
-        else if ((matchLen = matchNumber()) > 0) {
+        //        if ((matchLen = matchWhitespace()) > 0) {
+        //          token.categoryId = CategoryConstants.NORMAL;
+        //          consumeChars( matchLen);
+        //        }
+        //        else
+        if ((matchLen = matchNumber()) > 0) {
           token.categoryId = CategoryConstants.NUMERICVAL;
           consumeChars( matchLen);
         }
@@ -406,7 +411,8 @@ public class C_Categoriser extends AbstractCategoriser
   {
     int len = 0;
     char c = LA( len);
-    while (Character.isWhitespace( c)) {
+    // match WS until end of line..
+    while (Character.isWhitespace( c) /* && c !='\n' */) {
       c = LA( ++len);
     }
     return len;
@@ -500,7 +506,7 @@ public class C_Categoriser extends AbstractCategoriser
   private char LA( int lookAhead)
   {
     int offset = input.getIndex();
-    if (offset + lookAhead > input.offset + input.count) {
+    if (offset + lookAhead >= input.offset + input.count) {
       return CharacterIterator.DONE;
     }
     return input.array[lookAhead + offset];

@@ -101,7 +101,7 @@ public class HighlightKitTest
       vp.add( editor);
 
       JFrame f = new JFrame( "JavaEditorKit: " + args[0]);
-      f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
       f.getContentPane().setLayout( new BorderLayout());
       f.getContentPane().add( "Center", scroller);
       f.pack();
