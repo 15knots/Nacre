@@ -1,17 +1,18 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import java.io.IOException;
 
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
+import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Token;
+
 import sun.tools.java.Constants;
-import swing.text.highlight.categoriser.Categoriser;
-import swing.text.highlight.categoriser.Token;
 
 
 /**
@@ -296,7 +297,7 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
+     * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#closeInput()
      */
     public void closeInput()
     {

@@ -16,10 +16,11 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 
-import swing.text.highlight.CHighlightingKit;
-import swing.text.highlight.Category;
-import swing.text.highlight.HighlightingContext;
-import swing.text.highlight.HighlightingKit;
+import de.marw.javax.swing.text.highlight.CHighlightingKit;
+import de.marw.javax.swing.text.highlight.Category;
+import de.marw.javax.swing.text.highlight.HighlightingContext;
+import de.marw.javax.swing.text.highlight.HighlightingKit;
+
 
 
 /**

@@ -1,8 +1,8 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import java.io.IOException;
 import java.io.InputStream;

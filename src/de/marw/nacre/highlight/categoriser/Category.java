@@ -1,20 +1,21 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import java.io.Serializable;
 
-import swing.text.highlight.categoriser.Token;
+import de.marw.javax.swing.text.highlight.categoriser.Token;
+
 
 
 /**
  * Represents a lexical token category used to classify a piece of text for
  * syntax highlighting.
  * 
- * @see swing.text.highlight.categoriser.Token
- * @see swing.text.highlight.categoriser.Categoriser#nextToken(HighlightedDocument,
+ * @see de.marw.javax.swing.text.highlight.categoriser.Token
+ * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#nextToken(HighlightedDocument,
  *      Token) .
  * @author Martin Weber TODO unter Java v. 5 in ein enum konvertieren
  */

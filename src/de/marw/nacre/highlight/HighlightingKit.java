@@ -1,14 +1,15 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
 import javax.swing.text.ViewFactory;
 
-import swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+
 
 
 /**

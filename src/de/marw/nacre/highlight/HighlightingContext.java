@@ -2,7 +2,7 @@
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -18,8 +18,9 @@ import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.*;
 
-import swing.text.highlight.categoriser.Categoriser;
-import swing.text.highlight.categoriser.Token;
+import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Token;
+
 
 
 /**

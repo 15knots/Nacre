@@ -1,8 +1,8 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight;
+package de.marw.javax.swing.text.highlight;
 
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;

@@ -1,8 +1,8 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight.categoriser;
+package de.marw.javax.swing.text.highlight.categoriser;
 
 import java.text.CharacterIterator;
 import java.util.Comparator;
@@ -10,8 +10,9 @@ import java.util.Comparator;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
-import swing.text.highlight.Category;
-import swing.text.highlight.HighlightedDocument;
+import de.marw.javax.swing.text.highlight.Category;
+import de.marw.javax.swing.text.highlight.HighlightedDocument;
+
 
 
 public class C_Categoriser extends AbstractCategoriser

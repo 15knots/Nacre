@@ -1,17 +1,17 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight.categoriser;
+package de.marw.javax.swing.text.highlight.categoriser;
 
-import swing.text.highlight.HighlightedDocument;
+import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
 /**
  * Constants used to classify a piece of text for syntax highlighting.
  * 
- * @see swing.text.highlight.categoriser.Token
- * @see swing.text.highlight.categoriser.Categoriser#nextToken(HighlightedDocument,
+ * @see de.marw.javax.swing.text.highlight.categoriser.Token
+ * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#nextToken(HighlightedDocument,
  *      Token)
  * @author Martin Weber
  * @deprecated wird nicht mehr benötigt, Category ist jetzt eine typesafe

@@ -1,10 +1,11 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
-package swing.text.highlight.categoriser;
+package de.marw.javax.swing.text.highlight.categoriser;
 
 import javax.swing.text.Segment;
+
 
 
 /**
