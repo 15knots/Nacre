@@ -165,10 +165,10 @@ public abstract class AbstractCategoriser implements Categoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  protected int matchDecimal( int lookahead)
+  protected int matchDecimal( int lookAhead)
   {
     int len = 0;
-    while (Character.isDigit( LA( lookahead++))) {
+    while (Character.isDigit( LA( lookAhead++))) {
       len++;
     }
     return len;
@@ -183,10 +183,10 @@ public abstract class AbstractCategoriser implements Categoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  protected int matchHexDecimal( int lookahead)
+  protected int matchHexDecimal( int lookAhead)
   {
     int len = 0;
-    while (isHexDigit( LA( lookahead++))) {
+    while (isHexDigit( LA( lookAhead++))) {
       len++;
     }
     return len;
@@ -201,14 +201,14 @@ public abstract class AbstractCategoriser implements Categoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  protected int matchExponent( int lookahead)
+  protected int matchExponent( int lookAhead)
   {
     int len = 0;
-    char c = LA( lookahead);
+    char c = LA( lookAhead);
     if ((c == 'e' || c == 'E')) {
-      c = LA( lookahead + 1);
+      c = LA( lookAhead + 1);
       if (c == '+' || c == '-') {
-        len = matchDecimal( lookahead + 2);
+        len = matchDecimal( lookAhead + 2);
         if (len == 0) {
           // missing trailing number: no match
           return 0;
@@ -216,7 +216,7 @@ public abstract class AbstractCategoriser implements Categoriser
         len += 2;
       }
       else {
-        len = matchDecimal( lookahead + 1);
+        len = matchDecimal( lookAhead + 1);
         if (len == 0) {
           // missing trailing number: no match
           return 0;
@@ -236,7 +236,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  protected abstract int matchFloatSuffix( int lookahead);
+  protected abstract int matchFloatSuffix( int lookAhead);
 
   /**
    * Matches the suffix that indicates an integer numeric literal. <br>
@@ -247,7 +247,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  protected abstract int matchIntSuffix( int lookahead);
+  protected abstract int matchIntSuffix( int lookAhead);
 
   ///////////////////////////////////////////////////////////
   // categoriser helper methods
@@ -295,7 +295,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * <code>wordlist</code>.
    * 
    * @see AbstractCategoriser#input
-   * @param lenght
+   * @param length
    *        the length of the region that must match.
    * @param matches
    *        the strings that may match.
@@ -364,10 +364,10 @@ public abstract class AbstractCategoriser implements Categoriser
    *         otherwise.
    * @see java.lang.Character#isDigit(char)
    */
-  public static boolean isHexDigit( char c)
+  public static boolean isHexDigit( char ch)
   {
-    c = Character.toUpperCase( c);
-    switch (c) {
+    ch = Character.toUpperCase( ch);
+    switch (ch) {
       case '0':
       case '1':
       case '2':

@@ -36,14 +36,14 @@ public interface Categoriser
    *        The buffer where the token is returned or <code>null</code> if a
    *        new buffer should be allocated.
    * @return the categorized token.
-   * @see #openInput(int)
+   * @see #openInput(Segment)
    */
   public Token nextToken( Document doc, Token tokenBuf);
 
   /**
    * Notifies the categoriser of the end of the current scanninng process.
    * 
-   * @see #openInput(int)
+   * @see #openInput(Segment)
    */
   public void closeInput();
 

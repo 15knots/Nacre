@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -56,8 +56,8 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used in statements.
    * 
-   * @see Category#KEYWORD_STATEMENT
-   * @param lenght
+   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_STATEMENT
+   * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
@@ -71,8 +71,8 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used for types.
    * 
-   * @see Category#KEYWORD_TYPE
-   * @param lenght
+   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_TYPE
+   * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
@@ -86,8 +86,8 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used as operator.
    * 
-   * @see Category#KEYWORD_OPERATOR
-   * @param lenght
+   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_OPERATOR
+   * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
@@ -102,8 +102,8 @@ public class Cpp_Categoriser extends C_Categoriser
    * current scanner input position is a keyword used for predefined value
    * literals.
    * 
-   * @see Category#PREDEFVAL
-   * @param lenght
+   * @see de.marw.javax.swing.text.highlight.Category#PREDEFVAL
+   * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.

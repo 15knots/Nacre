@@ -10,7 +10,7 @@ import de.marw.javax.swing.text.highlight.Category;
 /**
  * The tokens returned by Categoriser objects.
  * 
- * @see Categoriser#nextToken(HighlightedDocument, Token)
+ * @see Categoriser#nextToken(Document, Token)
  * @author Martin Weber
  */
 public class Token implements Cloneable
