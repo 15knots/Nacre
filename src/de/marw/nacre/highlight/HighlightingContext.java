@@ -156,7 +156,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * point.
      */
     private boolean lexerValid;
-    private int seg2docOffset;
+
+    private int     seg2docOffset;
 
     /**
      * Construct a simple colorized view of java text.
@@ -181,25 +182,40 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     public void paint( Graphics g, Shape a)
     {
+      System.out.println( "# paint() -------");
       super.paint( g, a);
     }
 
+    /**
+     * Renders a line of text, suppressing whitespace at the end and expanding
+     * any tabs.
+     * 
+     * @param lineIndex
+     *          the line to draw >= 0
+     * @param g
+     *          the <code>Graphics</code> context
+     * @param x
+     *          the starting X position >= 0
+     * @param y
+     *          the starting Y position >= 0
+     * @see PlainView#drawUnselectedText
+     * @see PlainView#drawSelectedText
+     */
     protected void drawLine( int lineIndex, Graphics g, int x, int y)
     {
-      lexerValid = false;
+      //lexerValid = false;
       //      System.out.println( "# invalidate lexer ---------------------------");
       System.out.println( "# drawLine() " + lineIndex + " -------");
+      lexerValid = false;
       super.drawLine( lineIndex, g, x, y);
       // notify lexer
       //TODO lexer.closeInput();
     }
 
     /**
-     * Renders the given range in the model as normal unselected text. This is
+     * Renders the given range in the model as unselected text. This is
      * implemented to paint colors based upon the category-to-color
-     * translations. To reduce the number of calls to the Graphics object, text
-     * is batched up until a color change is detected or the entire requested
-     * range has been reached.
+     * translations.
      * 
      * @param g
      *          the graphics context
@@ -218,21 +234,72 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
         throws BadLocationException
     {
+      return drawText( g, x, y, p0, p1, false);
+    }
+
+    /**
+     * Renders the given range in the model as selected text. This is
+     * implemented to render the text in the background color specified in the
+     * hosting component. It assumes the highlighter will render the selected
+     * background.
+     * 
+     * @param g
+     *          the graphics context
+     * @param x
+     *          the starting X coordinate >= 0
+     * @param y
+     *          the starting Y coordinate >= 0
+     * @param p0
+     *          the beginning position in the model >= 0
+     * @param p1
+     *          the ending position in the model >= 0
+     * @return the location of the end of the range
+     * @exception BadLocationException
+     *              if the range is invalid
+     */
+    protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
+        throws BadLocationException
+    {
+      {
+        return drawText( g, x, y, p0, p1, true);
+      }
+    }
+
+    /**
+     * Renders the given range in the model as unselected or unselected text.
+     * This is implemented to paint colors based upon the category-to-color
+     * translations. To reduce the number of calls to the Graphics object, text
+     * is batched up until a color change is detected or the entire requested
+     * range has been reached.
+     * 
+     * @param g
+     *          the graphics context
+     * @param x
+     *          the starting X coordinate
+     * @param y
+     *          the starting Y coordinate
+     * @param p0
+     *          the beginning position in the model
+     * @param p1
+     *          the ending position in the model
+     * @returns the location of the end of the range
+     * @exception BadLocationException
+     *              if the range is invalid
+     */
+    protected int drawText( Graphics g, int x, int y, int p0, int p1,
+        boolean selected) throws BadLocationException
+    {
       HighlightedDocument doc = (HighlightedDocument) getDocument();
       Categoriser cato = doc.getCategoriser();
 
       Color lastColor = g.getColor();
       Font lastFont = g.getFont();
-      // the category we are painting. Used to determine color and font.
-      int categoryPainting = CategoryConstants.NORMAL;
-      //      System.out.println("paintloop ---------------------------------");
 
       Token token = new Token();
-      Segment catoInput = new Segment();
       Segment text = getLineBuffer();
       while (p0 < p1) {
         // get token
-        token = adjustScanner( doc, p0, p1, cato, catoInput, token);
+        token = adjustCategoriser( doc, p0, p1, cato, token);
         if (false) {
           // print current token
           Segment txt = new Segment();
@@ -245,25 +312,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         if (token.start > p0) {
           // gap between tokens: draw as normal text
           doc.getText( p0, Math.min( token.start, p1) - p0, text);
-          x = drawHighlightedText( CategoryConstants.NORMAL, text, x, y, g, p0);
+          x = drawHighlightedText( CategoryConstants.NORMAL, selected, text, x,
+              y, g, p0);
           p0 = token.start;
         }
         if (token.start <= p0) {
           // draw current token
           doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
-          x = drawHighlightedText( token.categoryId, text, x, y, g, p0);
-          categoryPainting = token.categoryId;
+          x = drawHighlightedText( token.categoryId, selected, text, x, y, g,
+              p0);
           p0 = tokenEnd;
         }
-        if(token.length <= 0)
+        if (token.length <= 0)
           break;
       }
 
-      //      if (token.start > p0) {
-      //        // flush remaining
-      //        doc.getText( p0, Math.min( token.start, p1) - p0, text);
-      //        x = drawHighlightedText( categoryPainting, text, x, y, g, p0);
-      //      }
       g.setColor( lastColor);
       g.setFont( lastFont);
       return x;
@@ -290,8 +353,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * @exception BadLocationException
      *              if the range is invalid
      */
-    private int drawHighlightedText( int categoryCode, Segment text, int x,
-        int y, Graphics g, int startOffset)
+    private int drawHighlightedText( int categoryCode, boolean selected,
+        Segment text, int x, int y, Graphics g, int startOffset)
     {
       if (text.count > 0) {
         Color fg = getForeground( categoryCode);
@@ -303,7 +366,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
         if (true) {
           System.out.print( "painting '" + text + "', offs=" + startOffset
-              + ", cat=" + categoryCode);
+              + ", cat=" + categoryCode + ", sel=" + selected);
           System.out.println( ", color=" + fg + ", font=" + font);
         }
         x = Utilities.drawTabbedText( text, x, y, g, this, startOffset);
@@ -313,19 +376,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * Update the scanner (if necessary) to point to the appropriate token for
-     * the given start position needed for rendering.
+     * the given start position needed for rendering and return the first token.
      * 
      * @param doc
      * @param p0
      *          the beginning position in the model >= 0
      * @param lexer
-     * @param lexerInput
      * @param token
      * @return
      */
-    private Token adjustScanner( HighlightedDocument doc, int p0, int p1,
-        Categoriser lexer, Segment lexerInput, Token token)
-        throws BadLocationException
+    private Token adjustCategoriser( HighlightedDocument doc, int p0, int p1,
+        Categoriser lexer, Token token) throws BadLocationException
     {
       int p0Adj = p0;
       if (!lexerValid) {
@@ -333,6 +394,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         // adjust categorizer's starting point (to start of line)
         p0Adj = lexer.getAdjustedStart( doc, p0);
         p1 = Math.min( doc.getLength(), p1);
+        Segment lexerInput = new Segment();
         doc.getText( p0Adj, p1 - p0Adj, lexerInput);
         seg2docOffset = lexerInput.offset - p0Adj;
         lexer.setInput( lexerInput);
@@ -344,9 +406,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         token.start -= seg2docOffset;
         if (true) {
           // print current token
-          String txt = new String( lexerInput.array, token.start
-              + seg2docOffset, token.length);
-          System.out.println( "tok=" + token + ", '" + txt + "', seg2docoffs="+seg2docOffset);
+          System.out
+              .println( "tok=" + token + ", seg2docoffs=" + seg2docOffset);
         }
         p0Adj = token.start + token.length;
       } while (p0Adj <= p0 && token.length > 0);
