@@ -1,4 +1,4 @@
-//$Header$
+//$Id$
 
 package swing.text.highlight;
 
@@ -10,7 +10,6 @@ import javax.swing.text.Segment;
 
 import sun.tools.java.Constants;
 import swing.text.highlight.categoriser.Categoriser;
-import swing.text.highlight.categoriser.CategoryConstants;
 import swing.text.highlight.categoriser.Token;
 
 
@@ -54,9 +53,9 @@ public class JavaHighlightingKit extends HighlightingKit
 
     private static boolean debug = false;
 
-    private Segment        input;
+    private Segment input;
 
-    private int            seg2docOffset;
+    private int seg2docOffset;
 
     Java_Tokeniser()
     {
@@ -110,7 +109,7 @@ public class JavaHighlightingKit extends HighlightingKit
 
       token.start = getStartOffset() - seg2docOffset;
       token.length = getEndOffset() - token.start;
-      token.categoryId = CategoryConstants.NORMAL;
+      token.category = Category.NORMAL;
       switch (super.token) {
         default:
         break;
@@ -171,17 +170,17 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.EXPR:
         case Constants.ARRAY:
         case Constants.GOTO:
-          token.categoryId = CategoryConstants.OPERATOR;
+          token.category = Category.OPERATOR;
           if (debug)
-            System.out.println( "cat=" + token.categoryId + ", '<op>'");
+            System.out.println( "cat=" + token.category + ", '<op>'");
         break;
 
         //  values
         case Constants.IDENT:
-          token.categoryId = CategoryConstants.IDENTIFIER1;
+          token.category = Category.IDENTIFIER_1;
           if (debug)
-            System.out.println( "cat=" + token.categoryId + ", '"
-                + super.idValue + "'");
+            System.out.println( "cat=" + token.category + ", '" + super.idValue
+                + "'");
         break;
         case Constants.BOOLEANVAL:
         case Constants.BYTEVAL:
@@ -190,15 +189,15 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.LONGVAL:
         case Constants.FLOATVAL:
         case Constants.DOUBLEVAL:
-          token.categoryId = CategoryConstants.NUMERICVAL;
+          token.category = Category.NUMERICVAL;
           if (debug)
-            System.out.println( "cat=" + token.categoryId + ", '<numval>'");
+            System.out.println( "cat=" + token.category + ", '<numval>'");
         break;
         case Constants.CHARVAL:
         case Constants.STRINGVAL:
-          token.categoryId = CategoryConstants.STRINGVAL;
+          token.category = Category.STRINGVAL;
           if (debug)
-            System.out.println( "cat=" + token.categoryId + ", '<Stringval>'");
+            System.out.println( "cat=" + token.category + ", '<STRINGVAL>'");
         break;
 
         // types
@@ -211,7 +210,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.DOUBLE:
         case Constants.VOID:
         case Constants.BOOLEAN:
-          token.categoryId = CategoryConstants.TYPE;
+          token.category = Category.KEYWORD_TYPE;
         break;
         // expressions
         case Constants.TRUE:
@@ -219,7 +218,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.THIS:
         case Constants.SUPER:
         case Constants.NULL:
-          token.categoryId = CategoryConstants.PREDEFVAL;
+          token.category = Category.PREDEFVAL;
         break;
         // statements
         case Constants.IF:
@@ -241,7 +240,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.EXPRESSION:
         case Constants.DECLARATION:
         case Constants.VARDECLARATION:
-          token.categoryId = CategoryConstants.KEYWORD1;
+          token.category = Category.KEYWORD_STATEMENT;
         break;
 
         // declarations
@@ -251,7 +250,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.IMPLEMENTS:
         case Constants.INTERFACE:
         case Constants.PACKAGE:
-          token.categoryId = CategoryConstants.KEYWORD2;
+          token.category = Category.KEYWORD;
         break;
 
         // modifiers = {
@@ -266,7 +265,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.FINAL:
         case Constants.VOLATILE:
         case Constants.ABSTRACT:
-          token.categoryId = CategoryConstants.TYPE;
+          token.category = Category.KEYWORD_TYPE;
         break;
 
         // punctuations = {
@@ -280,15 +279,15 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.LSQBRACKET:
         case Constants.RSQBRACKET:
         case Constants.THROWS:
-          token.categoryId = CategoryConstants.NORMAL;
+          token.category = Category.NORMAL;
         break;
 
         // specials = {
         case Constants.COMMENT:
           // mark elem for starting location of next scan
-          token.categoryId = CategoryConstants.COMMENT1;
+          token.category = Category.COMMENT_1;
           if (debug)
-            System.out.println( "cat=" + token.categoryId + ", '<comment>'");
+            System.out.println( "cat=" + token.category + ", '<comment>'");
           locationOK = false;
         break;
         case Constants.ERROR:
@@ -299,7 +298,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.INLINERETURN:
         case Constants.INLINEMETHOD:
         case Constants.INLINENEWINSTANCE:
-          token.categoryId = CategoryConstants.NORMAL;
+          token.category = Category.NORMAL;
         break;
       }
 

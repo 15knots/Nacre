@@ -6,9 +6,7 @@
 
 package swing.text.highlight.categoriser;
 
-import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
 import swing.text.highlight.HighlightedDocument;
@@ -20,9 +18,9 @@ import swing.text.highlight.HighlightedDocument;
 public abstract class AbstractCategoriser implements Categoriser
 {
 
-  protected static final boolean debug                = true;
+  protected static final boolean debug = false;
 
-  protected Segment              input;
+  protected Segment input;
 
   /**
    */

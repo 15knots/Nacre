@@ -12,6 +12,7 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
+import swing.text.highlight.Category;
 import swing.text.highlight.HighlightedDocument;
 
 
@@ -77,20 +78,19 @@ public class C_Categoriser extends AbstractCategoriser
     }
   }
 
-  private static final String[] kwPredefVal           = { "true", "false" };
+  private static final String[] kwPredefVal = { "true", "false" };
 
-  private static final String[] kwType                = { "char", "double",
-      "enum", "float", "int", "long", "short", "signed", "struct", "typedef",
-      "union", "unsigned", "void", "auto", "const", "extern", "register",
-      "static", "volatile", "far", "huge", "inline", "near", "pascal" };
+  private static final String[] kwType = { "char", "double", "enum", "float",
+      "int", "long", "short", "signed", "struct", "typedef", "union",
+      "unsigned", "void", "auto", "const", "extern", "register", "static",
+      "volatile", "far", "huge", "inline", "near", "pascal" };
 
-  private static final String[] kwStmt                = { "asm", "break",
-      "case", "continue", "default", "do", "else", "for", "goto", "if",
-      "return", "switch", "while"                    };
+  private static final String[] kwStmt = { "asm", "break", "case", "continue",
+      "default", "do", "else", "for", "goto", "if", "return", "switch", "while" };
 
-  private static final String[] kwOperator            = { "sizeof" };
+  private static final String[] kwOperator = { "sizeof" };
 
-  private int                   seg2docOffset;
+  private int seg2docOffset;
 
   // TODO beim Document halten.
   private MultilineTokenSupport multilineTokenSupport = new MultilineTokenSupport();
@@ -154,8 +154,9 @@ public class C_Categoriser extends AbstractCategoriser
     doc.getText( p0Adj, p1 - p0Adj, lexerInput);
     seg2docOffset = lexerInput.offset - p0Adj;
     if (debug) {
-      System.out.println( "setInput() char[0]='" + lexerInput.array[lexerInput.offset]
-          + "', offset=" + lexerInput.offset + ", count=" + lexerInput.count);
+      System.out.println( "setInput() char[0]='"
+          + lexerInput.array[lexerInput.offset] + "', offset="
+          + lexerInput.offset + ", count=" + lexerInput.count);
     }
     lexerInput.first(); // initialize CharIterator
   }
@@ -210,7 +211,7 @@ public class C_Categoriser extends AbstractCategoriser
    */
   private void getToken( HighlightedDocument doc, Token token)
   {
-    token.categoryId = CategoryConstants.NORMAL;
+    token.category = Category.NORMAL;
     int matchLen = matchWhitespace();
     consumeChars( matchLen);
     token.start = input.getIndex();
@@ -223,13 +224,13 @@ public class C_Categoriser extends AbstractCategoriser
       case '\"':
         // String
         readString();
-        token.categoryId = CategoryConstants.STRINGVAL;
+        token.category = Category.STRINGVAL;
       break;
 
       case '\'':
         // char const. we allow constants of arbitraty length here
         readCharConst();
-        token.categoryId = CategoryConstants.STRINGVAL;
+        token.category = Category.STRINGVAL;
       break;
 
       case '/':
@@ -238,15 +239,15 @@ public class C_Categoriser extends AbstractCategoriser
           case '*':
             boolean isMultiline = readMLComment();
             // TODO makr as multiline
-            token.categoryId = CategoryConstants.COMMENT1;
+            token.category = Category.COMMENT_1;
           break;
           case '/':
             readEOLComment();
-            token.categoryId = CategoryConstants.COMMENT2;
+            token.category = Category.COMMENT_2;
           break;
           default:
             input.next(); // consume '/'
-            token.categoryId = CategoryConstants.OPERATOR;
+            token.category = Category.OPERATOR;
           break;
         }
       break;
@@ -256,21 +257,21 @@ public class C_Categoriser extends AbstractCategoriser
         consumeChars( matchLen);
         matchLen = matchWord();
         consumeChars( matchLen);
-        token.categoryId = CategoryConstants.KEYWORD2;
+        token.category = Category.KEYWORD;
       break;
 
       default:
         //        if ((matchLen = matchWhitespace()) > 0) {
-        //          token.categoryId = CategoryConstants.NORMAL;
+        //          token.category = Category.NORMAL;
         //          consumeChars( matchLen);
         //        }
         //        else
         if ((matchLen = matchNumber()) > 0) {
-          token.categoryId = CategoryConstants.NUMERICVAL;
+          token.category = Category.NUMERICVAL;
           consumeChars( matchLen);
         }
         else if ((matchLen = matchOperator()) > 0) {
-          token.categoryId = CategoryConstants.OPERATOR;
+          token.category = Category.OPERATOR;
           consumeChars( matchLen);
         }
         else {
@@ -282,36 +283,36 @@ public class C_Categoriser extends AbstractCategoriser
              * somewhere above
              */
             // treat as normal text
-            token.categoryId = CategoryConstants.NORMAL;
+            token.category = Category.NORMAL;
             input.next(); // consume char
             break;
           }
 
           assert matchLen > 0 : "unrecognized char in scanner: " + LA( 0);
           if (isKW_PredefVal( matchLen)) {
-            token.categoryId = CategoryConstants.PREDEFVAL;
+            token.category = Category.PREDEFVAL;
             consumeChars( matchLen);
           }
           else if (isKW_Type( matchLen)) {
-            token.categoryId = CategoryConstants.TYPE;
+            token.category = Category.KEYWORD_TYPE;
             consumeChars( matchLen);
           }
           else if (isKW_stmt( matchLen)) {
-            token.categoryId = CategoryConstants.KEYWORD1;
+            token.category = Category.KEYWORD_STATEMENT;
             consumeChars( matchLen);
           }
           else if (isIdentifier1( matchLen)) {
-            token.categoryId = CategoryConstants.IDENTIFIER1;
+            token.category = Category.IDENTIFIER_1;
             consumeChars( matchLen);
           }
           else if (isIdentifier2( matchLen)) {
-            token.categoryId = CategoryConstants.IDENTIFIER2;
+            token.category = Category.IDENTIFIER_2;
             consumeChars( matchLen);
           }
           else {
             // still no category found...
             // treat matched word as normal text
-            token.categoryId = CategoryConstants.NORMAL;
+            token.category = Category.NORMAL;
             consumeChars( matchLen);
           }
         }

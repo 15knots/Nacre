@@ -1,5 +1,6 @@
  	/* comments*/ true ;
-falsee  ;
-
+falsee  ;          
+# define aa
 Xa >>>all ;
-kk+=sizeof++( int);
+kk+=sizeof++( int long double char float unsigned far huge pascal register volatile);
+ "String \t\" ddd"

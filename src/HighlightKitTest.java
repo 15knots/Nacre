@@ -14,7 +14,6 @@
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
 import java.io.File;
 import java.io.FileReader;
 
@@ -26,9 +25,9 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 
 import swing.text.highlight.CHighlightingKit;
+import swing.text.highlight.Category;
 import swing.text.highlight.HighlightingContext;
 import swing.text.highlight.HighlightingKit;
-import swing.text.highlight.categoriser.CategoryConstants;
 
 
 /**
@@ -57,40 +56,42 @@ public class HighlightKitTest
       editor.setContentType( "text/x-c-src");
       //      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
-      editor.setFont( new Font( "Courier", 0, 12));
-      editor.setEditable( true);
+      //     editor.setFont( new Font( "Monospaced", 0, 12));
+      //      editor.setEditable( true);
 
       // PENDING(prinz) This should have a customizer and
       // be serialized. This is a bogus initialization.
       HighlightingContext styles = kit.getStylePreferences();
       Style s;
-      s = styles.getStyleForCategory( CategoryConstants.COMMENT1);
+      s = styles.getStyleForCategory( Category.COMMENT_1);
       StyleConstants.setForeground( s, new Color( 0, 128, 0));
-      s = styles.getStyleForCategory( CategoryConstants.COMMENT2);
+      s = styles.getStyleForCategory( Category.COMMENT_2);
       StyleConstants.setForeground( s, new Color( 0, 153, 153));
 
-      s = styles.getStyleForCategory( CategoryConstants.IDENTIFIER1);
+      s = styles.getStyleForCategory( Category.IDENTIFIER_1);
       StyleConstants.setForeground( s, Color.cyan.darker());
-      s = styles.getStyleForCategory( CategoryConstants.STRINGVAL);
+      s = styles.getStyleForCategory( Category.STRINGVAL);
       StyleConstants.setForeground( s, new Color( 102, 153, 102));
-      //      StyleConstants.setItalic(s, true);
-      //      StyleConstants.setUnderline(s, true);
+      StyleConstants.setItalic( s, true);
+      StyleConstants.setStrikeThrough( s, true);
+      StyleConstants.setUnderline( s, true);
 
-      s = styles.getStyleForCategory( CategoryConstants.OPERATOR);
+      s = styles.getStyleForCategory( Category.OPERATOR);
       StyleConstants.setForeground( s, Color.CYAN);
       //      StyleConstants.setUnderline(s, true);
 
       Color keyword = new Color( 102, 102, 255);
-      s = styles.getStyleForCategory( CategoryConstants.KEYWORD1);
+      s = styles.getStyleForCategory( Category.KEYWORD_STATEMENT);
       StyleConstants.setForeground( s, keyword);
       //      StyleConstants.setBold( s, true);
-      s = styles.getStyleForCategory( CategoryConstants.KEYWORD2);
+      s = styles.getStyleForCategory( Category.KEYWORD);
       StyleConstants.setForeground( s, keyword);
-      s = styles.getStyleForCategory( CategoryConstants.TYPE);
+      s = styles.getStyleForCategory( Category.KEYWORD_TYPE);
       //      StyleConstants.setStrikeThrough(s, true);
       StyleConstants.setForeground( s, keyword.brighter());
       StyleConstants.setBold( s, true);
-      s = styles.getStyleForCategory( CategoryConstants.PREDEFVAL);
+
+      s = styles.getStyleForCategory( Category.PREDEFVAL);
       StyleConstants.setForeground( s, keyword.darker());
       StyleConstants.setBold( s, true);
 

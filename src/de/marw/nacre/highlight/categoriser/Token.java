@@ -6,6 +6,10 @@
 
 package swing.text.highlight.categoriser;
 
+import swing.text.highlight.Category;
+import swing.text.highlight.HighlightedDocument;
+
+
 /**
  * The tokens returned by Categoriser objects.
  * 
@@ -15,15 +19,15 @@ package swing.text.highlight.categoriser;
 public class Token implements Cloneable
 {
   /** the start position of the token */
-  public int start      = 0;
+  public int start = 0;
 
   /** the length of the token */
-  public int length     = 0;
+  public int length = 0;
 
   /**
-   * Numeric value of the token's Category.
+   * the token's Category.
    */
-  public int categoryId = CategoryConstants.NORMAL;
+  public Category category = Category.NORMAL;
 
   /**
    * Returns a shallow copy of this <code>Token</code> instance.
@@ -43,6 +47,6 @@ public class Token implements Cloneable
 
   public String toString()
   {
-    return "start=" + start + ", length=" + length + ", cat=" + categoryId;
+    return "start=" + start + ", length=" + length + ", cat=" + category;
   }
 }

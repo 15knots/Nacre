@@ -57,5 +57,5 @@ class SegmentInputStream extends InputStream
 
   Segment segment;
 
-  int     index;  // index into array of the segment
+  int index; // index into array of the segment
 }

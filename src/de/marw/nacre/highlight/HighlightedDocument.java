@@ -18,7 +18,6 @@ package swing.text.highlight;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.event.DocumentEvent;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;

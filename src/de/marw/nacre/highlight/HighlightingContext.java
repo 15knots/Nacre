@@ -6,13 +6,13 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
+import javax.swing.text.Caret;
 import javax.swing.text.Element;
+import javax.swing.text.JTextComponent;
 import javax.swing.text.PlainView;
 import javax.swing.text.Segment;
 import javax.swing.text.Style;
@@ -23,7 +23,6 @@ import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
 import swing.text.highlight.categoriser.Categoriser;
-import swing.text.highlight.categoriser.CategoryConstants;
 import swing.text.highlight.categoriser.Token;
 
 
@@ -49,17 +48,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   {
     super();
     Style root = getStyle( DEFAULT_STYLE);
-    Category[] categories = Category.getCategories();
-    categoryStyles = new Style[categories.length];
+    // configure the default style
+    StyleConstants.setFontFamily( root, "Monospaced");
+    StyleConstants.setFontSize( root, 16);
+
+    Category[] categories = Category.values();
+    categoryStyles = new Style[Category.values().length];
     for (int i = 0; i < categories.length; i++ ) {
-      Category t = categories[i];
-      Style parent = getStyle( t.getName());
+      Category cat = categories[i];
+      Style parent = getStyle( cat.getName());
       if (parent == null) {
-        parent = addStyle( t.getName(), root);
+        parent = addStyle( cat.getName(), root);
       }
       Style s = addStyle( null, parent);
-      s.addAttribute( Category.CategoryAttribute, t);
-      categoryStyles[i] = s;
+      s.addAttribute( Category.CategoryAttribute, cat);
+      categoryStyles[cat.ordinal()] = s;
     }
   }
 
@@ -67,43 +70,49 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    * Fetch the foreground color to use for a text run with the given category
    * id.
    */
-  public Color getForeground( int categoryCode)
+  public Color getForeground( Category category)
   {
     if (categoryColors == null) {
-      categoryColors = new Color[CategoryConstants.MaximumId + 1];
+      categoryColors = new Color[Category.values().length];
     }
+    Color c = null;
     //code--; // no mapping for Category.NORMAL
+    int categoryCode= category.ordinal();
     if ((categoryCode >= 0) && (categoryCode < categoryColors.length)) {
-      Color c = categoryColors[categoryCode];
+      c = categoryColors[categoryCode];
       if (c == null) {
         Style s = categoryStyles[categoryCode];
-        c = StyleConstants.getForeground( s);
-        categoryColors[categoryCode] = c;
+        if (s != null) {
+          c = super.getForeground( s);
+          categoryColors[categoryCode] = c;
+        }
       }
-      return c;
     }
-    return Color.black;
+    return c;
   }
 
   /**
    * Fetch the font to use for a text run with the given category id.
    */
-  public Font getFont( int categoryCode)
+  public Font getFont( Category category)
   {
     if (categoryFonts == null) {
-      categoryFonts = new Font[CategoryConstants.MaximumId + 1];
+      categoryFonts = new Font[Category.values().length];
     }
     //code--; // no mapping for Category.NORMAL
+    Font f = null;
+    int categoryCode= category.ordinal();
     if (categoryCode >= 0 && categoryCode < categoryFonts.length) {
-      Font f = categoryFonts[categoryCode];
+      f = categoryFonts[categoryCode];
       if (f == null) {
         Style s = categoryStyles[categoryCode];
-        f = super.getFont( s);
-        categoryFonts[categoryCode] = f;
+        if (s != null) {
+          f = super.getFont( s);
+          categoryFonts[categoryCode] = f;
+        }
       }
-      return f;
     }
-    return null;
+    return f;
   }
 
   /**
@@ -111,10 +120,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    * stored in a table to facilitate relatively fast access to use in
    * conjunction with the scanner.
    */
-  public Style getStyleForCategory( int categoryCode)
+  public Style getStyleForCategory( Category category)
   {
-    if (categoryCode < categoryStyles.length) {
-      return categoryStyles[categoryCode];
+    int categoryCode= category.ordinal();
+    if (categoryCode >= 0 && categoryCode < categoryStyles.length) {
+      Style s = categoryStyles[categoryCode];
+      return s;
     }
     return null;
   }
@@ -131,7 +142,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   /**
    * The styles representing the actual categories.
    */
-  private Style[]           categoryStyles;
+  private Style[] categoryStyles;
 
   /**
    * Cache of foreground colors to represent the various categories.
@@ -141,7 +152,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   /**
    * Cache of fonts to represent the various categories.
    */
-  private transient Font[]  categoryFonts;
+  private transient Font[] categoryFonts;
 
   /**
    * View that uses the lexical information to determine the style
@@ -155,6 +166,15 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * 
      */
     private TokenQueue tokenQueue;
+
+    /**
+     * the color used to render selected text or <code>null</code>.
+     */
+    private Color selectedColor;
+
+    private Font normalFont;
+
+    private Color normalColor;
 
     /**
      * Construct a simple colorized view of java text.
@@ -181,6 +201,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       System.out.println( "# paint() -------");
       super.paint( g, a);
+      JTextComponent host = (JTextComponent) getContainer();
+      normalColor = (host.isEnabled()) ? host.getForeground() : host
+          .getDisabledTextColor();
+      Caret c = host.getCaret();
+      selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
+          : normalColor;
+      normalFont = host.getFont();
     }
 
     /**
@@ -292,13 +319,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       HighlightedDocument doc = (HighlightedDocument) getDocument();
 
-      Color lastColor = g.getColor();
-      Font lastFont = g.getFont();
-
       Segment text = getLineBuffer();
       Token token = null;
       while (p0 < p1) {
-        int category = CategoryConstants.NORMAL;
+        Category category = Category.NORMAL;
         int flushTo = p1;
         if (!tokenQueue.isEmpty()) {
           // get token
@@ -312,7 +336,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           }
           if (token.start > p0) {
             // gap between tokens: draw as normal text
-            category = CategoryConstants.NORMAL;
+            category = Category.NORMAL;
             flushTo = token.start;
             doc.getText( p0, flushTo - p0, text);
             x = drawHighlightedText( category, selected, text, x, y, g, p0);
@@ -320,7 +344,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           }
           if (token.start <= p0) {
             // draw current token
-            category = token.categoryId;
+            category = token.category;
             flushTo = Math.min( token.start + token.length, p1);
             if (token.start + token.length < p1) {
               // token was completely consumed: remove from queue
@@ -333,8 +357,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         p0 = flushTo;
       }
 
-      g.setColor( lastColor);
-      g.setFont( lastFont);
       return x;
     }
 
@@ -343,7 +365,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * given tab expansion technique. This is implemented to paint colors based
      * upon the category-to-color translations.
      * 
-     * @param categoryCode
+     * @param category
      *          the category we are painting. Used to determine color and font.
      * @param text
      *          the source of the text
@@ -359,20 +381,25 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * @exception BadLocationException
      *              if the range is invalid
      */
-    private int drawHighlightedText( int categoryCode, boolean selected,
+    private int drawHighlightedText( Category category, boolean selected,
         Segment text, int x, int y, Graphics g, int startOffset)
     {
       if (text.count > 0) {
-        Color fg = getForeground( categoryCode);
-        Font font = getFont( categoryCode);
-        if (fg != null)
-          g.setColor( fg);
-        if (font != null)
-          g.setFont( font);
+        Color fg = selected ? selectedColor : getForeground( category);
+        Font font = getFont( category);
 
-        if (true) {
+        if (fg == null) {
+          fg = normalColor;
+        }
+        if (font == null) {
+          font = normalFont;
+        }
+        g.setColor( fg);
+        g.setFont( font);
+
+        if (false) {
           System.out.print( "painting '" + text + "', offs=" + startOffset
-              + ", cat=" + categoryCode + ", sel=" + selected);
+              + ", cat=" + category + ", sel=" + selected);
           System.out.println( ", color=" + fg + ", font=" + font);
         }
         x = Utilities.drawTabbedText( text, x, y, g, this, startOffset);
@@ -446,9 +473,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private final class TokenQueue
     {
-      private Categoriser         categoriser;
+      private Categoriser categoriser;
 
-      private Token               tokenBuf;
+      private Token tokenBuf;
 
       private HighlightedDocument doc;
 
