@@ -14,16 +14,13 @@ import de.marw.javax.swing.text.highlight.Category;
 import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
-public class C_Categoriser extends AbstractCategoriser
+/**
+ * A source code scanner and token categoriser for the C programming language..
+ * 
+ * @author Martin Weber
+ */
+public class C_Categoriser extends C_likeCategoriser
 {
-  public static final class RevStringByLengthComparator implements Comparator
-  {
-    public int compare( Object o1, Object o2)
-    {
-      return ((String) o2).length() - ((String) o1).length();
-    }
-  }
-
   private static final String[] kwPredefVal = { "true", "false" };
 
   private static final String[] kwType = { "char", "double", "enum", "float",
@@ -175,16 +172,50 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
+   * Matches the suffix that indicates a floating point numeric literal. <br>
+   * FloatSuffix: [fFlL]
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  private int matchNumber()
+  protected int matchFloatSuffix( int lookahead)
   {
-    // TODO
-    return 0; // no match
+    int len = 0;
+    char c = Character.toUpperCase( LA( lookahead));
+    if (c == 'F' || c == 'L') {
+      len++;
+    }
+    return len;
   }
 
   /**
+   * Matches the suffix that indicates an integer numeric literal. <br>
+   * IntSuffix: [lLuU]
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchIntSuffix( int lookahead)
+  {
+    int len = 0;
+    char c = Character.toUpperCase( LA( lookahead));
+    if (c == 'L' || c == 'U') {
+      len++;
+    }
+    c = Character.toUpperCase( LA( lookahead));
+    if (c == 'L' || c == 'U') {
+      len++;
+    }
+    return len;
+  }
+
+  /**
+   * Matches an operator keyword.
+   * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
@@ -214,46 +245,12 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Matches an Identifer or a keyword.
-   * 
-   * @return the length of the matching text or <code>0</code> if no match was
-   *         found.
-   */
-  private int matchWord()
-  {
-    int len = 0;
-    char c = LA( len);
-    if (Character.isJavaIdentifierStart( c)) {
-      c = LA( ++len);
-      while (Character.isJavaIdentifierPart( c)) {
-        c = LA( ++len);
-      }
-    }
-    return len;
-  }
-
-  /**
-   * Matches white space.
-   * 
-   * @return the length of the matching text or <code>0</code> if no match was
-   *         found.
-   */
-  private int matchWhitespace()
-  {
-    int len = 0;
-    while (Character.isWhitespace( LA( len))) {
-      len++ ;
-    }
-    return len;
-  }
-
-  /**
    * Matches white space until end of line.
    * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  private int matchWhitespaceNoNL()
+  protected int matchWhitespaceNoNL()
   {
     int len = 0;
     char c = LA( len);
@@ -265,84 +262,8 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Consumes a character literal until end of line.
-   */
-  private void consumeCharConst()
-  {
-    char c = input.next();
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '\\':
-          input.next();
-        break;
-        case '\'':
-        case '\n':
-          input.next();
-          return;
-      }
-    }
-  }
-
-  /**
-   * Consumes a string literal until end of line.
-   */
-  private void consumeString()
-  {
-    char c = input.next();
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '\\':
-          input.next();
-        break;
-        case '\"':
-        case '\n':
-          input.next();
-          return;
-      }
-    }
-  }
-
-  /**
-   * Consumes a multiline comment which is started by '/*''.
-   */
-  private void consumeMLComment()
-  {
-
-    input.next(); // consume '/'
-    char c = input.next(); // consume '*'
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '*':
-          if (LA( 1) == '/') {
-            consumeChars( 2); // consume '*/'
-            return;
-          }
-        break;
-      }
-    }
-  }
-
-  /**
-   * Consumes a multiline comment which is started by '/*''.
-   */
-  private void consumeEOLComment()
-  {
-
-    input.next(); // consume '/'
-    char c = input.next(); // consume '/'
-    for (; c != CharacterIterator.DONE; c = input.next()) {
-      switch (c) {
-        case '\n':
-          input.next(); // consume '\n'
-          return;
-      }
-    }
-    return;
-  }
-
-  /**
-   * Checks if a subregion in the <code>input</code> starting at the current
-   * scanner input position is a keyword used in statements.
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a keyword used in statements.
    * 
    * @see Category#KEYWORD_STATEMENT
    * @param lenght
@@ -356,8 +277,8 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Checks if a subregion in the <code>input</code> starting at the current
-   * scanner input position is a keyword used for types.
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a keyword used for types.
    * 
    * @see Category#KEYWORD_TYPE
    * @param lenght
@@ -371,8 +292,9 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Checks if a subregion in the <code>input</code> starting at the current
-   * scanner input position is a keyword used for predefined value literals.
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a keyword used for predefined value
+   * literals.
    * 
    * @see Category#PREDEFVAL
    * @param lenght
@@ -387,8 +309,8 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Checks if a subregion in the <code>input</code> starting at the current
-   * scanner input position is a custom identifier.
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a custom identifier.
    * 
    * @see Category#IDENTIFIER_1
    * @param identifierLen
@@ -396,7 +318,7 @@ public class C_Categoriser extends AbstractCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isIdentifier1( int identifierLen)
+  protected boolean isIdentifier1( int identifierLen)
   {
     // TODO Auto-generated method stub
     /*
@@ -407,8 +329,8 @@ public class C_Categoriser extends AbstractCategoriser
   }
 
   /**
-   * Checks if a subregion in the <code>input</code> starting at the current
-   * scanner input position is a custom identifier.
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a custom identifier.
    * 
    * @see Category#IDENTIFIER_2
    * @param identifierLen
@@ -416,7 +338,7 @@ public class C_Categoriser extends AbstractCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isIdentifier2( int identifierLen)
+  protected boolean isIdentifier2( int identifierLen)
   {
     // TODO Auto-generated method stub
     /*

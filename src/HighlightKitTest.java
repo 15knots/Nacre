@@ -89,6 +89,9 @@ public class HighlightKitTest
       StyleConstants.setStrikeThrough( s, true);
       StyleConstants.setUnderline( s, true);
 
+      s = styles.getStyleForCategory( Category.NUMERICVAL);
+      StyleConstants.setForeground( s, new Color( 255, 0, 70));
+
       s = styles.getStyleForCategory( Category.OPERATOR);
       StyleConstants.setForeground( s, Color.CYAN);
       //      StyleConstants.setUnderline(s, true);

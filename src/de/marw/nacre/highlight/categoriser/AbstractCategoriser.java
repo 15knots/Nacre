@@ -58,12 +58,194 @@ public abstract class AbstractCategoriser implements Categoriser
   }
 
   ///////////////////////////////////////////////////////////
+  // matcher methods for use by subclasses
+  ///////////////////////////////////////////////////////////
+
+  /**
+   * Matches white space.
+   * 
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchWhitespace()
+  {
+    int len = 0;
+    while (Character.isWhitespace( LA( len))) {
+      len++;
+    }
+    return len;
+  }
+
+ /**
+   * Matches a number. <br>
+   * 
+   * <pre>
+   * 
+   *   Number 
+   *      : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *      | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *      | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *  
+   * </pre>
+   * 
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchNumber()
+  {
+
+    int len;
+    len = matchDecimal( 0); // matched Decimal
+    if (len == 1) {
+      // hexadecimal number?
+      if (LA( 0) == '0' && Character.toUpperCase( LA( 1)) == 'X'
+          && isHexDigit( LA( 2))) {
+        len += 2;
+        len += matchHexDecimal( 2);
+        // match trailing LongSuffix and UnsignedSuffix...
+        matchIntSuffix( len + 1);
+        // matched '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )?
+        return len;
+      }
+    }
+    else {
+      if (LA( len) == '.') {
+        // fractional number?
+        if (Character.isDigit( LA( len + 1))) {
+          // fractional number: matched Decimal '.' Digit
+          len += 2;
+          len += matchDecimal( len); // matched Decimal '.' Decimal
+          len += matchExponent( len);
+          len += matchFloatSuffix( len);
+          // matched ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+          return len;
+        }
+        else {
+          return 0;// no match
+        }
+      }
+    }
+
+    if (len > 0) {
+      // if we ran here, we matched Decimal, either an integer or float
+      // match trailing suffixes...
+      // try suffixes for float
+      int suflen = matchExponent( len + 1);
+      // matched Decimal (Exponent)?
+      suflen += matchFloatSuffix( len + suflen);
+      if (suflen == 0) {
+        // no suffixes for float, try suffixes for integer
+        // match trailing LongSuffix and UnsignedSuffix...
+        suflen = matchIntSuffix( len + 1);
+      }
+      len += suflen;
+    }
+    return len;
+  }
+
+  /**
+   * Matches a decimal number. <br>
+   * Decimal: [0-9]+
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchDecimal( int lookahead)
+  {
+    int len = 0;
+    while (Character.isDigit( LA( lookahead++))) {
+      len++;
+    }
+    return len;
+  }
+
+  /**
+   * Matches a hexadecimal number. <br>
+   * HexDecimal: [0-9a-fA-F]+
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchHexDecimal( int lookahead)
+  {
+    int len = 0;
+    while (isHexDigit( LA( lookahead++))) {
+      len++;
+    }
+    return len;
+  }
+
+  /**
+   * Matches an exponent. <br>
+   * Exponent : ( 'e' | 'E' ) ( '+' | '-' )? Decimal
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchExponent( int lookahead)
+  {
+    int len = 0;
+    char c = LA( lookahead);
+    if ((c == 'e' || c == 'E')) {
+      c = LA( lookahead + 1);
+      if (c == '+' || c == '-') {
+        len = matchDecimal( lookahead + 2);
+        if (len == 0) {
+          // missing trailing number: no match
+          return 0;
+        }
+        len += 2;
+      }
+      else {
+        len = matchDecimal( lookahead + 1);
+        if (len == 0) {
+          // missing trailing number: no match
+          return 0;
+        }
+        len += 1;
+      }
+    }
+    return len;
+  }
+
+  /**
+   * Matches the suffix that indicates a floating point numeric literal. <br>
+   * FloatSuffix: [fFlL]
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected abstract int matchFloatSuffix( int lookahead);
+
+  /**
+   * Matches the suffix that indicates an integer numeric literal. <br>
+   * IntSuffix: [lLuU]
+   * 
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected abstract int matchIntSuffix( int lookahead);
+
+  ///////////////////////////////////////////////////////////
   // categoriser helper methods
   ///////////////////////////////////////////////////////////
 
   /**
    * Fetches the lookahead character at the specified position.
    * 
+   * @see #input
+   * @param lookAhead
+   *        the position ahead of the current index of the input segment. *
    * @return the lookahead character or <code>CharacterIterator.DONE</code> at
    *         end of input is reached.
    */
@@ -106,7 +288,7 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   protected final boolean matchInWordlist( int length, final String[] wordlist)
   {
-    for (int i = 0; i < wordlist.length; i++ ) {
+    for (int i = 0; i < wordlist.length; i++) {
       if (wordlist[i].length() == length
           && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
               wordlist[i]) > 0)
@@ -140,7 +322,7 @@ public abstract class AbstractCategoriser implements Categoriser
       return 0; // no match
     }
     int j = 0;
-    for (int i = offset; i < endpos; i++ , j++ ) {
+    for (int i = offset; i < endpos; i++, j++) {
       char c1 = textArray[i];
       char c2 = match.charAt( j);
 
@@ -155,6 +337,40 @@ public abstract class AbstractCategoriser implements Categoriser
     }
 
     return j;
+  }
+
+  /**
+   * Determines if the specified character is a digit.
+   * 
+   * @param ch
+   *        the character to be tested.
+   * @return <code>true</code> if the character is a digit; <code>false</code>
+   *         otherwise.
+   * @see java.lang.Character#isDigit(char)
+   */
+  public static boolean isHexDigit( char c)
+  {
+    c = Character.toUpperCase( c);
+    switch (c) {
+      case '0':
+      case '1':
+      case '2':
+      case '3':
+      case '4':
+      case '5':
+      case '6':
+      case '7':
+      case '8':
+      case '9':
+      case 'A':
+      case 'B':
+      case 'C':
+      case 'D':
+      case 'E':
+      case 'F':
+        return true;
+    }
+    return false;
   }
 
 }
