@@ -22,7 +22,7 @@ import de.marw.javax.swing.text.highlight.HighlightingKit;
 
 
 /**
- * Simple wrapper around JEditorPane to browse java text using the
+ * Simple wrapper around JEditorPane to browse program code using the
  * HighlightingKit plug-in. Run with
  * 
  * <pre>
@@ -59,24 +59,7 @@ public class HighlightKitTest
       }
       JEditorPane editor = new JEditorPane();
 
-      HighlightingKit kit = new CHighlightingKit();
-      editor.setEditorKitForContentType( kit.getContentType(), kit);
-      //     kit = new JavaHighlightingKit();
-      //     editor.setEditorKitForContentType( kit.getContentType(), kit);
-      // add more EditorKits to support different content types here...
-
-      // 
-      editor.setContentType( "text/x-c-src");
-      //      editor.setContentType( "text/x-java");
-      editor.setBackground( Color.white);
-      editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
-      editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
-      //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 14));
-      //editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
-      //editor.setEditable( false);
-
-      CategoryStyles styles = kit.getCategoryStyles();
-      styles.setColor(Category.COMMENT_2, Color.YELLOW);
+      configureEditor( editor);
 
       File file = new File( args[0]);
       editor.read( new FileReader( file), file);
@@ -106,6 +89,31 @@ public class HighlightKitTest
     catch (Throwable e) {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * @param editor
+   */
+  protected static void configureEditor( JEditorPane editor)
+  {
+    HighlightingKit kit = new CHighlightingKit();
+    editor.setEditorKitForContentType( kit.getContentType(), kit);
+    //     kit = new JavaHighlightingKit();
+    //     editor.setEditorKitForContentType( kit.getContentType(), kit);
+    // add more EditorKits to support different content types here...
+
+    // 
+    editor.setContentType( "text/x-c-src");
+    //      editor.setContentType( "text/x-java");
+    editor.setBackground( Color.white);
+    editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+    editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
+    //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 14));
+    //editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
+    //editor.setEditable( false);
+
+    CategoryStyles styles = kit.getCategoryStyles();
+    styles.setColor(Category.COMMENT_2, Color.YELLOW);
   }
 
 }
