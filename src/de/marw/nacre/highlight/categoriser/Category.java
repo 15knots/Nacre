@@ -22,6 +22,11 @@ public class Category implements Serializable
 {
 
   /**
+   * Comment for <code>serialVersionUID</code>
+   */
+  private static final long serialVersionUID = 3257853198856107314L;
+
+  /**
    * Normal text category. This should be used to mark normal text without any
    * highlighting.
    */
