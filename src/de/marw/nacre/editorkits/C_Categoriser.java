@@ -205,10 +205,10 @@ public class C_Categoriser extends C_likeCategoriser
     char c = Character.toUpperCase( LA( lookahead));
     if (c == 'L' || c == 'U') {
       len++;
-    }
-    c = Character.toUpperCase( LA( lookahead));
-    if (c == 'L' || c == 'U') {
-      len++;
+      c = Character.toUpperCase( LA( lookahead + 1));
+      if (c == 'L' || c == 'U') {
+        len++;
+      }
     }
     return len;
   }
