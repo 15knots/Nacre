@@ -12,29 +12,44 @@ import de.marw.javax.swing.text.highlight.Category;
 
 
 /**
- * A source code scanner and token categoriser for the C programming language..
+ * A source code scanner and token categoriser for the C programming language.
+ * In addition to the ANSI standard, this scanner recognizes single line
+ * comments as well.
  * 
  * @author Martin Weber
  */
 public class C_Categoriser extends C_likeCategoriser
 {
-  private static final String[] kwPredefVal = { "true", "false" };
 
+  /**
+   * Type keywords.
+   */
   private static final String[] kwType = { "char", "double", "enum", "float",
       "int", "long", "short", "signed", "struct", "typedef", "union",
       "unsigned", "void", "auto", "const", "extern", "register", "static",
       "volatile", "far", "huge", "inline", "near", "pascal" };
 
+  /**
+   * statement keywords.
+   */
   private static final String[] kwStmt = { "asm", "break", "case", "continue",
       "default", "do", "else", "for", "goto", "if", "return", "switch", "while" };
 
+  /**
+   * operator keywords.
+   */
   private static final String[] kwOperator = { "sizeof" };
+
+  /**
+   * predefined constants value keywords.
+   */
+  private static final String[] kwPredefVal = { "__DATE__", "__FILE__",
+      "__LINE__", "__TIME__", "true", "false" };
 
   /**
    * 
    */
-  public C_Categoriser()
-  {
+  public C_Categoriser() {
   }
 
   /*
@@ -56,18 +71,18 @@ public class C_Categoriser extends C_likeCategoriser
     return token;
   }
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // categoriser methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   /**
    * @param token
    *        the token to initialise.
    */
   private void getToken( Document doc, Token token)
   {
-    token.category = null;
     consumeChars( matchWhitespace());
 
+    token.category = null;
     token.multiline = false;
     token.start = input.getIndex();
     char c = input.current();
@@ -135,7 +150,7 @@ public class C_Categoriser extends C_likeCategoriser
             else if (isKW_Statement( matchLen)) {
               token.category = Category.KEYWORD_STATEMENT;
             }
-            else if (isKW_Operator(matchLen)) {
+            else if (isKW_Operator( matchLen)) {
               token.category = Category.KEYWORD_OPERATOR;
             }
             else if (isIdentifier1( matchLen)) {
@@ -170,6 +185,7 @@ public class C_Categoriser extends C_likeCategoriser
    * Matches the suffix that indicates a floating point numeric literal. <br>
    * FloatSuffix: [fF][lL] | [lL][fF]
    * 
+   * @todo hexadecimal floats, e.g. 0x1.fp3
    * @param lookAhead
    *        the position ahead of the current index of the input segment. *
    * @return the length of the matching text or <code>0</code> if no match was
@@ -223,7 +239,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
    */
-  private int matchOperator()
+  protected int matchOperator()
   {
     int len = 0;
     // non keyword operators
@@ -264,7 +280,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isKW_Statement( int length)
+  protected boolean isKW_Statement( int length)
   {
     return matchOneOfStrings( length, kwStmt);
   }
@@ -279,7 +295,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isKW_Type( int length)
+  protected boolean isKW_Type( int length)
   {
     return matchOneOfStrings( length, kwType);
   }
@@ -294,7 +310,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @return <code>true</code> if the subregion is one of the keywords,
    *         otherwise <code>false</code>.
    */
-  private boolean isKW_Operator( int length)
+  protected boolean isKW_Operator( int length)
   {
     return matchOneOfStrings( length, kwOperator);
   }
@@ -356,12 +372,12 @@ public class C_Categoriser extends C_likeCategoriser
     return false; // no match
   }
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // categoriser helper methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // other helper methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
 }
