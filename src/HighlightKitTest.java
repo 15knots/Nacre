@@ -29,7 +29,13 @@ import de.marw.javax.swing.text.highlight.HighlightingKit;
  * <pre>
  * 
  *  
- *   java HighlightKitTest filename
+ *   
+ *    
+ *     
+ *      java HighlightKitTest filename
+ *      
+ *     
+ *    
  *   
  *  
  * </pre>
@@ -51,13 +57,15 @@ public class HighlightKitTest
       System.exit( 1);
     }
     try {
-      GraphicsEnvironment env = GraphicsEnvironment
-          .getLocalGraphicsEnvironment();
-      String names[] = env.getAvailableFontFamilyNames();
-      for (int i = 0; i < names.length; i++) {
-        System.out.println( "- " + i + ": " + names[i]);
+      if (false) {
+        GraphicsEnvironment env = GraphicsEnvironment
+            .getLocalGraphicsEnvironment();
+        String names[] = env.getAvailableFontFamilyNames();
+        System.out.println( "## available fonts...");
+        for (int i = 0; i < names.length; i++) {
+          System.out.println( " - " + i + ": " + names[i]);
+        }
       }
-
       JEditorPane editor = new JEditorPane();
 
       HighlightingKit kit = new CHighlightingKit();
@@ -70,8 +78,8 @@ public class HighlightKitTest
       editor.setContentType( "text/x-c-src");
       //      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
-      //editor.setFont( new Font( "Monospaced", Font.PLAIN, 14));
-      editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 14));
+      editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+      editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
       //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 14));
       //editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
       //editor.setEditable( false);
@@ -129,12 +137,13 @@ public class HighlightKitTest
       f.getContentPane().add( "Center", scroller);
 
       f.pack();
-      f.setSize( 200, 300);
+      f.setSize( 211, 701);
       if (TEST_MULTILINE_TOKEN_PROOFNESS) {
         // caret in letzte Zeile (test, ob repaint() immer in erster Zeile
         // anfängt)
-        editor.setCaretPosition( editor.getDocument().getLength());
-        scroller.getViewport().setViewPosition( new Point( 10, 962));
+        f.setSize( 211, 301);
+        editor.setCaretPosition( editor.getDocument().getLength()-1);
+        scroller.getViewport().setViewPosition( new Point( 0, 9999));
       }
 
       f.setVisible( true);
