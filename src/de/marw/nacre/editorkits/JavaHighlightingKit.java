@@ -6,13 +6,12 @@ package de.marw.javax.swing.text.highlight;
 
 import java.io.IOException;
 
-import javax.swing.text.Element;
+import javax.swing.text.Document;
 import javax.swing.text.Segment;
 
+import sun.tools.java.Constants;
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.Token;
-
-import sun.tools.java.Constants;
 
 
 /**
@@ -86,7 +85,7 @@ public class JavaHighlightingKit extends HighlightingKit
     /**
      * @see Categoriser#nextToken(HighlightedDocument, Token)
      */
-    public Token nextToken( HighlightedDocument doc, Token token)
+    public Token nextToken( Document doc, Token token)
     {
       if (token == null) {
         token = new Token();

@@ -65,7 +65,7 @@ public class HighlightKitTest
       editor.setBackground( Color.white);
       editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
       //      editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
-      //      editor.setEditable( true);
+      //editor.setEditable( false);
 
       // PENDING(prinz) This should have a customizer and
       // be serialized. This is a bogus initialization.

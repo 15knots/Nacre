@@ -5,7 +5,6 @@
 package de.marw.javax.swing.text.highlight;
 
 import javax.swing.text.DefaultEditorKit;
-import javax.swing.text.Document;
 import javax.swing.text.ViewFactory;
 
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
@@ -49,17 +48,6 @@ public abstract class HighlightingKit extends DefaultEditorKit
   }
 
   // --- EditorKit methods -------------------------
-
-  /**
-   * Creates an uninitialized text storage model that is appropriate for this
-   * type of editor.
-   * 
-   * @return the model
-   */
-  public Document createDefaultDocument()
-  {
-    return new HighlightedDocument();
-  }
 
   /**
    * Fetches a factory that is suitable for producing views of any models that

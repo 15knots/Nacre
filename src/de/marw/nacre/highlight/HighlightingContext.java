@@ -5,7 +5,6 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -16,7 +15,19 @@ import java.util.Map;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
-import javax.swing.text.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Caret;
+import javax.swing.text.Document;
+import javax.swing.text.Element;
+import javax.swing.text.JTextComponent;
+import javax.swing.text.PlainView;
+import javax.swing.text.Segment;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
+import javax.swing.text.Utilities;
+import javax.swing.text.View;
+import javax.swing.text.ViewFactory;
 
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.Token;
@@ -242,7 +253,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     HiliteView( Element elem)
     {
       super( elem);
-      tokenQueue = new TokenQueue( (HighlightedDocument) elem.getDocument());
+      tokenQueue = new TokenQueue( elem.getDocument());
       requiredScanStart = 0;
     }
 
@@ -537,7 +548,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     protected int drawText( Graphics g, int x, int y, int p0, int p1,
         boolean selected) throws BadLocationException
     {
-      Document doc = (HighlightedDocument) getDocument();
+      Document doc = getDocument();
 
       Segment text = getLineBuffer();
       Token token = null;
@@ -817,7 +828,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private final class TokenQueue
     {
-      private final HighlightedDocument doc;
+      private final Document doc;
 
       private transient Token tokenBuf;
 
@@ -826,7 +837,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       /**
        * @param doc
        */
-      public TokenQueue( HighlightedDocument doc)
+      public TokenQueue( Document doc)
       {
         super();
         this.doc = doc;

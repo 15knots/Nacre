@@ -5,10 +5,10 @@
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
+import javax.swing.text.Document;
 import javax.swing.text.Segment;
 
 import junit.framework.TestCase;
-import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
 /**
@@ -42,7 +42,7 @@ public class AbstractCategoriserImplsTest extends TestCase
         return 0;
       }
 
-      public Token nextToken( HighlightedDocument doc, Token tokenBuf)
+      public Token nextToken( Document doc, Token tokenBuf)
       {
         throw new UnsupportedOperationException( "method not implemented");
       }

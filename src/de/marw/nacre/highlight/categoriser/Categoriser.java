@@ -4,10 +4,8 @@
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
-import javax.swing.text.Element;
+import javax.swing.text.Document;
 import javax.swing.text.Segment;
-
-import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
 
@@ -40,7 +38,7 @@ public interface Categoriser
    * @return the categorized token.
    * @see #openInput(int)
    */
-  public Token nextToken( HighlightedDocument doc, Token tokenBuf);
+  public Token nextToken( Document doc, Token tokenBuf);
 
   /**
    * Notifies the categoriser of the end of the current scanninng process.

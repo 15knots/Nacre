@@ -5,7 +5,6 @@
 package de.marw.javax.swing.text.highlight.categoriser;
 
 import de.marw.javax.swing.text.highlight.Category;
-import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
 /**

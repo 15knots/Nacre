@@ -5,13 +5,10 @@
 package de.marw.javax.swing.text.highlight.categoriser;
 
 import java.text.CharacterIterator;
-import java.util.Comparator;
 
-import javax.swing.text.Element;
-import javax.swing.text.Segment;
+import javax.swing.text.Document;
 
 import de.marw.javax.swing.text.highlight.Category;
-import de.marw.javax.swing.text.highlight.HighlightedDocument;
 
 
 /**
@@ -42,7 +39,7 @@ public class C_Categoriser extends C_likeCategoriser
 
   /* interface Categoriser
    */
-  public Token nextToken( HighlightedDocument doc, Token token)
+  public Token nextToken( Document doc, Token token)
   {
     if (token == null) {
       token = new Token();
@@ -65,7 +62,7 @@ public class C_Categoriser extends C_likeCategoriser
    * @param token
    *        the token to initialise.
    */
-  private void getToken( HighlightedDocument doc, Token token)
+  private void getToken( Document doc, Token token)
   {
     token.category = Category.NORMAL;
     consumeChars( matchWhitespace());
