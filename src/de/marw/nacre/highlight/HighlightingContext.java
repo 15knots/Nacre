@@ -119,7 +119,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    */
   public Style getStyleForCategory( int code)
   {
-    if (code < categoryStyles.length) { return categoryStyles[code]; }
+    if (code < categoryStyles.length) {
+      return categoryStyles[code];
+    }
     return null;
   }
 
@@ -229,10 +231,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         if ((fg != lastColor && lastColor != null)
             || (font != lastFont && font != null)) {
           // highlighting change, flush what we have
-          g.setColor( lastColor);
-          g.setFont( lastFont);
+          if (lastColor != null)
+            g.setColor( lastColor);
+          if (font != null)
+            g.setFont( lastFont);
           doc.getText( mark, p0 - mark, text);
-          //          System.out.println("-> cat="+token.categoryId+", '"+text+"'");
           x = Utilities.drawTabbedText( text, x, y, g, this, mark);
           mark = p0;
         }
