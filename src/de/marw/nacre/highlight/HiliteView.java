@@ -39,10 +39,6 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
 public class HiliteView extends PlainView
 {
 
-  private static final Object unsafeRestartHere = new Object();
-
-  private static final Object unsafeRestartFollows = new Object();
-
   /**
    * the Categoriser used for highlighting text of this document or
    * <code>null</code> if no highlighting is to be done.
@@ -52,7 +48,7 @@ public class HiliteView extends PlainView
   /**
    * The styles representing the actual categories.
    */
-  private CategoryStyles categoryStyles;
+  private transient CategoryStyles categoryStyles;
 
   /**
    * Cache of foreground colors to represent the various categories.
@@ -79,12 +75,14 @@ public class HiliteView extends PlainView
   private final transient TokenQueue tokenQueue;
 
   /**
-   * the color used to render selected text.
+   * the last known host's (the text component's) color used to render selected
+   * text.
    */
   private transient Color selectedColor;
 
   /**
-   * the color used to render unselected text.
+   * the last known host's (the text component's) color used to render
+   * unselected text.
    */
   private transient Color normalColor;
 
@@ -357,16 +355,16 @@ public class HiliteView extends PlainView
         line = rootElement.getElement( lineIndex);
         synchronized (UNSAFE_LINE_MARKS_LOCK ) {
           // the following line(s) are unsafe to restart scanning
-          Object mark = getMark( line);
-          if (mark != HiliteView.unsafeRestartHere)
-            putMark( line, HiliteView.unsafeRestartFollows);
+          ScanState mark = getMark( line);
+          if (mark != ScanState.UnsafeRestartHere)
+            putMark( line, ScanState.UnsafeRestartFollows);
           // mark following lines as unsafe to restart scanning
           for (int numLines = rootElement.getElementCount() - 1; token.start
               + token.length >= endOffset
               && lineIndex < numLines;) {
             lineIndex++;
             line = rootElement.getElement( lineIndex);
-            putMark( line, HiliteView.unsafeRestartHere);
+            putMark( line, ScanState.UnsafeRestartHere);
             endOffset = Math.min( doc.getLength(), line.getEndOffset());
           } // while
         } // synchronized
@@ -595,12 +593,12 @@ public class HiliteView extends PlainView
       int lineIdx = elem.getElementIndex( changes.getOffset());
       Element line = elem.getElement( lineIdx);
       synchronized (UNSAFE_LINE_MARKS_LOCK ) {
-        Object mark = getMark( line);
+        ScanState mark = getMark( line);
         if (mark != null) {
-          if (mark == HiliteView.unsafeRestartHere) {
+          if (mark == ScanState.UnsafeRestartHere) {
             requiredScanStart = Math.min( requiredScanStart, lineIdx - 1);
           }
-          else if (mark == HiliteView.unsafeRestartFollows) {
+          else if (mark == ScanState.UnsafeRestartFollows) {
             requiredScanStart = Math.min( requiredScanStart, lineIdx);
           }
           int endline = removeConsecutiveMarks( lineIdx);
@@ -673,7 +671,7 @@ public class HiliteView extends PlainView
    * Holds the marks for lines that are unsafe to restart scanning. Lazily
    * created.
    */
-  private Map<Element, Object> unsafeLineMarks = null;
+  private Map<Element, ScanState> unsafeLineMarks = null;
 
   /**
    * Gets the mark that specifies a line as a position where to start the
@@ -684,7 +682,7 @@ public class HiliteView extends PlainView
    * @return The marking object or <code>null</code> if the line is not
    *         marked.
    */
-  private Object getMark( Element line)
+  private ScanState getMark( Element line)
   {
     if (line != null) {
       synchronized (UNSAFE_LINE_MARKS_LOCK ) {
@@ -726,7 +724,7 @@ public class HiliteView extends PlainView
    * @param value
    *        The marking object.
    */
-  private void putMark( Element line, Object value)
+  private void putMark( Element line, ScanState value)
   {
     if (line == null) {
       throw new NullPointerException( "line");
@@ -734,7 +732,7 @@ public class HiliteView extends PlainView
     synchronized (UNSAFE_LINE_MARKS_LOCK ) {
       // lazy creation
       if (unsafeLineMarks == null) {
-        unsafeLineMarks = new HashMap<Element, Object>();
+        unsafeLineMarks = new HashMap<Element, ScanState>();
       }
       unsafeLineMarks.put( line, value);
     }
@@ -749,7 +747,7 @@ public class HiliteView extends PlainView
    * @return The marking object or <code>null</code> if the line is not
    *         marked.
    */
-  private Object removeMark( Element line)
+  private ScanState removeMark( Element line)
   {
     if (line != null) {
       synchronized (UNSAFE_LINE_MARKS_LOCK ) {
@@ -815,6 +813,25 @@ public class HiliteView extends PlainView
     if (font == null)
       font = hostFont;
     return font;
+  }
+
+  /**
+   * States used to look up a reasonable scanner start position.
+   * 
+   * @see HiliteView#getAdjustedStart(int)
+   * @author Martin Weber
+   */
+  private enum ScanState {
+    /**
+     * Line mark: this line is unsafe to restart scanning.
+     */
+    UnsafeRestartHere,
+    /**
+     * Line mark: this line is safe to restart scanning, the following line(s)
+     * are unsafe to restart scanning.
+     */
+    UnsafeRestartFollows
+    ;
   }
 
   /**
