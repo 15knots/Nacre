@@ -6,6 +6,7 @@ package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.Map;
 
 import javax.swing.text.Document;
 import javax.swing.text.Segment;
@@ -381,6 +382,15 @@ public class JavaHighlightingKit extends HighlightingKit
       System.err.println( err);
       System.err.println( "location: " + (where & MAXFILESIZE));
     }
+  }
+
+  /** 
+   * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryDescriptions()
+   */
+  public Map getCategoryDescriptions()
+  {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

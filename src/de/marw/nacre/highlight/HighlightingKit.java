@@ -4,6 +4,8 @@
 
 package de.marw.javax.swing.text.highlight;
 
+import java.util.Map;
+
 import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Element;
 import javax.swing.text.PlainView;
@@ -75,7 +77,7 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
   }
 
   /**
-   * Returns the set of color and font style informations used used to render
+   * Returns the set of color and font style informations used to render
    * highlighted text in the document for a specific content type. <br/>If a
    * client application changes one of the styles contained in the set returned
    * here, the change will be automatically reflected by any
@@ -90,6 +92,14 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    */
   public abstract CategoryStyles getCategoryStyles();
 
+  /**
+   * Returns a Map that specifies each category as a <strong>localized </strong>
+   * string that can be used as a label. If the returned Map yields a
+   * <code>null</code> -value for a Category, this editor kit does not
+   * highlight any text as the queried category.
+   */
+  public abstract Map getCategoryDescriptions();
+  
   /**
    * Creates the Categoriser used for highlighting text of this document or
    * <code>null</code> if no highlighting is to be done.

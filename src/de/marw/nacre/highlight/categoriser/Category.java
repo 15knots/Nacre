@@ -15,10 +15,11 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
 
 /**
  * Represents a lexical token category used to classify a piece of text for
- * syntax highlighting.
+ * syntax highlighting. Note that the identiers of the enumerated constants only
+ * serve as a hint to programmers, the actual meaning of a category depends on
+ * the <code>HighlightingKit</code>'s implementation.
  * 
  * @see de.marw.javax.swing.text.highlight.categoriser.Token
- * @see de.marw.javax.swing.text.highlight.categoriser.Categoriser#nextToken(Document, Token).
  */
 public enum Category {
 
@@ -26,109 +27,83 @@ public enum Category {
    * Comment 1 category. This can be used to mark a comment. (eg, Java and C
    * modes use this to mark a multiple comment.)
    */
-  COMMENT_1("Multi-line comment"),
+  COMMENT_1,
 
   /**
    * Comment 2 category. This can be used to mark a comment.(eg, Java and C++
    * modes use this to mark a single line comment.)
    */
-  COMMENT_2("Single-line comment"),
+  COMMENT_2,
 
   /**
    * Literal string category. This can be used to mark a string literal (eg,
    * Java and C modes use this to mark "..." literals.)
    */
-  STRINGVAL("Strings"),
+  STRINGVAL,
 
   /**
    * Number category. Used to mark literal numbers.
    */
-  NUMERICVAL("Numbers"),
+  NUMERICVAL,
 
   /**
    * Literal predefined value category. This can be used to mark an object
    * literal (eg, Java mode uses this to mark <code>true</code>,
    * <code>false</code>,<code>null</code>.)
    */
-  PREDEFVAL("Predefined values"),
+  PREDEFVAL,
 
   /**
    * Alternative keyword category. This can be used to mark a keyword. (C mode
    * uses this for preprocessor directives.)
    */
-  KEYWORD("Keywords"),
+  KEYWORD,
 
   /**
    * Statement Keyword category. This can be used to mark a keyword for
    * statement. (eg, for, if, while)
    */
-  KEYWORD_STATEMENT("Statement keywords"),
+  KEYWORD_STATEMENT,
 
   /**
    * Type keyword category. This can be used to mark a keyword for data types.
    */
-  KEYWORD_TYPE("Type keywords"),
+  KEYWORD_TYPE,
 
   /**
    * Operator keyword category. This can be used to mark an operator. (eg, C++
    * mode marks 'new' and 'sizeof' with this token type)
    */
-  KEYWORD_OPERATOR("Operator keywords"),
+  KEYWORD_OPERATOR,
 
   /**
    * Operator category. This can be used to mark an operator other than those
    * marked as <code>KEYWORD_OPERATOR</code>. (eg, Java mode marks +, -, etc
    * with this token type)
    */
-  OPERATOR("Operators"),
+  OPERATOR,
 
   /**
    * Label category. This can be used to mark labels.
    */
-  LABEL("Labels"),
+  LABEL,
 
   /**
    * Documentation category. Used to mark special documentation (eg Javadoc
    * comments, Python's autodoc)
    */
-  DOC("Documentation"),
+  DOC,
 
   /**
    * Custom identifier 1 category. This can be used to mark identifiers of
    * interest, so the user can easily spot them.
    */
-  IDENTIFIER_1("Custom identifier 1"),
+  IDENTIFIER_1,
 
   /**
    * Custom identifier 2 category. This can be used to mark identifiers of
    * interest, so the user can easily spot them.
    */
-  IDENTIFIER_2("Custom identifier 2")
+  IDENTIFIER_2
   ;
-
-  // ----------------------------------------------------------
-  /**
-   * String representation of this Category.
-   */
-  private final String description;
-
-  /**
-   * Sole Constructor.
-   * 
-   * @param description
-   *        The String representation of this enum constant, as declared in the
-   *        enum declaration.
-   */
-  private Category( String description) {
-    this.description = description;
-  }
-
-  /**
-   * Specifies the category as a string that can be used as a label. 
-   */
-  public String getDescription()
-  {
-    return description;
-  }
-
 }
