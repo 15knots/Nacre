@@ -130,7 +130,7 @@ public class HiliteView extends PlainView
   }
 
   /**
-   * Sets a new set of color and font style informations used used to render
+   * Sets a new set of color and font style informations used to render
    * highlighted text.
    * 
    * @param styles
@@ -164,7 +164,7 @@ public class HiliteView extends PlainView
    *        the allocated region to render into
    * @see View#paint(java.awt.Graphics, java.awt.Shape)
    */
-  public void paint( Graphics g, Shape a)
+  @Override public void paint( Graphics g, Shape a)
   {
     JTextComponent host = (JTextComponent) getContainer();
     {
@@ -314,7 +314,7 @@ public class HiliteView extends PlainView
    * @see PlainView#drawUnselectedText
    * @see PlainView#drawSelectedText
    */
-  protected void drawLine( int lineIndex, Graphics g, int x, int y)
+  @Override protected void drawLine( int lineIndex, Graphics g, int x, int y)
   {
     // System.out.println( "# drawLine() " + lineIndex + " -------");
     super.drawLine( lineIndex, g, x, y);
@@ -393,8 +393,8 @@ public class HiliteView extends PlainView
    * @throws BadLocationException
    *         if the range is invalid
    */
-  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
-      throws BadLocationException
+  @Override protected int drawUnselectedText( Graphics g, int x, int y, int p0,
+      int p1) throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, false);
   }
@@ -538,7 +538,7 @@ public class HiliteView extends PlainView
   /**
    * Overwritten to remove listeners when going to be garbage collected.
    */
-  public void setParent( View parent)
+  @Override public void setParent( View parent)
   {
     if (parent == null) {
       // we are going to be garbage collected
@@ -574,7 +574,8 @@ public class HiliteView extends PlainView
    * are added or removed, damages the whole view. Overridden to update the line
    * marks. The field <code>requiredScanStart</code> is updated.
    */
-  protected void updateDamage( DocumentEvent changes, Shape a, ViewFactory f)
+  @Override protected void updateDamage( DocumentEvent changes, Shape a,
+      ViewFactory f)
   {
     Element elem = getElement();
     DocumentEvent.ElementChange ec = changes.getChange( elem);
