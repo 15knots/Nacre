@@ -1,16 +1,4 @@
-/*
- * @(#)Category.java 1.2 99/05/27 Copyright (c) 1998 Sun Microsystems, Inc. All
- * Rights Reserved. This software is the confidential and proprietary
- * information of Sun Microsystems, Inc. ("Confidential Information"). You shall
- * not disclose such Confidential Information and shall use it only in
- * accordance with the terms of the license agreement you entered into with Sun.
- * SUN MAKES NO REPRESENTATIONS OR WARRANTIES ABOUT THE SUITABILITY OF THE
- * SOFTWARE, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR
- * NON-INFRINGEMENT. SUN SHALL NOT BE LIABLE FOR ANY DAMAGES SUFFERED BY
- * LICENSEE AS A RESULT OF USING, MODIFYING OR DISTRIBUTING THIS SOFTWARE OR ITS
- * DERIVATIVES.
- */
+//$Id$
 
 package swing.text.highlight;
 
@@ -20,24 +8,41 @@ import swing.text.highlight.categoriser.CategoryConstants;
 
 
 /**
- * Simple class to represent a lexical token. This wraps the Constants used by
- * the scanner to provide a convenient class that can be stored as a attribute
+ * Represents a lexical token category. This wraps the constants used by
+ * the categoriser to provide a convenient class that can be stored as a attribute
  * value.
  * 
- * @author Timothy Prinzing
- * @version 1.2 05/27/99
+ * @author weber
  */
 public class Category implements Serializable
 {
 
-  private Category( int categoryId)
+  private static Category[]  all               = { new Comment1(),
+      new Comment2(), new Stringval(), new PredefVal(), new NumericVal(),
+      new Label(), new Keyword1(), new Keyword2(), new Type(), new Operator(),
+      new Identifier1(), new Identifier2(), new Doc() };
+
+  /**
+   * Key to be used in AttributeSet's holding a value of Category type.
+   */
+  public static final Object CategoryAttribute = new AttributeKey();
+
+  /**
+   * Numeric value of this Category.
+   */
+  private int                categoryId;
+
+  /**
+   * @param categoryId
+   */
+  protected Category( int categoryId)
   {
     this.categoryId = categoryId;
   }
 
   /**
-   * Numeric value of this Category. This is the value returned by the
-   * categorizer.
+   * Returns the numeric value of this Category. These are the values returned
+   * by the categoriser.
    */
   public int getId()
   {
@@ -88,15 +93,6 @@ public class Category implements Serializable
   {
     return all;
   }
-
-  // --- variables -------------------------------------
-
-  /**
-   * Key to be used in AttributeSet's holding a value of Category.
-   */
-  public static final Object CategoryAttribute = new AttributeKey();
-
-  private int                categoryId;
 
   //----------------------------------------------------------
   public static class Comment1 extends Category
@@ -229,7 +225,7 @@ public class Category implements Serializable
   static class AttributeKey
   {
 
-    private AttributeKey()
+    protected AttributeKey()
     {
     }
 
@@ -239,10 +235,5 @@ public class Category implements Serializable
     }
 
   }
-
-  private static Category[] all = { new Comment1(), new Comment2(),
-      new Stringval(), new PredefVal(), new NumericVal(), new Label(),
-      new Keyword1(), new Keyword2(), new Type(), new Operator(),
-      new Identifier1(), new Identifier2(), new Doc() };
 
 }
