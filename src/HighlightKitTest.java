@@ -50,13 +50,13 @@ public class HighlightKitTest
 
       HighlightingKit kit = new CHighlightingKit();
       editor.setEditorKitForContentType( kit.getContentType(), kit);
-      kit = new JavaHighlightingKit();
-      editor.setEditorKitForContentType( kit.getContentType(), kit);
+ //     kit = new JavaHighlightingKit();
+ //     editor.setEditorKitForContentType( kit.getContentType(), kit);
       // add more EditorKits to support different content types here...
 
       // 
-      //      editor.setContentType( "text/x-c-src");
-      editor.setContentType( "text/x-java");
+      editor.setContentType( "text/x-c-src");
+//      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
       editor.setFont( new Font( "Courier", 0, 12));
       editor.setEditable( true);

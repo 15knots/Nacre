@@ -3,15 +3,9 @@
 
 package swing.text.highlight;
 
-import java.text.CharacterIterator;
-
-import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
-import swing.text.highlight.categoriser.AbstractCategoriser;
 import swing.text.highlight.categoriser.Categoriser;
-import swing.text.highlight.categoriser.CategoryConstants;
-import swing.text.highlight.categoriser.Token;
 
 
 /**
@@ -50,188 +44,238 @@ public class CHighlightingKit extends HighlightingKit
     return new C_Tokeniser();
   }
 
-  public class C_Tokeniser extends AbstractCategoriser
+  /**
+   * Checks if a subregion of a <code>Segment</code> is equal to a character
+   * array.
+   * 
+   * @param ignoreCase
+   *          True if case should be ignored, false otherwise
+   * @param text
+   *          The segment
+   * @param offset
+   *          The offset into the segment
+   * @param match
+   *          The character array to match
+   */
+  private static boolean regionMatches( boolean ignoreCase, Segment text,
+      int offset, char[] match)
   {
+    int endpos = offset + match.length;
+    char[] textArray = text.array;
 
-    C_Tokeniser()
-    {
+    if (endpos > (text.offset + text.count)) {
+      return false;
     }
 
-    public void setInput( Segment input)
-    {
-      super.setInput( input);
-      //      lexer= new LexerC( new SegmentInputStream( input));
-    }
+    for (int i = offset, j = 0; i < endpos; i++ , j++ ) {
+      char c1 = textArray[i];
+      char c2 = match[j];
 
-    /**
-     * Überschrieben, um
-     */
-    public Token nextToken( HighlightedDocument doc, Token token)
-    {
-      if (token == null) {
-        token = new Token();
+      if (ignoreCase) {
+        c1 = Character.toUpperCase( c1);
+        c2 = Character.toUpperCase( c2);
       }
 
-      scan( token);
-      return token;
-    }
-
-    private void scan( Token token)
-    {
-      tokenLoop: for (;;) {
-        skipWS();
-        token.start = input.getIndex();
-        char c = nextChar();
-
-        switch (c) {
-          case '\"':
-            readString();
-            token.categoryId = CategoryConstants.STRINGVAL;
-          break tokenLoop;
-
-          case '\'':
-            readCharConst();
-            token.categoryId = CategoryConstants.STRINGVAL;
-          break tokenLoop;
-
-          case '/':
-            if (input.array[input.getIndex()] == '*') {
-              readMLComment();
-              token.categoryId = CategoryConstants.COMMENT1;
-            }
-            else {
-              token.categoryId = CategoryConstants.OPERATOR;
-            }
-          break tokenLoop;
-          case '#':
-            skipWS();
-            readWord();
-            token.categoryId = CategoryConstants.KEYWORD2;
-          break tokenLoop;
-          default:
-            readWord();
-            token.categoryId = CategoryConstants.NORMAL;
-          break tokenLoop;
-        }
-      }
-      token.length = input.getIndex() - token.start;
-    }
-
-    /**
-     * 
-     */
-    private void readWord()
-    {
-      for (char c = input.current(); Character.isLetterOrDigit( c)
-          || (c == '_');) {
-        c = nextChar();
+      if (c1 != c2) {
+        return false;
       }
     }
 
-    void skipWS()
-    {
-      while (Character.isWhitespace( input.current())) {
-        input.next();
-      }
-    }
-
-    /**
-     * 
-     */
-    private void readCharConst()
-    {
-      // TODO Auto-generated method stub
-      throw new java.lang.UnsupportedOperationException(
-          "readCharCOnst not implemented");
-
-    }
-
-    /**
-     * 
-     */
-    private void readMLComment()
-    {
-      char c = nextChar();
-      for (;;) {
-        switch (c) {
-          case '*':
-            if (input.current() == '/') {
-              nextChar();
-              return;
-            }
-            c = nextChar();
-          break;
-          case CharacterIterator.DONE:
-            return;
-          default:
-            c = nextChar();
-        }
-      }
-    }
-
-    /**
-     * 
-     */
-    private void readString()
-    {
-      char c = nextChar();
-      for (;;) {
-        switch (c) {
-          case '\\':
-            nextChar();
-          break;
-          case '\"':
-          case '\n':
-            nextChar();
-            return;
-          case CharacterIterator.DONE:
-            return;
-          default:
-            c = nextChar();
-        }
-      }
-    }
-
-    private char nextChar()
-    {
-      char ret = input.current();
-      input.next();
-      return ret;
-    }
-
-    /**
-     * Überschrieben, um
-     */
-    public void insertUpdate( Element elem)
-    {
-      // TODO Auto-generated method stub
-      //throw new java.lang.UnsupportedOperationException("insertUpdate not
-      // implemented");
-
-    }
-
-    /**
-     * Überschrieben, um
-     */
-    public void removeUpdate( Element line)
-    {
-      // TODO Auto-generated method stub
-      //throw new java.lang.UnsupportedOperationException("removeUpdate not
-      // implemented");
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see swing.text.highlight.categoriser.Categoriser#closeInput()
-     */
-    public void closeInput()
-    {
-      // TODO Auto-generated method stub
-
-    }
+    return true;
   }
+
+  //public byte markTokensImpl( Segment line, int lineIndex)
+  //{
+  //  byte lastTokenType;
+  //  char[] array= line.array;
+  //  int offset= line.offset;
+  //  int lastOffset= offset;
+  //  int lastKeyword= offset;
+  //
+  //  int length= line.count + offset;
+  //  boolean backslash= false;
+  //
+  //  loop: for (int i= offset; i < length; i++) {
+  //    int i1= (i + 1);
+  //
+  //    char c= array[i];
+  //
+  //    if (c == '\\') {
+  //      backslash= !backslash;
+  //
+  //      continue;
+  //    }
+  //
+  //    switch (lastTokenType) {
+  //      case CategoryConstants.NORMAL:
+  //
+  //        switch (c) {
+  //          /*
+  //           * case '#': if(backslash) backslash = false;
+  //           * if(doKeyword(line,i,c)) break; addToken(i - lastOffset,token);
+  //           * addToken(length - i,CategoryConstants.KEYWORD2); lastOffset =
+  //           * lastKeyword = length; break loop;
+  //           */
+  //          case '"':
+  //            doKeyword( line, i, c);
+  //
+  //            if (backslash) {
+  //              backslash= false;
+  //            }
+  //            else {
+  //              addToken( i - lastOffset, lastTokenType);
+  //              lastTokenType= CategoryConstants.STRINGVAL;
+  //              lastOffset= lastKeyword= i;
+  //            }
+  //
+  //          break;
+  //
+  //          case '\'':
+  //            doKeyword( line, i, c);
+  //
+  //            if (backslash) {
+  //              backslash= false;
+  //            }
+  //            else {
+  //              addToken( i - lastOffset, lastTokenType);
+  //              lastTokenType= CategoryConstants.STRINGVAL;
+  //              lastOffset= lastKeyword= i;
+  //            }
+  //
+  //          break;
+  //
+  //          case ':':
+  //
+  //            if (lastKeyword == offset) {
+  //              if (doKeyword( line, i, c)) {
+  //                break;
+  //              }
+  //
+  //              backslash= false;
+  //              addToken( i1 - lastOffset, CategoryConstants.LABEL);
+  //              lastOffset= lastKeyword= i1;
+  //            }
+  //            else if (doKeyword( line, i, c)) {
+  //              break;
+  //            }
+  //
+  //          break;
+  //
+  //          case '/':
+  //            backslash= false;
+  //            doKeyword( line, i, c);
+  //
+  //            if ((length - i) > 1) {
+  //              switch (array[i1]) {
+  //                case '*':
+  //                  addToken( i - lastOffset, lastTokenType);
+  //                  lastOffset= lastKeyword= i;
+  //
+  //                  if (((length - i) > 2) && (array[i + 2] == '*')) {
+  //                    lastTokenType= CategoryConstants.COMMENT2;
+  //                  }
+  //                  else {
+  //                    lastTokenType= CategoryConstants.COMMENT1;
+  //                  }
+  //
+  //                break;
+  //
+  //                case '/':
+  //                  addToken( i - lastOffset, lastTokenType);
+  //                  addToken( length - i, CategoryConstants.COMMENT1);
+  //                  lastOffset= lastKeyword= length;
+  //
+  //                break loop;
+  //              }
+  //            }
+  //
+  //          break;
+  //
+  //          default:
+  //            backslash= false;
+  //
+  //            if (!Character.isLetterOrDigit( c) && (c != '_') && (c != '#')) {
+  //              doKeyword( line, i, c);
+  //            }
+  //
+  //          break;
+  //        }
+  //
+  //      break;
+  //
+  //      case CategoryConstants.COMMENT1:
+  //      case CategoryConstants.COMMENT2:
+  //        backslash= false;
+  //
+  //        if ((c == '*') && ((length - i) > 1)) {
+  //          if (array[i1] == '/') {
+  //            i++;
+  //            addToken( (i + 1) - lastOffset, lastTokenType);
+  //            lastTokenType= CategoryConstants.NORMAL;
+  //            lastOffset= lastKeyword= i + 1;
+  //          }
+  //        }
+  //
+  //      break;
+  //
+  //      case CategoryConstants.STRINGVAL:
+  //
+  //        if (backslash) {
+  //          backslash= false;
+  //        }
+  //        else if (c == '"') {
+  //          addToken( i1 - lastOffset, lastTokenType);
+  //          lastTokenType= CategoryConstants.NORMAL;
+  //          lastOffset= lastKeyword= i1;
+  //        }
+  //
+  //      break;
+  //
+  //      case CategoryConstants.STRINGVAL:
+  //
+  //        if (backslash) {
+  //          backslash= false;
+  //        }
+  //        else if (c == '\'') {
+  //          addToken( i1 - lastOffset, CategoryConstants.STRINGVAL);
+  //          lastTokenType= CategoryConstants.NORMAL;
+  //          lastOffset= lastKeyword= i1;
+  //        }
+  //
+  //      break;
+  //
+  //      default:
+  //        throw new InternalError( "Invalid state: " + lastTokenType);
+  //    }
+  //  }
+  //
+  //  if (lastTokenType == CategoryConstants.NORMAL) {
+  //    doKeyword( line, length, '\0');
+  //  }
+  //
+  //  switch (lastTokenType) {
+  //    case CategoryConstants.STRINGVAL:
+  //    case CategoryConstants.STRINGVAL:
+  //      addToken( length - lastOffset, CategoryConstants.INVALID);
+  //      lastTokenType= CategoryConstants.NORMAL;
+  //
+  //    break;
+  //
+  //    case CategoryConstants.KEYWORD2:
+  //      addToken( length - lastOffset, lastTokenType);
+  //
+  //      if (!backslash) {
+  //        lastTokenType= CategoryConstants.NORMAL;
+  //      }
+  //
+  //    default:
+  //      addToken( length - lastOffset, lastTokenType);
+  //
+  //    break;
+  //  }
+  //
+  //  return lastTokenType;
+  //}
 
 }
 

@@ -282,7 +282,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
             // print current token
             Segment txt = new Segment();
             doc.getText( token.start, token.length, txt);
-            System.out.println( "cat=" + token.categoryId + ", '" + txt + "'");
+            System.out.println( "tok=" + token + ", '" + txt + "'");
           }
           p += token.start + token.length;
         }

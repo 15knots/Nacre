@@ -54,20 +54,22 @@ public interface CategoryConstants
   public static final int NUMERICVAL  = 5;
 
   /**
-   * Label category id. This can be used to mark labels (eg, C mode uses this to
-   * mark ...: sequences)
+   * Label category id. This can be used to mark labels.
+   * 
+   * @deprecated Bullshit, this requieres a Parser, not a Scanner!
    */
   public static final int LABEL       = 6;
 
   /**
    * Keyword 1 category id. This can be used to mark a keyword. This should be
-   * used for general language constructs.
+   * used for statements.
+   *TODO umbenennen in STATEMENT
    */
   public static final int KEYWORD1    = 7;
 
   /**
    * Keyword 2 category id. This can be used to mark a keyword. This should be
-   * used for preprocessor commands, or variables.
+   * used for preprocessor directives.
    */
   public static final int KEYWORD2    = 8;
 

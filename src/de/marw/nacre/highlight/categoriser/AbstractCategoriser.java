@@ -68,6 +68,45 @@ public abstract class AbstractCategoriser implements Categoriser
     return line.getStartOffset();
   }
 
+  /**
+   * Checks if a subregion of a <code>Segment</code> is equal to a string.
+   * 
+   * @param ignoreCase
+   *          True if case should be ignored, false otherwise
+   * @param text
+   *          The segment
+   * @param offset
+   *          The offset into the segment
+   * @param match
+   *          The string to match
+   */
+  public static int regionMatches( boolean ignoreCase, Segment text,
+      int offset, String match)
+  {
+    int endpos = offset + match.length();
+    char[] textArray = text.array;
+  
+    if (endpos > (text.offset + text.count)) {
+      return 0; // no match
+    }
+    int j = 0;
+    for (int i = offset; i < endpos; i++ , j++ ) {
+      char c1 = textArray[i];
+      char c2 = match.charAt( j);
+  
+      if (ignoreCase) {
+        c1 = Character.toUpperCase( c1);
+        c2 = Character.toUpperCase( c2);
+      }
+  
+      if (c1 != c2) {
+        return 0; // no match
+      }
+    }
+  
+    return j;
+  }
+
   /** Used as a key on lines that contain multiline Tokens. */
   protected static class AttributeKey
   {

@@ -1,0 +1,6 @@
+  
+  true;
+falsee;
+
+ja >>>all;
+kk+=sizeof++( int);
