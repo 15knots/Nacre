@@ -344,7 +344,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           p1 = Math.min( doc.getLength(), line.getEndOffset());
           consumeTokens( p0, p1);
           // line is scanned, determine marks
-          requiredScanStart = updateMarks( map, requiredScanStart) + 1;
+          requiredScanStart = addMarks( map, requiredScanStart) + 1;
         }
       }
       catch (BadLocationException ex) {
@@ -403,7 +403,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * Renders a line of text, suppressing whitespace at the end and expanding
-     * any tabs.
+     * any tabs. The field <code>requiredScanStart</code> is updated.
      * 
      * @param lineIndex
      *        the line to draw >= 0
@@ -424,7 +424,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
       // Check which line(s) following are unsafe to restart scanning and mark
       // these
-      lineIndex = updateMarks( getElement(), lineIndex);
+      lineIndex = addMarks( getElement(), lineIndex);
       requiredScanStart = lineIndex + 1; // document has been scanned up to here
       /*
        * force the component to repaint the following lines, thus supporting
@@ -438,8 +438,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * Checks whether the line(s) following the specified index are unsafe to
-     * restart scanning and marks these. The filed
-     * <code>requiredScanStart</code> is updated.
+     * restart scanning and marks these.
      * 
      * @param rootElement
      *        the root element of the view.
@@ -447,7 +446,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      *        number of the line where to start.
      * @return the number of the last line that was checked.
      */
-    private int updateMarks( Element rootElement, int lineIndex)
+    private int addMarks( Element rootElement, int lineIndex)
     {
       if ( !tokenQueue.isEmpty()) {
         Document doc = rootElement.getDocument();
@@ -458,20 +457,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         int endOffset = Math.min( doc.getLength(), line.getEndOffset());
         if (token.multiline && token.start < endOffset) {
           line = rootElement.getElement( lineIndex);
-          // the following line(s) are unsafe to restart scanning
-          Object mark = getMark( line);
-          if (mark != HighlightingContext.unsafeRestartHere)
-            putMark( line, HighlightingContext.unsafeRestartFollows);
-          // mark following lines as unsafe to restart scanning
-          for (int numLines = rootElement.getElementCount() - 1; token.start
-              + token.length >= endOffset
-              && lineIndex < numLines;) {
-            lineIndex++;
-            line = rootElement.getElement( lineIndex);
-            putMark( line, HighlightingContext.unsafeRestartHere);
-            endOffset = Math.min( doc.getLength(), line.getEndOffset());
-          } // while
-
+          synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+            // the following line(s) are unsafe to restart scanning
+            Object mark = getMark( line);
+            if (mark != HighlightingContext.unsafeRestartHere)
+              putMark( line, HighlightingContext.unsafeRestartFollows);
+            // mark following lines as unsafe to restart scanning
+            for (int numLines = rootElement.getElementCount() - 1; token.start
+                + token.length >= endOffset
+                && lineIndex < numLines;) {
+              lineIndex++;
+              line = rootElement.getElement( lineIndex);
+              putMark( line, HighlightingContext.unsafeRestartHere);
+              endOffset = Math.min( doc.getLength(), line.getEndOffset());
+            } // while
+          } // synchronized
         }
       }
       return lineIndex;
@@ -655,7 +655,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     /**
      * Repaint the region of change covered by the given document event. If
      * lines are added or removed, damages the whole view. Overridden to update
-     * the line marks.
+     * the line marks. The field <code>requiredScanStart</code> is updated.
      */
     protected void updateDamage( DocumentEvent changes, Shape a, ViewFactory f)
     {
@@ -676,16 +676,18 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       else {
         int lineIdx = elem.getElementIndex( changes.getOffset());
         Element line = elem.getElement( lineIdx);
-        Object mark = getMark( line);
-        if (mark != null) {
-          if (mark == HighlightingContext.unsafeRestartHere) {
-            requiredScanStart = Math.min( requiredScanStart, lineIdx - 1);
+        synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+          Object mark = getMark( line);
+          if (mark != null) {
+            if (mark == HighlightingContext.unsafeRestartHere) {
+              requiredScanStart = Math.min( requiredScanStart, lineIdx - 1);
+            }
+            else if (mark == HighlightingContext.unsafeRestartFollows) {
+              requiredScanStart = Math.min( requiredScanStart, lineIdx);
+            }
+            int endline = removeConsecutiveMarks( lineIdx);
+            damageLineRange( lineIdx, endline, a, getContainer());
           }
-          else if (mark == HighlightingContext.unsafeRestartFollows) {
-            requiredScanStart = Math.min( requiredScanStart, lineIdx);
-          }
-          int endline = removeConsecutiveMarks( lineIdx);
-          damageLineRange( lineIdx, endline, a, getContainer());
         }
       }
       super.updateDamage( changes, a, f);
@@ -721,16 +723,21 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     /**
      * @param lineIndex
      *        the line number where to start removing line marks.
+     * @return the line number where the last line mark was removed.
      */
     private int removeConsecutiveMarks( int lineIndex)
     {
-      Element element = getElement();
-      for (;; lineIndex++) {
-        Element line = element.getElement( lineIndex);
-        if ( !hasMark( line)) {
-          break;
+      synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+        if (unsafeLineMarks != null) {
+          Element element = getElement();
+          for (;; lineIndex++) {
+            Element line = element.getElement( lineIndex);
+            if (line == null || !unsafeLineMarks.containsKey( line)) {
+              break;
+            }
+            removeMark( line);
+          }
         }
-        removeMark( line);
       }
       return lineIndex;
     }
@@ -739,7 +746,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     // unsafe line marking
     ///////////////////////////////////////////////////////////////////
     /**
-     * Holds the marks for lines that are unsafe to restart scanning.
+     * The locking object for atomic operations that rely on
+     * <code>unsafeLineMarks</code>.
+     */
+    private final Object UNSAFE_LINE_MARKS_LOCK = new Object();
+
+    /**
+     * Holds the marks for lines that are unsafe to restart scanning. Lazily
+     * created.
      */
     private Map unsafeLineMarks = null;
 
@@ -748,18 +762,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * scanning is <strong>unsafe </strong>.
      * 
      * @param line
-     *        The line to get the mark for.
+     *        The line to get the mark for or <code>null</code>.
      * @return The marking object or <code>null</code> if the line is not
      *         marked.
      */
     private Object getMark( Element line)
     {
-      if (unsafeLineMarks == null || line == null) {
-        return null;
+      if (line != null) {
+        synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+          if (unsafeLineMarks != null) {
+            return unsafeLineMarks.get( line);
+          }
+        }
       }
-      synchronized (unsafeLineMarks ) {
-        return unsafeLineMarks.get( line);
-      }
+      return null;
     }
 
     /**
@@ -767,18 +783,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * scanning is <strong>unsafe </strong>.
      * 
      * @param line
-     *        The line to get the mark for.
+     *        The line to get the mark for or <code>null</code>.
      * @return <code>true</code> if the line is marked, otherwise
      *         <code>false</code>.
      */
     private boolean hasMark( Element line)
     {
-      if (unsafeLineMarks == null || line == null) {
-        return false;
+      if (line != null) {
+        synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+          if (unsafeLineMarks != null) {
+            return this.unsafeLineMarks.containsKey( line);
+          }
+        }
       }
-      synchronized (unsafeLineMarks ) {
-        return this.unsafeLineMarks.containsKey( line);
-      }
+      return false;
     }
 
     /**
@@ -795,11 +813,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       if (line == null) {
         throw new NullPointerException( "line");
       }
-      // lazy creation
-      if (unsafeLineMarks == null) {
-        unsafeLineMarks = new HashMap();
-      }
-      synchronized (unsafeLineMarks ) {
+      synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+        // lazy creation
+        if (unsafeLineMarks == null) {
+          unsafeLineMarks = new HashMap();
+        }
         unsafeLineMarks.put( line, value);
       }
     }
@@ -809,18 +827,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * scanning is <strong>unsafe </strong>.
      * 
      * @param line
-     *        The line to unmark.
+     *        The line to unmark or <code>null</code>.
      * @return The marking object or <code>null</code> if the line is not
      *         marked.
      */
     private Object removeMark( Element line)
     {
-      if (unsafeLineMarks == null || line == null) {
-        return null;
+      if (line != null) {
+        synchronized (UNSAFE_LINE_MARKS_LOCK ) {
+          if (unsafeLineMarks != null) {
+            return unsafeLineMarks.remove( line);
+          }
+        }
       }
-      synchronized (unsafeLineMarks ) {
-        return unsafeLineMarks.remove( line);
-      }
+      return null;
     }
 
     /**
