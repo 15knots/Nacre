@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -6,6 +6,7 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
@@ -125,7 +126,7 @@ public class HiliteView extends PlainView
     setCategoryStyles( styles);
     this.tokenQueue = new TokenQueue( elem.getDocument());
     requiredScanStart = 0;
-    //System.out.println( "Ctor: " + this);
+    // System.out.println( "Ctor: " + this);
   }
 
   /**
@@ -146,6 +147,10 @@ public class HiliteView extends PlainView
     }
     categoryStyles = styles;
     categoryStyles.addCategoryStylesListener( cacheInvalidator);
+
+    Container host = getContainer();
+    if (host != null)
+      host.repaint();
   }
 
   /**
@@ -168,9 +173,9 @@ public class HiliteView extends PlainView
       Caret c = host.getCaret();
       selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
           : normalColor;
-      updateMetrics();
       // host font changes invalidate the font cache
       Font f = host.getFont();
+      metrics = host.getFontMetrics( f);
       if (hostFont != f) {
         categoryFonts = null;
         hostFont = f;
@@ -200,6 +205,7 @@ public class HiliteView extends PlainView
     Element map = getElement();
     int lineCount = map.getElementCount();
     int startLine = Math.min( requiredScanStart, linesAbove);
+    startLine = Math.min( startLine, lineCount - 1);
     int endLine = Math.min( lineCount, linesTotal - linesBelow);
     endLine = Math.max( endLine - 1, 0);
 
@@ -209,7 +215,7 @@ public class HiliteView extends PlainView
     Document doc = map.getDocument();
     Element line1 = map.getElement( startLine);
     // Element line2 = map.getElement( endLine);
-    // bisschen mehr Text scanner für besseres forcedRepaint..
+    // bisschen mehr Text scannen für besseres forcedRepaint..
     Element line2 = map.getElement( Math.min( endLine + 5, lineCount - 1));
     int p0 = line1.getStartOffset();
     int p1 = Math.min( doc.getLength(), line2.getEndOffset());
@@ -228,7 +234,7 @@ public class HiliteView extends PlainView
       tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
 
       // mark lines without rendering...
-      while (requiredScanStart < linesAbove) {
+      while (requiredScanStart < linesAbove&&requiredScanStart<lineCount) {
         // scan current line...
         Element line = map.getElement( requiredScanStart);
         p0 = line.getStartOffset();
@@ -445,14 +451,21 @@ public class HiliteView extends PlainView
     Segment text = getLineBuffer();
     Token token = null;
     while (p0 < p1) {
-      Category category = Category.NORMAL;
+      Category category = null;
       int flushTo = p1;
+
       if ( !tokenQueue.isEmpty()) {
         // get token
         token = tokenQueue.peek();
+        // Abschnitte ohne Kategorie zusammenziehen...
+        for (; !tokenQueue.isEmpty() && token.category == null; token = tokenQueue
+            .peek()) {
+          tokenQueue.remove();
+        }
+
         if (token.start > p0) {
           // gap between tokens: draw as normal text
-          category = Category.NORMAL;
+          category = null;
           flushTo = Math.min( token.start, p1);
           doc.getText( p0, flushTo - p0, text);
           x = drawHighlightedText( category, selected, text, x, y, g, p0);
@@ -510,6 +523,12 @@ public class HiliteView extends PlainView
         font = hostFont;
       }
 
+      if (false) {
+        System.out.print( "painting '" + text + "', offs=" + startOffset
+            + ", cat=" + category + ", sel=" + selected);
+        System.out.println( ", color=" + fg.getRGB() + ", font="
+            + font.getFontName());
+      }
       if ( !g.getColor().equals( fg)) {
         g.setColor( fg);
       }
@@ -517,14 +536,22 @@ public class HiliteView extends PlainView
         g.setFont( font);
       }
 
-      if (false) {
-        System.out.print( "painting '" + text + "', offs=" + startOffset
-            + ", cat=" + category + ", sel=" + selected);
-        System.out.println( ", color=" + fg + ", font=" + font);
-      }
       x = Utilities.drawTabbedText( text, x, y, g, this, startOffset);
     }
     return x;
+  }
+
+  /**
+   * Overwritten to remove listeners when going to be garbage collected.
+   */
+  public void setParent( View parent)
+  {
+    if (parent == null) {
+      // we are going to be garbage collected
+      // System.out.println( "garbage: " + this);
+      categoryStyles.removeCategoryStylesListener( cacheInvalidator);
+    }
+    super.setParent( parent);
   }
 
   /*
@@ -651,7 +678,7 @@ public class HiliteView extends PlainView
    * Holds the marks for lines that are unsafe to restart scanning. Lazily
    * created.
    */
-  private Map unsafeLineMarks = null;
+  private Map<Element, Object> unsafeLineMarks = null;
 
   /**
    * Gets the mark that specifies a line as a position where to start the
@@ -712,7 +739,7 @@ public class HiliteView extends PlainView
     synchronized (UNSAFE_LINE_MARKS_LOCK ) {
       // lazy creation
       if (unsafeLineMarks == null) {
-        unsafeLineMarks = new HashMap();
+        unsafeLineMarks = new HashMap<Element, Object>();
       }
       unsafeLineMarks.put( line, value);
     }
@@ -746,6 +773,11 @@ public class HiliteView extends PlainView
    */
   private Color getForeground( Category category)
   {
+    if (category == null) {
+      // treat as normal text, use the JTextComponent's font and color
+      return null;
+    }
+
     if (categoryColors == null) {
       categoryColors = new Color[Category.values().length];
     }
@@ -768,6 +800,11 @@ public class HiliteView extends PlainView
    */
   private Font getFont( Category category)
   {
+    if (category == null) {
+      // treat as normal text, use the JTextComponent's font and color
+      return null;
+    }
+
     if (categoryFonts == null) {
       categoryFonts = new Font[Category.values().length];
     }
@@ -785,19 +822,6 @@ public class HiliteView extends PlainView
       }
     }
     return f;
-  }
-
-  /**
-   * @see javax.swing.text.View#setParent(javax.swing.text.View)
-   */
-  public void setParent( View parent)
-  {
-    if (parent == null) {
-      // we are going to be garbage collected
-      //System.out.println( "garbage: " + this);
-      categoryStyles.removeCategoryStylesListener( cacheInvalidator);
-    }
-    super.setParent( parent);
   }
 
   /**

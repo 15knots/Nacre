@@ -65,7 +65,7 @@ public class C_Categoriser extends C_likeCategoriser
    */
   private void getToken( Document doc, Token token)
   {
-    token.category = Category.NORMAL;
+    token.category = null;
     consumeChars( matchWhitespace());
 
     token.multiline = false;
@@ -147,7 +147,7 @@ public class C_Categoriser extends C_likeCategoriser
             else {
               // still no category found...
               // treat matched word as normal text
-              token.category = Category.NORMAL;
+              token.category = null;
             }
           } // matchlen >0
           else {
@@ -156,7 +156,7 @@ public class C_Categoriser extends C_likeCategoriser
              * somewhere above: treat as normal text
              */
             matchLen = 1; // consume char
-            token.category = Category.NORMAL;
+            token.category = null;
           }
         }
         consumeChars( matchLen);

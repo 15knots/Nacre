@@ -22,9 +22,12 @@ public class Token implements Cloneable
   public int length = 0;
 
   /**
-   * the token's Category.
+   * the token's Category. This is <code>null</code> to indicate an undefined
+   * text category. Categorisers will use this to mark their unititialized
+   * state. The rendering mechanism will treat a <code>null</code> -values as
+   * normal text without any highlighting.
    */
-  public Category category = Category.NORMAL;
+  public Category category = null;
 
   /**
    * <code>true</code> if this Token might span multiple lines (e.g.

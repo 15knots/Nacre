@@ -21,8 +21,7 @@ class SegmentInputStream extends InputStream
 
   private char c;
 
-  public SegmentInputStream( Segment segment)
-  {
+  public SegmentInputStream( Segment segment) {
     this.segment = segment;
     c = segment.first(); // initialize CharIterator
   }

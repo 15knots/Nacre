@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,17 +27,18 @@ public class CategoryStyles implements Serializable
   /**
    * Comment for <code>serialVersionUID</code>
    */
-  private static final long serialVersionUID = 3763096375331796789L;
+  private static final long serialVersionUID = 3978148737866741304L;
 
   /**
    * the categories and the styles managed by this object.
    */
-  private Map categoryStyles = new HashMap( Category.values().length / 2);
+  private EnumMap<Category, StyleEntry> categoryStyles = new EnumMap<Category, StyleEntry>(
+      Category.class);
 
   /**
    * Listeners, lazily created
    */
-  private transient List listeners;
+  private transient List<CategoryStylesListener> listeners;
 
   /**
    * Constructs an empty set of color and font style informations.
@@ -73,7 +74,7 @@ public class CategoryStyles implements Serializable
    */
   public int getStyle( Category category)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
+    StyleEntry style = categoryStyles.get( category);
     if (style != null) {
       return style.style;
     }
@@ -91,7 +92,7 @@ public class CategoryStyles implements Serializable
    */
   public Color getColor( Category category)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
+    StyleEntry style = categoryStyles.get( category);
     if (style != null) {
       return style.color;
     }
@@ -109,7 +110,7 @@ public class CategoryStyles implements Serializable
    */
   public boolean isBold( Category category)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
+    StyleEntry style = categoryStyles.get( category);
     if (style != null) {
       return style.isBold();
     }
@@ -127,7 +128,7 @@ public class CategoryStyles implements Serializable
    */
   public boolean isItalic( Category category)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
+    StyleEntry style = categoryStyles.get( category);
     if (style != null) {
       return style.isItalic();
     }
@@ -143,18 +144,15 @@ public class CategoryStyles implements Serializable
    *        The <code>Color</code> to render the specified category or
    *        <code>null</code> if the default text component's color is to be
    *        used.
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
    */
   public void setColor( Category category, Color newColor)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
-    if (style == null && newColor != null) {
-      style = new StyleEntry( newColor);
-      categoryStyles.put( category, style);
-    }
-    else {
-      style.setColor( newColor);
-      checkDefaultRemove( style);
-    }
+    StyleEntry style = getOrCreateStyle( category);
+
+    style.setColor( newColor);
+    checkDefaultRemove( style);
     fireCategoryStylesChanged( category);
   }
 
@@ -167,18 +165,14 @@ public class CategoryStyles implements Serializable
    * @param bold
    *        <code>true</code> if the <code>Font</code> object's style is
    *        BOLD; <code>false</code> otherwise.
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
    */
   public void setBold( Category category, boolean bold)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
-    if (style == null && bold) {
-      style = new StyleEntry( null);
-      categoryStyles.put( category, style);
-    }
-    else {
-      style.setBold( bold);
-      checkDefaultRemove( style);
-    }
+    StyleEntry style = getOrCreateStyle( category);
+    style.setBold( bold);
+    checkDefaultRemove( style);
     fireCategoryStylesChanged( category);
   }
 
@@ -191,25 +185,21 @@ public class CategoryStyles implements Serializable
    * @param italic
    *        <code>true</code> if the <code>Font</code> object's style is
    *        ITALIC; <code>false</code> otherwise.
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
    */
   public void setItalic( Category category, boolean italic)
   {
-    StyleEntry style = (StyleEntry) categoryStyles.get( category);
-    if (style == null && italic) {
-      style = new StyleEntry( null);
-      categoryStyles.put( category, style);
-    }
-    else {
-      style.setItalic( italic);
-      checkDefaultRemove( style);
-    }
+    StyleEntry style = getOrCreateStyle( category);
+    style.setItalic( italic);
+    checkDefaultRemove( style);
     fireCategoryStylesChanged( category);
   }
 
   public void addCategoryStylesListener( CategoryStylesListener listener)
   {
     if (listeners == null) {
-      listeners = new ArrayList();
+      listeners = new ArrayList<CategoryStylesListener>();
     }
     listeners.add( listener);
   }
@@ -225,11 +215,29 @@ public class CategoryStyles implements Serializable
   {
     if (listeners != null) {
       CategoryStylesEvent evt = new CategoryStylesEvent( this, cat);
-      for (Iterator iter = listeners.iterator(); iter.hasNext();) {
-        CategoryStylesListener listener = (CategoryStylesListener) iter.next();
+      for (CategoryStylesListener listener : listeners) {
         listener.styleChanged( evt);
       }
     }
+  }
+
+  /**
+   * @param category
+   * @return
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
+   */
+  private StyleEntry getOrCreateStyle( Category category)
+  {
+    if (category == null) {
+      throw new NullPointerException( "category");
+    }
+    StyleEntry style = categoryStyles.get( category);
+    if (style == null) {
+      style = new StyleEntry();
+      categoryStyles.put( category, style);
+    }
+    return style;
   }
 
   /**
@@ -269,15 +277,10 @@ public class CategoryStyles implements Serializable
     private int style;
 
     /**
-     * Construct a new StyleEntry object with the specified color and a plain
-     * font style.
-     * 
-     * @param color
-     *        The foreground color to use or <code>null</code> if the default
-     *        text component's color is to be used.
+     * Constructs a new StyleEntry object with no color and a plain font style.
      */
-    public StyleEntry( Color color) {
-      this.color = color;
+    public StyleEntry() {
+      this.color = null;
       this.style = Font.PLAIN;
     }
 

@@ -14,12 +14,10 @@ import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.text.Document;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
 
 import de.marw.javax.swing.text.highlight.CHighlightingKit;
 import de.marw.javax.swing.text.highlight.Category;
-import de.marw.javax.swing.text.highlight.HighlightingContext;
+import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
 
 
@@ -77,46 +75,8 @@ public class HighlightKitTest
       //editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
       //editor.setEditable( false);
 
-      // PENDING(prinz) This should have a customizer and
-      // be serialized. This is a bogus initialization.
-      HighlightingContext styles = kit.getStylePreferences();
-
-      Style s;
-      s = styles.getStyleForCategory( Category.COMMENT_1);
-      StyleConstants.setForeground( s, new Color( 63, 127, 95));
-      s = styles.getStyleForCategory( Category.COMMENT_2);
-      StyleConstants.setForeground( s, new Color( 63, 127, 95));
-
-      s = styles.getStyleForCategory( Category.STRINGVAL);
-      StyleConstants.setForeground( s, new Color( 42, 0, 255));
-      StyleConstants.setItalic( s, true);
-
-      s = styles.getStyleForCategory( Category.NUMERICVAL);
-      StyleConstants.setForeground( s, new Color( 42, 0, 255));
-
-      s = styles.getStyleForCategory( Category.PREDEFVAL);
-      StyleConstants.setForeground( s, new Color( 42, 0, 255));
-      StyleConstants.setBold( s, true);
-
-      Color keyword = new Color( 127, 0, 85);
-      s = styles.getStyleForCategory( Category.KEYWORD_STATEMENT);
-      StyleConstants.setForeground( s, keyword);
-      StyleConstants.setBold( s, true);
-      s = styles.getStyleForCategory( Category.KEYWORD_OPERATOR);
-      StyleConstants.setForeground( s, keyword);
-      StyleConstants.setBold( s, true);
-      s = styles.getStyleForCategory( Category.KEYWORD_TYPE);
-      StyleConstants.setForeground( s, new Color( 181, 0, 121));
-      StyleConstants.setBold( s, true);
-      s = styles.getStyleForCategory( Category.KEYWORD);
-      StyleConstants.setForeground( s, new Color( 109, 137, 164));
-      StyleConstants.setBold( s, true);
-
-      s = styles.getStyleForCategory( Category.DOC);
-      StyleConstants.setForeground( s, new Color( 6, 40, 143));
-
-      s = styles.getStyleForCategory( Category.IDENTIFIER_1);
-      StyleConstants.setForeground( s, Color.cyan.darker());
+      CategoryStyles styles = kit.getCategoryStyles();
+      styles.setColor(Category.COMMENT_2, Color.YELLOW);
 
       File file = new File( args[0]);
       editor.read( new FileReader( file), file);
@@ -145,7 +105,6 @@ public class HighlightKitTest
     }
     catch (Throwable e) {
       e.printStackTrace();
-      System.exit( 1);
     }
   }
 

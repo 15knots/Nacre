@@ -144,7 +144,7 @@ public class JavaHighlightingKit extends HighlightingKit
 
       token.start = getStartOffset();
       token.length = getEndOffset() - token.start;
-      token.category = Category.NORMAL;
+      token.category = null;
       switch (super.token) {
         default:
         break;
@@ -314,7 +314,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.LSQBRACKET:
         case Constants.RSQBRACKET:
         case Constants.THROWS:
-          token.category = Category.NORMAL;
+          token.category = null;
         break;
 
         // specials = {
@@ -331,7 +331,7 @@ public class JavaHighlightingKit extends HighlightingKit
         case Constants.INLINERETURN:
         case Constants.INLINEMETHOD:
         case Constants.INLINENEWINSTANCE:
-          token.category = Category.NORMAL;
+          token.category = null;
         break;
       }
 

@@ -25,7 +25,7 @@ public class CHighlightingKit extends HighlightingKit
    * The styles representing the actual categories.
    */
   private static CategoryStyles categoryStyles;
-  
+
   public CHighlightingKit() {
     super();
   }
@@ -48,7 +48,7 @@ public class CHighlightingKit extends HighlightingKit
     return new C_Categoriser();
   }
 
-  /** 
+  /**
    * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryStyles()
    */
   public CategoryStyles getCategoryStyles()
@@ -58,7 +58,7 @@ public class CHighlightingKit extends HighlightingKit
     }
     return categoryStyles;
   }
-  
+
   /**
    * Creates a built-in set of color and font style informations used used to
    * render highlighted text written in the C programming language.

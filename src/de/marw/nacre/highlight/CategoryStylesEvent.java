@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -18,6 +18,7 @@ public class CategoryStylesEvent extends EventObject
    * Comment for <code>serialVersionUID</code>
    */
   private static final long serialVersionUID = 3256445806675834423L;
+
   /**
    * the Category where the style change occured.
    */
