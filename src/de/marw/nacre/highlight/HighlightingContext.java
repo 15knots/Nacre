@@ -91,8 +91,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    *        the Categoriser used for highlighting text of this document or
    *        <code>null</code> if no highlighting is to be done.
    */
-  public HighlightingContext( Categoriser categoriser)
-  {
+  public HighlightingContext( Categoriser categoriser) {
     super();
     this.categoriser = categoriser;
     ChangeListener cacheInvalidator = new CacheInvalidator();
@@ -250,8 +249,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     /**
      * Construct a simple colorized view of java text.
      */
-    HiliteView( Element elem)
-    {
+    HiliteView( Element elem) {
       super( elem);
       tokenQueue = new TokenQueue( elem.getDocument());
       requiredScanStart = 0;
@@ -270,15 +268,14 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     public void paint( Graphics g, Shape a)
     {
-      Rectangle alloc = (Rectangle) a;
       JTextComponent host = (JTextComponent) getContainer();
-      Color normalColor = (host.isEnabled()) ? host.getForeground() : host
-          .getDisabledTextColor();
-      Caret c = host.getCaret();
-      selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
-          : normalColor;
-      updateMetrics();
       {
+        Color normalColor = (host.isEnabled()) ? host.getForeground() : host
+            .getDisabledTextColor();
+        Caret c = host.getCaret();
+        selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
+            : normalColor;
+        updateMetrics();
         // forward host font changes to the default style
         Font f = host.getFont();
         if (hostFont != f) {
@@ -293,16 +290,20 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // try and paint them. Since all of the lines are the same height
       // with this object, determination of what lines need to be repainted
       // is quick.
-      Rectangle clip = g.getClipBounds();
-      int fontHeight = metrics.getHeight();
-      int heightBelow = (alloc.y + alloc.height) - (clip.y + clip.height);
-      int linesBelow = Math.max( 0, heightBelow / fontHeight);
-      int heightAbove = clip.y - alloc.y;
-      int linesAbove = Math.max( 0, heightAbove / fontHeight);
-      int linesTotal = alloc.height / fontHeight;
+      int linesBelow, linesAbove, linesTotal;
+      {
+        Rectangle alloc = (Rectangle) a;
+        Rectangle clip = g.getClipBounds();
+        int fontHeight = metrics.getHeight();
+        int heightBelow = (alloc.y + alloc.height) - (clip.y + clip.height);
+        linesBelow = Math.max( 0, heightBelow / fontHeight);
+        int heightAbove = clip.y - alloc.y;
+        linesAbove = Math.max( 0, heightAbove / fontHeight);
+        linesTotal = alloc.height / fontHeight;
 
-      if (alloc.height % fontHeight != 0) {
-        linesTotal++;
+        if (alloc.height % fontHeight != 0) {
+          //        linesTotal++;
+        }
       }
       // update the visible lines
       Element map = getElement();
@@ -311,11 +312,12 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       int endLine = Math.min( lineCount, linesTotal - linesBelow);
       endLine = Math.max( endLine - 1, 0);
 
-      System.out.println( "# paint() lines=" + linesAbove + ".." + endLine
-          + "-------");
+      System.out.println( "# paint() lines: " + startLine + ", " + linesAbove
+          + ".." + (endLine) + " -------");
       Document doc = map.getDocument();
       Element line1 = map.getElement( startLine);
-      //      Element line2 = map.getElement( endLine);
+      //Element line2 = map.getElement( endLine);
+      // bisschen mehr Text scanner für besseres forcedRepaint..
       Element line2 = map.getElement( Math.min( endLine + 5, lineCount - 1));
       int p0 = line1.getStartOffset();
       int p1 = Math.min( doc.getLength(), line2.getEndOffset());
@@ -639,17 +641,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * super.insertUpdate( e, a, f); System.out.println( "### insertUpdate()
      * DONE --------------------"); }
      */
-    /*
-     * @see javax.swing.text.View#removeUpdate(javax.swing.event.DocumentEvent,
-     *      java.awt.Shape, javax.swing.text.ViewFactory)
-     */
-    /*
-     * public void removeUpdate( DocumentEvent e, Shape a, ViewFactory f) {
-     * System.out.println( "### removeUpdate()--------------------");
-     * super.removeUpdate( e, a, f); System.out.println( "### removeUpdate()
-     * DONE --------------------"); }
-     */
-
+    //    /*
+    //     * @see
+    // javax.swing.text.View#removeUpdate(javax.swing.event.DocumentEvent,
+    //     * java.awt.Shape, javax.swing.text.ViewFactory)
+    //     */
+    //    public void removeUpdate( DocumentEvent e, Shape a, ViewFactory f)
+    //    {
+    //      System.out.println( "### removeUpdate()--------------------");
+    //      super.removeUpdate( e, a, f);
+    //      System.out.println( "### removeUpdate() DONE --------------------");
+    //    }
     /**
      * Repaint the region of change covered by the given document event. If
      * lines are added or removed, damages the whole view. Overridden to update
@@ -837,8 +839,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       /**
        * @param doc
        */
-      public TokenQueue( Document doc)
-      {
+      public TokenQueue( Document doc) {
         super();
         this.doc = doc;
       }
@@ -895,7 +896,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       {
         if (false) {
           // print current tokenBuf
-          System.out.println( "tok=" + tokenBuf + ", seg2docoffs="
+          System.out.print( "tok=" + tokenBuf + ", seg2docoffs="
               + seg2docOffset);
           try {
             Segment txt = new Segment();
