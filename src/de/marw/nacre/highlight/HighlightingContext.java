@@ -6,6 +6,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.HashMap;
 import java.util.Map;
@@ -145,6 +146,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
   public View create( Element elem)
   {
+    //    String kind = elem.getName();
     return new HiliteView( elem);
   }
 
@@ -202,9 +204,9 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * scanner.
      * 
      * @param g
-     *          the rendering surface to use
+     *        the rendering surface to use
      * @param a
-     *          the allocated region to render into
+     *        the allocated region to render into
      * @see View#paint(java.awt.Graphics, java.awt.Shape)
      */
     public void paint( Graphics g, Shape a)
@@ -224,13 +226,13 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * any tabs.
      * 
      * @param lineIndex
-     *          the line to draw >= 0
+     *        the line to draw >= 0
      * @param g
-     *          the <code>Graphics</code> context
+     *        the <code>Graphics</code> context
      * @param x
-     *          the starting X position >= 0
+     *        the starting X position >= 0
      * @param y
-     *          the starting Y position >= 0
+     *        the starting Y position >= 0
      * @see PlainView#drawUnselectedText
      * @see PlainView#drawSelectedText
      */
@@ -238,27 +240,26 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     {
       System.out.println( "# drawLine() " + lineIndex + " -------");
       try {
+        Element rootElement = getElement();
+        HighlightedDocument doc = (HighlightedDocument) rootElement
+            .getDocument();
+        Element line = rootElement.getElement( lineIndex);
+        int p0 = line.getStartOffset();
+        int p1 = Math.min( doc.getLength(), line.getEndOffset());
         /*
          * (Re-)Initialise the categoriser to point to the appropriate token for
          * the given start position needed for rendering. The start position
          * adjustment is required by text runs that span multiple line (eg
          * '/*'-comments).
          */
-        HighlightedDocument doc = (HighlightedDocument) getDocument();
-        Element rootElement = getElement();
-        Element line = rootElement.getElement( lineIndex);
-
-        int p0 = line.getStartOffset();
-        int p1 = Math.min( doc.getLength(), line.getEndOffset());
-        // adjust categorizer's starting point (to start of line)
-        int p0Adj = getAdjustedStart( rootElement, lineIndex);
+        int p0Adj = getAdjustedStart( lineIndex);
         Segment lexerInput = new Segment();
         doc.getText( p0Adj, p1 - p0Adj, lexerInput);
         tokenQueue.initialise( p0, lexerInput, lexerInput.offset - p0Adj);
 
         super.drawLine( lineIndex, g, x, y);
 
-        // notify lexer
+        // drawing complete, notify categoriser
         doc.getCategoriser().closeInput();
 
         // check and mark whether the next line is unsafe to restart scanning
@@ -266,21 +267,27 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         if (!tokenQueue.isEmpty()) {
           // get token
           token = tokenQueue.peek();
-          if (token.multiline) {
-            if (token.start < p1) {
+          if (token.multiline && token.start < p1) {
+            do {
               line = rootElement.getElement( ++lineIndex);
               // the current line is unsafe to restart scanning
-              putMark( line, null);
-              System.out.println( "#  mark line " + lineIndex);
-              while (token.start + token.length > p1) {
-                line = rootElement.getElement( ++lineIndex);
-                // the current line is unsafe to restart scanning
+              if (line != null) {
                 putMark( line, null);
+                /*
+                 * force the component to repaint the lines, thus supporting
+                 * highlighting tokens that span mutliple lines.
+                 */
+                if (metrics != null) {
+                  System.out.println("# force repaint of "+lineIndex);
+                  Component host = getContainer();
+                  host.repaint( x, y + (lineIndex * metrics.getHeight()), g
+                      .getClipBounds().width, metrics.getHeight());
+                }
+
               }
-            }
+            } while (token.start + token.length > p1);
           }
         }
-
       }
       catch (BadLocationException ex) {
         throw new /* StateInvariantError */Error( "Can't render line: "
@@ -293,25 +300,25 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * location. This allows for adjustments needed to accommodate multiline
      * comments.
      * 
-     * @param doc
-     *          The document holding the text.
      * @param lineIndex
-     *          The number of the line to render.
-     * @return adjusted start position which is greater or equal than zero.
+     *        The number of the line to render.
+     * @return the adjusted start position in the document model which is
+     *         greater or equal than zero.
      */
-    private int getAdjustedStart( Element rootElement, int lineIndex)
+    private int getAdjustedStart( int lineIndex)
     {
+      Element element = getElement();
       // walk backwards until we get an untagged line...
-      System.out.print( "# find start in line " + lineIndex);
+      //System.out.print( "# find start in line " + lineIndex);
       for (; lineIndex > 0; lineIndex-- ) {
-        Element line = rootElement.getElement( lineIndex);
+        Element line = element.getElement( lineIndex);
         if (!hasMark( line)) {
-          System.out.println( " found start in " + lineIndex);
+          //  System.out.println( " found start in " + lineIndex);
           return line.getStartOffset();
         }
-        System.out.print( "," + lineIndex);
+        //System.out.print( "," + lineIndex);
       }
-      System.out.println( " not found (0)");
+      //System.out.println( " not found (0)");
       return 0;
     }
 
@@ -321,18 +328,18 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * translations.
      * 
      * @param g
-     *          the graphics context
+     *        the graphics context
      * @param x
-     *          the starting X coordinate
+     *        the starting X coordinate
      * @param y
-     *          the starting Y coordinate
+     *        the starting Y coordinate
      * @param p0
-     *          the beginning position in the model
+     *        the beginning position in the model
      * @param p1
-     *          the ending position in the model
-     * @returns the location of the end of the range
-     * @exception BadLocationException
-     *              if the range is invalid
+     *        the ending position in the model
+     * @return the location of the end of the range
+     * @throws BadLocationException
+     *         if the range is invalid
      */
     protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
         throws BadLocationException
@@ -347,18 +354,18 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * background.
      * 
      * @param g
-     *          the graphics context
+     *        the graphics context
      * @param x
-     *          the starting X coordinate >= 0
+     *        the starting X coordinate >= 0
      * @param y
-     *          the starting Y coordinate >= 0
+     *        the starting Y coordinate >= 0
      * @param p0
-     *          the beginning position in the model >= 0
+     *        the beginning position in the model >= 0
      * @param p1
-     *          the ending position in the model >= 0
+     *        the ending position in the model >= 0
      * @return the location of the end of the range
-     * @exception BadLocationException
-     *              if the range is invalid
+     * @throws BadLocationException
+     *         if the range is invalid
      */
     protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
         throws BadLocationException
@@ -368,22 +375,22 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * Renders the given range in the model as selected or unselected text. This
-     * is implemented to paint colors based upon the category-to-color
+     * is implemented to paint colors and fonts based upon the category-to-color
      * translations.
      * 
      * @param g
-     *          the graphics context
+     *        the graphics context
      * @param x
-     *          the starting X coordinate
+     *        the starting X coordinate
      * @param y
-     *          the starting Y coordinate
+     *        the starting Y coordinate
      * @param p0
-     *          the beginning position in the model
+     *        the beginning position in the model
      * @param p1
-     *          the ending position in the model
-     * @returns the X coordinate of the end of the range
-     * @exception BadLocationException
-     *              if the range is invalid
+     *        the ending position in the model
+     * @return the X coordinate of the end of the range
+     * @throws BadLocationException
+     *         if the range is invalid
      */
     protected int drawText( Graphics g, int x, int y, int p0, int p1,
         boolean selected) throws BadLocationException
@@ -398,13 +405,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
         if (!tokenQueue.isEmpty()) {
           // get token
           token = tokenQueue.peek();
-          if (false) {
-            // print current token
-            Segment txt = new Segment();
-            System.out.print( "tok= " + token);
-            doc.getText( token.start, token.length, txt);
-            System.out.println( ", '" + txt + "'");
-          }
           if (token.start > p0) {
             // gap between tokens: draw as normal text
             category = Category.NORMAL;
@@ -423,6 +423,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
             }
           }
         }
+        // flush what we have..
         doc.getText( p0, flushTo - p0, text);
         x = drawHighlightedText( category, selected, text, x, y, g, p0);
         p0 = flushTo;
@@ -432,25 +433,22 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
-     * Draws the given text, expanding any tabs that are contained using the
-     * given tab expansion technique. This is implemented to paint colors based
-     * upon the category-to-color translations.
+     * Draws the given text, using the color and font indicated by the given
+     * <code>Category</code>.
      * 
      * @param category
-     *          the category we are painting. Used to determine color and font.
+     *        the category we are painting. Used to determine color and font.
      * @param text
-     *          the source of the text
+     *        the source of the text to draw
      * @param x
-     *          the X origin >= 0
+     *        the X origin >= 0
      * @param y
-     *          the Y origin >= 0
+     *        the Y origin >= 0
      * @param g
-     *          the graphics context
+     *        the graphics context
      * @param startOffset
-     *          starting offset of the text in the document >= 0
+     *        starting offset of the text in the document >= 0
      * @return the X location at the end of the rendered text
-     * @exception BadLocationException
-     *              if the range is invalid
      */
     private int drawHighlightedText( Category category, boolean selected,
         Segment text, int x, int y, Graphics g, int startOffset)
@@ -485,7 +483,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // TODO Auto-generated method stub TEST
       System.out.println( "### insertUpdate()--------------------");
       super.insertUpdate( e, a, f);
-
       System.out.println( "### insertUpdate()  DONE --------------------");
     }
 
@@ -502,44 +499,42 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     }
 
     /**
-     * @see javax.swing.text.View#changedUpdate(javax.swing.event.DocumentEvent,
-     *      java.awt.Shape, javax.swing.text.ViewFactory)
+     * Repaint the region of change covered by the given document event. If
+     * lines are added or removed, damages the whole view. Overridden to update
+     * the line marks.
      */
-    public void XXXchangedUpdate( DocumentEvent e, Shape a, ViewFactory f)
+    protected void updateDamage( DocumentEvent changes, Shape a, ViewFactory f)
     {
-      // TODO Auto-generated method stub TEST
-      System.out.println( "changedUpdate()--------------------");
-      super.changedUpdate( e, a, f);
-    }
+      Element elem = getElement();
+      DocumentEvent.ElementChange ec = changes.getChange( elem);
 
-    /**
-     * Repaints the given line range. Overwritten to repaint all lines, thus
-     * supporting highlighting tokens that span mutliple lines.
-     * 
-     * @param host
-     *          the component hosting the view (used to call repaint)
-     * @param a
-     *          the region allocated for the view to render into
-     * @param line0
-     *          the starting line number to repaint. This must be a valid line
-     *          number in the model.
-     * @param line1
-     *          the ending line number to repaint. This must be a valid line
-     *          number in the model.
-     */
-    protected void damageLineRange( int line0, int line1, Shape a,
-        Component host)
-    {
-      if (a != null) {
-        host.repaint();
+      Element[] added = (ec != null) ? ec.getChildrenAdded() : null;
+      Element[] removed = (ec != null) ? ec.getChildrenRemoved() : null;
+      if (((added != null) && (added.length > 0))
+          || ((removed != null) && (removed.length > 0))) {
+        // lines were added or removed...
+        if (added != null) {
+          for (int i = 0; i < added.length; i++ ) {
+          }
+        }
+        if (removed != null) {
+          for (int i = 0; i < removed.length; i++ ) {
+            removeMark( removed[i]);
+          }
+        }
       }
+      else {
+        if (changes.getType() == DocumentEvent.EventType.INSERT) {
+        }
+      }
+      super.updateDamage( changes, a, f);
     }
 
     ///////////////////////////////////////////////////////////////////
     // unsafe line marking
     ///////////////////////////////////////////////////////////////////
     /**
-     * Hold the marks for lines that are unsafe to restart scanning.
+     * Holds the marks for lines that are unsafe to restart scanning.
      */
     private Map unsafeLineMarks = null;
 
@@ -553,7 +548,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     /**
      * @param line
-     *          TODO
+     *        TODO
      * @return
      */
     private boolean hasMark( Element line)
@@ -621,18 +616,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * 
        * @param p0
        * @param doc
-       *          the document model.
+       *        the document model.
        * @param line
-       *          the starting line in the model.
+       *        the starting line in the model.
        */
       public void initialise( int p0, Segment lexerInput, int seg2docOffset)
-          throws BadLocationException
       {
         //System.out.println( "# TokenQueue.initialise()");
 
         this.seg2docOffset = seg2docOffset;
         categoriser = doc.getCategoriser(); // remember categoriser
-        categoriser.openInput( doc, lexerInput);
+        categoriser.openInput( lexerInput);
 
         do {
           remove();
@@ -655,7 +649,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        */
       public Token peek()
       {
-        if (true) {
+        if (false) {
           // print current tokenBuf
           System.out.println( "tok=" + tokenBuf + ", seg2docoffs="
               + seg2docOffset);

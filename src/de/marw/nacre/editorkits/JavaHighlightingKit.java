@@ -4,7 +4,6 @@ package swing.text.highlight;
 
 import java.io.IOException;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -59,11 +58,9 @@ public class JavaHighlightingKit extends HighlightingKit
     }
 
     /**
-     * @see Categoriser#openInput(HighlightedDocument, int)
-     * @throws BadLocationException
+     * @see Categoriser#openInput(int)
      */
-    public void openInput( HighlightedDocument doc, Segment lexerInput)
-        throws BadLocationException
+    public void openInput( Segment lexerInput)
     {
       if (debug) {
         System.out.println( "setInput() char[0]='"

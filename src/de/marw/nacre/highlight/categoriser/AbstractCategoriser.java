@@ -6,10 +6,8 @@
 
 package swing.text.highlight.categoriser;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Segment;
 
-import swing.text.highlight.HighlightedDocument;
 
 
 /**
@@ -31,11 +29,8 @@ public abstract class AbstractCategoriser implements Categoriser
 
   /**
    * Überschrieben, um
-   * 
-   * @throws BadLocationException
    */
-  public void openInput( HighlightedDocument doc, Segment lexerInput)
-      throws BadLocationException
+  public void openInput( Segment lexerInput)
   {
     if (debug) {
       System.out.println( "# AbstractCategoriser.openInput() char[0]='"
@@ -74,9 +69,9 @@ public abstract class AbstractCategoriser implements Categoriser
    * @param ignoreCase
    *          True if case should be ignored, false otherwise
    * @param text
-   *          The segment
+   *          The source of the text
    * @param offset
-   *          The offset into the segment
+   *          The offset into the segment to start the matching
    * @param match
    *          The string to match
    * @return the length of the matching text or <code>0</code> if no match was

@@ -6,11 +6,8 @@ kk+=sizeof++( int long double char float unsigned far huge pascal register volat
 kk+=size_f++( i_t l_ng d_uble ch_r fl_at u_signed f_r h_ge p_scal r_gister volat_le i_t l_ng d_uble ch_r fl_at u_signed f_r h_ge p_scal r_gister volat_le i_t l_ng d_uble ch_r fl_at u_signed f_r h_ge p_scal r_gister volat_le);
  "String \t\" ddd"
 volatile i=0; /* many
-	
 	lines 
-	
 	of
-	 
 	comments
 	
 kk+=sizeof++( 

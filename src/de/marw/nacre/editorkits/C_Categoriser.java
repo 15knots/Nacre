@@ -5,7 +5,6 @@ package swing.text.highlight.categoriser;
 import java.text.CharacterIterator;
 import java.util.Comparator;
 
-import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.Segment;
 
@@ -42,10 +41,9 @@ public class C_Categoriser extends AbstractCategoriser
   {
   }
 
-  public void openInput( HighlightedDocument doc, Segment lexerInput)
-      throws BadLocationException
+  public void openInput( Segment lexerInput)
   {
-    super.openInput( doc, lexerInput);
+    super.openInput( lexerInput);
 
   }
 
