@@ -1,4 +1,4 @@
-/* $Header$ */
+/* $Id$ */
 
 // Copyright © 2004 Martin Weber
 
@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,18 +16,7 @@ import java.util.Map;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.Caret;
-import javax.swing.text.Element;
-import javax.swing.text.JTextComponent;
-import javax.swing.text.PlainView;
-import javax.swing.text.Segment;
-import javax.swing.text.Style;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyleContext;
-import javax.swing.text.Utilities;
-import javax.swing.text.View;
-import javax.swing.text.ViewFactory;
+import javax.swing.text.*;
 
 import swing.text.highlight.categoriser.Categoriser;
 import swing.text.highlight.categoriser.Token;
@@ -187,7 +177,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   /**
    * View that uses the lexical information to determine the style
    * characteristics of the text that it renders. This simply colorizes the
-   * various categories and assumes a constant font family and size.
+   * various categories and assumes a constant font family and size. <br>
+   * The view represents each child element as a line of text.
    * 
    * @todo super.updateMetrics verwendet den FOnt aus der JTextComponent statt
    *       der Style-Attribute
@@ -229,13 +220,61 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     public void paint( Graphics g, Shape a)
     {
       System.out.println( "# paint() -------");
+      Rectangle alloc = (Rectangle) a;
       JTextComponent host = (JTextComponent) getContainer();
       Color normalColor = (host.isEnabled()) ? host.getForeground() : host
           .getDisabledTextColor();
       Caret c = host.getCaret();
       selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
           : normalColor;
+      updateMetrics();
+
+      // If the lines are clipped then we don't expend the effort to
+      // try and paint them. Since all of the lines are the same height
+      // with this object, determination of what lines need to be repainted
+      // is quick.
+      Rectangle clip = g.getClipBounds();
+      int fontHeight = metrics.getHeight();
+      int heightBelow = (alloc.y + alloc.height) - (clip.y + clip.height);
+      int linesBelow = Math.max( 0, heightBelow / fontHeight);
+      int heightAbove = clip.y - alloc.y;
+      int linesAbove = Math.max( 0, heightAbove / fontHeight);
+      int linesTotal = alloc.height / fontHeight;
+
+      if (alloc.height % fontHeight != 0) {
+        linesTotal++ ;
+      }
+      // update the visible lines
+      Element map = getElement();
+      int lineCount = map.getElementCount();
+      int endLine = Math.min( lineCount, linesTotal - linesBelow);
+      endLine = Math.max( endLine - 1, 0);
+      Document doc = (HighlightedDocument) map.getDocument();
+      Element line1 = map.getElement( linesAbove);
+      Element line2 = map.getElement( endLine);
+      int p0 = line1.getStartOffset();
+      int p1 = Math.min( doc.getLength(), line2.getEndOffset());
+      /*
+       * (Re-)Initialise the categoriser to point to the appropriate token for
+       * the given start position needed for rendering. The start position
+       * adjustment is required by text runs that span multiple line (eg
+       * '/*'-comments).
+       */
+      int p0Adj = getAdjustedStart( linesAbove);
+      Segment lexerInput = new Segment();
+      try {
+        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
+        tokenQueue.initialise( p0, lexerInput, lexerInput.offset - p0Adj);
+      }
+      catch (BadLocationException ex) {
+        // we cannot paint highlighted here, so we will render as normal text.
+        // the painting logic in PlainView might raise a BadLocationException on
+        // its own.
+        throw new /* StateInvariantError */Error( "Can't render", ex);
+      }
       super.paint( g, a);
+      // drawing complete, notify categoriser
+      HighlightingContext.this.categoriser.closeInput();
     }
 
     /**
@@ -256,59 +295,38 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     protected void drawLine( int lineIndex, Graphics g, int x, int y)
     {
       System.out.println( "# drawLine() " + lineIndex + " -------");
-      try {
+      super.drawLine( lineIndex, g, x, y);
+
+      // check and mark whether the next line is unsafe to restart scanning
+      Token token = null;
+      if (!tokenQueue.isEmpty()) {
         Element rootElement = getElement();
-        HighlightedDocument doc = (HighlightedDocument) rootElement
-            .getDocument();
+        Document doc = (HighlightedDocument) rootElement.getDocument();
         Element line = rootElement.getElement( lineIndex);
-        int p0 = line.getStartOffset();
-        int p1 = Math.min( doc.getLength(), line.getEndOffset());
-        /*
-         * (Re-)Initialise the categoriser to point to the appropriate token for
-         * the given start position needed for rendering. The start position
-         * adjustment is required by text runs that span multiple line (eg
-         * '/*'-comments).
-         */
-        int p0Adj = getAdjustedStart( lineIndex);
-        Segment lexerInput = new Segment();
-        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-        tokenQueue.initialise( p0, lexerInput, lexerInput.offset - p0Adj);
+        int endOffset = Math.min( doc.getLength(), line.getEndOffset());
+        // get last token highlighted
+        token = tokenQueue.peek();
+        if (token.multiline && token.start < endOffset) {
+          int l0 = lineIndex;
+          while (token.start + token.length > endOffset) {
+            line = rootElement.getElement( ++lineIndex);
+            // the current line is unsafe to restart scanning
+            putMark( line, null);
+            endOffset = Math.min( doc.getLength(), line.getEndOffset());
+          } // while
 
-        super.drawLine( lineIndex, g, x, y);
-
-        // drawing complete, notify categoriser
-        HighlightingContext.this.categoriser.closeInput();
-
-        // check and mark whether the next line is unsafe to restart scanning
-        Token token = null;
-        if (!tokenQueue.isEmpty()) {
-          // get token
-          token = tokenQueue.peek();
-          if (token.multiline && token.start < p1) {
-            do {
-              line = rootElement.getElement( ++lineIndex);
-              // the current line is unsafe to restart scanning
-              if (line != null) {
-                putMark( line, null);
-                /*
-                 * force the component to repaint the lines, thus supporting
-                 * highlighting tokens that span mutliple lines.
-                 */
-                if (metrics != null) {
-                  System.out.println( "# force repaint of " + lineIndex);
-                  Component host = getContainer();
-                  host.repaint( x, y + (lineIndex * metrics.getHeight()), g
-                      .getClipBounds().width, metrics.getHeight());
-                }
-
-              }
-            } while (token.start + token.length > p1);
+          /*
+           * force the component to repaint the following lines, thus supporting
+           * highlighting tokens that span mutliple lines.
+           */
+          if (metrics != null && lineIndex > l0) {
+            System.out.println( "# force repaint of " + l0 + ".." + lineIndex);
+            Component host = getContainer();
+            host.repaint( x, y + l0 * metrics.getHeight(),
+                g.getClipBounds().width, ((lineIndex - l0) * metrics
+                    .getHeight()));
           }
         }
-      }
-      catch (BadLocationException ex) {
-        throw new /* StateInvariantError */Error( "Can't render line: "
-            + lineIndex);
       }
     }
 
@@ -412,7 +430,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     protected int drawText( Graphics g, int x, int y, int p0, int p1,
         boolean selected) throws BadLocationException
     {
-      HighlightedDocument doc = (HighlightedDocument) getDocument();
+      Document doc = (HighlightedDocument) getDocument();
 
       Segment text = getLineBuffer();
       Token token = null;
@@ -425,7 +443,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           if (token.start > p0) {
             // gap between tokens: draw as normal text
             category = Category.NORMAL;
-            flushTo = token.start;
+            flushTo = Math.min( token.start, p1);
             doc.getText( p0, flushTo - p0, text);
             x = drawHighlightedText( category, selected, text, x, y, g, p0);
             p0 = flushTo;
@@ -441,9 +459,11 @@ public class HighlightingContext extends StyleContext implements ViewFactory
           }
         }
         // flush what we have..
-        doc.getText( p0, flushTo - p0, text);
-        x = drawHighlightedText( category, selected, text, x, y, g, p0);
-        p0 = flushTo;
+        if (flushTo > p0) {
+          doc.getText( p0, flushTo - p0, text);
+          x = drawHighlightedText( category, selected, text, x, y, g, p0);
+          p0 = flushTo;
+        }
       }
 
       return x;
