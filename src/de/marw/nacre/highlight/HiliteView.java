@@ -177,7 +177,7 @@ public class HiliteView extends PlainView
       Font f = host.getFont();
       metrics = host.getFontMetrics( f);
       if (hostFont != f) {
-        categoryFonts = null;
+        categoryFonts = null; // invalidate cache
         hostFont = f;
       }
     }
@@ -234,7 +234,7 @@ public class HiliteView extends PlainView
       tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
 
       // mark lines without rendering...
-      while (requiredScanStart < linesAbove&&requiredScanStart<lineCount) {
+      while (requiredScanStart < linesAbove && requiredScanStart < lineCount) {
         // scan current line...
         Element line = map.getElement( requiredScanStart);
         p0 = line.getStartOffset();
@@ -515,13 +515,7 @@ public class HiliteView extends PlainView
   {
     if (text.count > 0) {
       Color fg = selected ? selectedColor : getForeground( category);
-      if (fg == null) {
-        fg = normalColor;
-      }
       Font font = getFont( category);
-      if (font == null) {
-        font = hostFont;
-      }
 
       if (false) {
         System.out.print( "painting '" + text + "', offs=" + startOffset
@@ -775,21 +769,20 @@ public class HiliteView extends PlainView
   {
     if (category == null) {
       // treat as normal text, use the JTextComponent's font and color
-      return null;
+      return normalColor;
     }
 
     if (categoryColors == null) {
       categoryColors = new Color[Category.values().length];
     }
-    Color c = null;
     int categoryCode = category.ordinal();
-    if ((categoryCode >= 0) && (categoryCode < categoryColors.length)) {
-      c = categoryColors[categoryCode];
-      if (c == null && categoryStyles.isDefined( category)) {
-        c = categoryStyles.getColor( category);
-        categoryColors[categoryCode] = c;
-      }
+    Color c = categoryColors[categoryCode];
+    if (c == null && categoryStyles.isDefined( category)) {
+      c = categoryStyles.getColor( category);
+      categoryColors[categoryCode] = c;
     }
+    if (c == null)
+      c = normalColor;
     return c;
   }
 
@@ -802,26 +795,25 @@ public class HiliteView extends PlainView
   {
     if (category == null) {
       // treat as normal text, use the JTextComponent's font and color
-      return null;
+      return hostFont;
     }
 
     if (categoryFonts == null) {
       categoryFonts = new Font[Category.values().length];
     }
-    Font f = null;
     int categoryCode = category.ordinal();
-    if (categoryCode >= 0 && categoryCode < categoryFonts.length) {
-      f = categoryFonts[categoryCode];
-      if (f == null && categoryStyles.isDefined( category)) {
-        f = getContainer().getFont();
-        int style = categoryStyles.getStyle( category);
-        if (style != Font.PLAIN) {
-          f = f.deriveFont( style);
-        }
-        categoryFonts[categoryCode] = f;
+    Font font = categoryFonts[categoryCode];
+    if (font == null && categoryStyles.isDefined( category)) {
+      font = hostFont;
+      int style = categoryStyles.getStyle( category);
+      if (style != Font.PLAIN) {
+        font = font.deriveFont( style);
       }
+      categoryFonts[categoryCode] = font;
     }
-    return f;
+    if (font == null)
+      font = hostFont;
+    return font;
   }
 
   /**
@@ -837,12 +829,10 @@ public class HiliteView extends PlainView
 
       int categoryCode = evt.getCategory().ordinal();
       // invalidate caches
-      if (categoryFonts != null && categoryCode >= 0
-          && categoryCode < categoryFonts.length) {
+      if (categoryFonts != null) {
         HiliteView.this.categoryFonts[categoryCode] = null;
       }
-      if (categoryColors != null && categoryCode >= 0
-          && categoryCode < categoryColors.length) {
+      if (categoryColors != null) {
         HiliteView.this.categoryColors[categoryCode] = null;
       }
       HiliteView.this.getContainer().repaint();
