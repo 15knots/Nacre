@@ -53,15 +53,15 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       public void stateChanged( ChangeEvent e)
       {
         // invalidate caches
-        HighlightingContext.this.categoryColors = null;
-        HighlightingContext.this.categoryFonts = null;
+        categoryColors = null;
+        categoryFonts = null;
       }
     };
 
     Style root = getStyle( DEFAULT_STYLE);
     // configure the default style
     StyleConstants.setFontFamily( root, "Monospaced");
-    StyleConstants.setFontSize( root, 10);
+    StyleConstants.setFontSize( root, 12);
     root.addChangeListener( cacheInvalidator);
 
     Category[] categories = Category.values();
@@ -234,19 +234,84 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     protected void drawLine( int lineIndex, Graphics g, int x, int y)
     {
-      //lexerValid = false;
-      //      System.out.println( "# invalidate lexer ---------------------------");
       System.out.println( "# drawLine() " + lineIndex + " -------");
       try {
-        tokenQueue.initialise( lineIndex);
+        /*
+         * (Re-)Initialise the categoriser to point to the appropriate token for
+         * the given start position needed for rendering. The start position
+         * adjustment is required by text runs that span multiple line (eg
+         * '/*'-comments).
+         */
+        HighlightedDocument doc = (HighlightedDocument) getDocument();
+        Element rootElement = getElement();
+        Element line = rootElement.getElement( lineIndex);
+
+        int p0 = line.getStartOffset();
+        int p1 = Math.min( doc.getLength(), line.getEndOffset());
+        // adjust categorizer's starting point (to start of line)
+        int p0Adj = getAdjustedStart( rootElement, lineIndex);
+        Segment lexerInput = new Segment();
+        doc.getText( p0Adj, p1 - p0Adj, lexerInput);
+        tokenQueue.initialise( p0, lexerInput, lexerInput.offset - p0Adj);
+
         super.drawLine( lineIndex, g, x, y);
+
         // notify lexer
-        //TODO lexer.closeInput();
+        doc.getCategoriser().closeInput();
+
+        // check and mark whether the next line is unsafe to restart scanning
+        Token token = null;
+        if (!tokenQueue.isEmpty()) {
+          // get token
+          token = tokenQueue.peek();
+          if (token.multiline) {
+            if (token.start < p1) {
+              line = rootElement.getElement( ++lineIndex);
+              // the current line is unsafe to restart scanning
+              doc.putMark( line, null);
+              System.out.println( "#  mark line " + lineIndex);
+              while (token.start + token.length > p1) {
+                line = rootElement.getElement( ++lineIndex);
+                // the current line is unsafe to restart scanning
+                doc.putMark( line, null);
+              }
+            }
+          }
+        }
+
       }
       catch (BadLocationException ex) {
         throw new /* StateInvariantError */Error( "Can't render line: "
             + lineIndex);
       }
+    }
+
+    /**
+     * Fetch a reasonable location to start scanning given the desired start
+     * location. This allows for adjustments needed to accommodate multiline
+     * comments.
+     * 
+     * @param doc
+     *          The document holding the text.
+     * @param lineIndex
+     *          The number of the line to render.
+     * @return adjusted start position which is greater or equal than zero.
+     */
+    private int getAdjustedStart( Element rootElement, int lineIndex)
+    {
+      // walk backwards until we get a tagged line...
+      HighlightedDocument doc = (HighlightedDocument) getDocument();
+      System.out.print( "# find start in line " + lineIndex);
+      for (; lineIndex > 0; lineIndex-- ) {
+        Element line = rootElement.getElement( lineIndex);
+        if (!doc.hasMark( line)) {
+          System.out.println( " found start in " + lineIndex);
+          return line.getStartOffset();
+        }
+        System.out.print( "," + lineIndex);
+      }
+      System.out.println( " not found (0)");
+      return 0;
     }
 
     /**
@@ -297,9 +362,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
     protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
         throws BadLocationException
     {
-      {
-        return drawText( g, x, y, p0, p1, true);
-      }
+      return drawText( g, x, y, p0, p1, true);
     }
 
     /**
@@ -471,18 +534,23 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
     }
 
+    // TODO beim Document halten.
+    private MultilineTokenSupport multilineTokenSupport = new MultilineTokenSupport();
+
     /**
      * Eine Queue für <code>Token</code>s.
      * 
-     * @author weber
+     * @author Martin Weber
      */
     private final class TokenQueue
     {
-      private Categoriser categoriser;
+      private final HighlightedDocument doc;
 
-      private Token tokenBuf;
+      private transient Categoriser categoriser;
 
-      private HighlightedDocument doc;
+      private transient Token tokenBuf;
+
+      private transient int seg2docOffset;
 
       /**
        * @param doc
@@ -499,23 +567,23 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        * adjustment is required by text runs that span multiple line (eg Javadoc
        * comments).
        * 
+       * @param p0
        * @param doc
        *          the document model.
        * @param line
        *          the starting line in the model.
        */
-      public void initialise( int lineIndex) throws BadLocationException
+      public void initialise( int p0, Segment lexerInput, int seg2docOffset)
+          throws BadLocationException
       {
-        //System.out.println( "# TokenQueue.adjustCategoriser()");
-        Element rootElement = doc.getDefaultRootElement();
+        //System.out.println( "# TokenQueue.initialise()");
 
-        Element line = rootElement.getElement( lineIndex);
-        int p0 = line.getStartOffset();
+        this.seg2docOffset = seg2docOffset;
         categoriser = doc.getCategoriser(); // remember categoriser
-        categoriser.openInput( doc, lineIndex);
+        categoriser.openInput( doc, lexerInput);
 
         do {
-          tokenBuf = categoriser.nextToken( doc, tokenBuf);
+          remove();
         } while (!isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
 
       }
@@ -535,9 +603,17 @@ public class HighlightingContext extends StyleContext implements ViewFactory
        */
       public Token peek()
       {
-        if (false) {
+        if (true) {
           // print current tokenBuf
-          System.out.println( "tok=" + tokenBuf);
+          System.out.println( "tok=" + tokenBuf + ", seg2docoffs="
+              + seg2docOffset);
+          try {
+            Segment txt = new Segment();
+            doc.getText( tokenBuf.start, tokenBuf.length, txt);
+            System.out.println( ", '" + txt + "'");
+          }
+          catch (BadLocationException ex) {
+          }
         }
         return tokenBuf;
       }
@@ -550,8 +626,10 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       public void remove()
       {
         tokenBuf = categoriser.nextToken( doc, tokenBuf);
+        tokenBuf.start -= seg2docOffset;
       }
-    }
+
+    } // TokenQueue
   }
 
 }

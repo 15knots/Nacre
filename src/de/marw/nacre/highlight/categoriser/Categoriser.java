@@ -6,6 +6,7 @@ package swing.text.highlight.categoriser;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
+import javax.swing.text.Segment;
 
 import swing.text.highlight.HighlightedDocument;
 
@@ -19,19 +20,17 @@ public interface Categoriser
 {
 
   /**
-   * (Re-)Initialises the categoriser to point to the appropriate token for the
-   * given start position needed for rendering. The start position adjustment is
-   * required by text runs that span multiple line (eg Javadoc comments). This
+   * (Re-)Initialises the categoriser to scan the specified <code>Segment</code>. This
    * gets called when the View is going to be rendered. <br>
    * bedeutet implizit, dass ein Scanabschnitt beginnt.
    * 
    * @param doc
    *          the document model.
-   * @param lineIndex
-   *          the starting line in the model.
+   * @param lexerInput
+   *          the run of text to categorise.
    * @throws BadLocationException
    */
-  public void openInput( HighlightedDocument doc, int lineIndex)
+  public void openInput( HighlightedDocument doc, Segment lexerInput)
       throws BadLocationException;
 
   /**

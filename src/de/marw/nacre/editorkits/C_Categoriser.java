@@ -14,62 +14,11 @@ import javax.swing.text.Segment;
 
 import swing.text.highlight.Category;
 import swing.text.highlight.HighlightedDocument;
+import swing.text.highlight.MultilineTokenSupport;
 
 
 public class C_Categoriser extends AbstractCategoriser
 {
-  /**
-   * Verwaltet die Markierungen für Aufsetzpunkte des <code>Categoriser</code>
-   * s.
-   * 
-   * @author weber
-   */
-  public static class MultilineTokenSupport
-  {
-
-    private List marks = new ArrayList( 50);
-
-    /**
-     * 
-     */
-    public MultilineTokenSupport()
-    {
-      super();
-    }
-
-    public void putMark( Element line)
-    {
-      if (line == null) {
-        throw new NullPointerException( "line is null");
-      }
-      synchronized (this ) {
-        if (marks == null) {
-          marks = new ArrayList( 50);
-        }
-        marks.add( line);
-      }
-    }
-
-    public void removeMark( Element line)
-    {
-      if (line == null) {
-        throw new NullPointerException( "line is null");
-      }
-      synchronized (this ) {
-        if (marks != null) {
-          marks.remove( line);
-        }
-      }
-    }
-
-    public boolean hasMark( Element line)
-    {
-      synchronized (this ) {
-        return marks != null && marks.contains( line);
-      }
-    }
-  }
-
   public static final class RevStringByLengthComparator implements Comparator
   {
     public int compare( Object o1, Object o2)
@@ -90,69 +39,18 @@ public class C_Categoriser extends AbstractCategoriser
 
   private static final String[] kwOperator = { "sizeof" };
 
-  private int seg2docOffset;
-
-  // TODO beim Document halten.
-  private MultilineTokenSupport multilineTokenSupport = new MultilineTokenSupport();
-
-  //private static RevStringByLengthComparator byLenghtDescending = new
-  // RevStringByLengthComparator();
-  //  static {
-  //    // sort keyword arrays by keyword length (descending)
-  //    Arrays.sort( kwPredefVal, byLenghtDescending);
-  //    Arrays.sort( kwType, byLenghtDescending);
-  //    Arrays.sort( kwStmt, byLenghtDescending);
-  //    Arrays.sort( kwOperator, byLenghtDescending);
-  //  }
-
+  /**
+   * 
+   */
   public C_Categoriser()
   {
   }
 
-  /**
-   * Fetch a reasonable location to start scanning given the desired start
-   * location. This allows for adjustments needed to accommodate multiline
-   * comments.
-   * 
-   * @param doc
-   *          The document holding the text.
-   * @param lineIndex
-   *          The number of the line to render.
-   * @return adjusted start position which is greater or equal than zero.
-   */
-  private int getAdjustedStart( HighlightedDocument doc, int lineIndex)
-  {
-    Element rootElement = doc.getDefaultRootElement();
-    rootElement.getAttributes();
-    // walk backwards until we get a tagged line...
-    System.out.println( "# find start in " + lineIndex + "...");
-    while (lineIndex > 0) {
-      Element line = rootElement.getElement( lineIndex);
-      if (multilineTokenSupport.hasMark( line)) {
-        //        System.out.println( "# found start in " + lineIndex);
-        return line.getStartOffset();
-      }
-      //        System.out.print( " " + lineIndex);
-      lineIndex -= 1;
-    }
-
-    return 0;
-  }
-
-  public void openInput( HighlightedDocument doc, int lineIndex)
+  public void openInput( HighlightedDocument doc, Segment lexerInput)
       throws BadLocationException
   {
-    super.openInput( doc, lineIndex);
+    super.openInput( doc, lexerInput);
 
-    Element rootElement = doc.getDefaultRootElement();
-    Element line = rootElement.getElement( lineIndex);
-    int p0 = line.getStartOffset();
-    int p1 = Math.min( doc.getLength(), line.getEndOffset());
-    // adjust categorizer's starting point (to start of line)
-    int p0Adj = getAdjustedStart( doc, lineIndex);
-    Segment lexerInput = super.getInput();
-    doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-    seg2docOffset = lexerInput.offset - p0Adj;
     if (debug) {
       System.out.println( "setInput() char[0]='"
           + lexerInput.array[lexerInput.offset] + "', offset="
@@ -171,12 +69,11 @@ public class C_Categoriser extends AbstractCategoriser
     }
 
     getToken( doc, token);
-    token.start -= seg2docOffset;
     if (debug) {
       // print current token
       System.out.print( "tok=" + token);
       String txt = new String( input.array, token.start, token.length);
-      System.out.println( ", seg2docoffs=" + seg2docOffset + ", '" + txt + "'");
+      System.out.println( ", '" + txt + "'");
     }
     return token;
   }
@@ -212,8 +109,10 @@ public class C_Categoriser extends AbstractCategoriser
   private void getToken( HighlightedDocument doc, Token token)
   {
     token.category = Category.NORMAL;
-    int matchLen = matchWhitespace();
-    consumeChars( matchLen);
+    consumeChars( matchWhitespace());
+
+    int matchLen = 0;
+    token.multiline = false;
     token.start = input.getIndex();
     char c = input.current();
     switch (c) {
@@ -237,9 +136,9 @@ public class C_Categoriser extends AbstractCategoriser
         // comments or operator?
         switch (LA( 1)) {
           case '*':
-            boolean isMultiline = readMLComment();
-            // TODO makr as multiline
+            readMLComment();
             token.category = Category.COMMENT_1;
+            token.multiline = true; // mark as multiline token
           break;
           case '/':
             readEOLComment();
@@ -253,8 +152,7 @@ public class C_Categoriser extends AbstractCategoriser
       break;
       case '#': // preprocessor directive
         input.next(); // consume '#'
-        matchLen = matchWhitespaceNoNL();
-        consumeChars( matchLen);
+        consumeChars( matchWhitespaceNoNL());
         matchLen = matchWord();
         consumeChars( matchLen);
         token.category = Category.KEYWORD;
@@ -268,54 +166,45 @@ public class C_Categoriser extends AbstractCategoriser
         //        else
         if ((matchLen = matchNumber()) > 0) {
           token.category = Category.NUMERICVAL;
-          consumeChars( matchLen);
         }
         else if ((matchLen = matchOperator()) > 0) {
           token.category = Category.OPERATOR;
-          consumeChars( matchLen);
         }
         else {
           // now try to match a keyword
           matchLen = matchWord();
-          if (matchLen == 0) {
-            /*
-             * if we dont get a keyword here, it is any character not handled
-             * somewhere above
-             */
-            // treat as normal text
-            token.category = Category.NORMAL;
-            input.next(); // consume char
-            break;
-          }
-
-          assert matchLen > 0 : "unrecognized char in scanner: " + LA( 0);
-          if (isKW_PredefVal( matchLen)) {
-            token.category = Category.PREDEFVAL;
-            consumeChars( matchLen);
-          }
-          else if (isKW_Type( matchLen)) {
-            token.category = Category.KEYWORD_TYPE;
-            consumeChars( matchLen);
-          }
-          else if (isKW_stmt( matchLen)) {
-            token.category = Category.KEYWORD_STATEMENT;
-            consumeChars( matchLen);
-          }
-          else if (isIdentifier1( matchLen)) {
-            token.category = Category.IDENTIFIER_1;
-            consumeChars( matchLen);
-          }
-          else if (isIdentifier2( matchLen)) {
-            token.category = Category.IDENTIFIER_2;
-            consumeChars( matchLen);
-          }
+          if (matchLen > 0) {
+            if (isKW_PredefVal( matchLen)) {
+              token.category = Category.PREDEFVAL;
+            }
+            else if (isKW_Type( matchLen)) {
+              token.category = Category.KEYWORD_TYPE;
+            }
+            else if (isKW_stmt( matchLen)) {
+              token.category = Category.KEYWORD_STATEMENT;
+            }
+            else if (isIdentifier1( matchLen)) {
+              token.category = Category.IDENTIFIER_1;
+            }
+            else if (isIdentifier2( matchLen)) {
+              token.category = Category.IDENTIFIER_2;
+            }
+            else {
+              // still no category found...
+              // treat matched word as normal text
+              token.category = Category.NORMAL;
+            }
+          } // matchlen >0
           else {
-            // still no category found...
-            // treat matched word as normal text
+            /*
+             * if we didn't get a keyword here, it is any character not handled
+             * somewhere above: treat as normal text
+             */
+            matchLen = 1; // consume char
             token.category = Category.NORMAL;
-            consumeChars( matchLen);
           }
         }
+        consumeChars( matchLen);
       break; // default
     } // switch
 
@@ -604,8 +493,4 @@ public class C_Categoriser extends AbstractCategoriser
   ///////////////////////////////////////////////////////////
   // other helper methods
   ///////////////////////////////////////////////////////////
-  private Element elementAtOffset( Document doc, int offset)
-  {
-    return null; //TODO
-  }
 }

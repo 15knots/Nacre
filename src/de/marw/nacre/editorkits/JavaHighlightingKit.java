@@ -53,7 +53,7 @@ public class JavaHighlightingKit extends HighlightingKit
 
     private static boolean debug = false;
 
-    private Segment input;
+    private Segment lexerInput;
 
     private int seg2docOffset;
 
@@ -67,28 +67,19 @@ public class JavaHighlightingKit extends HighlightingKit
      * @see Categoriser#openInput(HighlightedDocument, int)
      * @throws BadLocationException
      */
-    public void openInput( HighlightedDocument doc, int lineIndex)
+    public void openInput( HighlightedDocument doc, Segment lexerInput)
         throws BadLocationException
     {
       if (debug) {
-        System.out.println( "setInput() char[0]='" + input.array[input.offset]
-            + "', offset=" + input.offset + ", count=" + input.count);
+        System.out.println( "setInput() char[0]='" + lexerInput.array[lexerInput.offset]
+            + "', offset=" + lexerInput.offset + ", count=" + lexerInput.count);
       }
-      Element rootElement = doc.getDefaultRootElement();
-
-      Element line = rootElement.getElement( lineIndex);
-      int p0 = line.getStartOffset();
-      int p1 = Math.min( doc.getLength(), line.getEndOffset());
-      // adjust categorizer's starting point (to start of line)
-      int p0Adj = getAdjustedStart( doc, lineIndex);
-      this.input = new Segment();
-      doc.getText( p0Adj, p1 - p0Adj, input);
-      seg2docOffset = input.offset - p0Adj;
+      this.lexerInput = lexerInput;
       try {
         /*
          * Note: This call will retrieve the first token too!
          */
-        super.useInputStream( new SegmentInputStream( input));
+        super.useInputStream( new SegmentInputStream( lexerInput));
       }
       catch (IOException e) {
         // can't adjust scanner... calling logic
@@ -320,7 +311,7 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void closeInput()
     {
-      this.input = null;
+      this.lexerInput = null;
     }
 
     /**
@@ -343,33 +334,6 @@ public class JavaHighlightingKit extends HighlightingKit
       int lineNum = rootElement.getElementIndex( line.getStartOffset());
       HighlightedDocument doc = (HighlightedDocument) line.getDocument();
       //TODO doc.putMark( lineNum, CategorizerAttribute);
-    }
-
-    /**
-     * Fetch a reasonable location to start scanning given the desired start
-     * location. This allows for adjustments needed to accommodate multiline
-     * comments.
-     * 
-     * @param doc
-     *          The document holding the text.
-     * @param lineIndex
-     *          The number of the line to render.
-     * @return adjusted start position which is greater or equal than zero.
-     */
-    private int getAdjustedStart( HighlightedDocument doc, int lineNum)
-    {
-      Element rootElement = doc.getDefaultRootElement();
-      // walk backwards until we get a tagged line...
-      System.out.println( "# find start in " + lineNum + "...");
-      Element line = rootElement.getElement( lineNum);
-      for (; lineNum > 0; line = rootElement.getElement( lineNum), lineNum-- ) {
-        //        System.out.print( " " + lineNum);
-        if (null != doc.getMark( line))
-          break;
-      }
-      System.out.println( "# found start in " + lineNum);
-
-      return line.getStartOffset();
     }
 
     /**

@@ -16,7 +16,7 @@ import swing.text.highlight.categoriser.Token;
  *      Token) .
  * @author Martin Weber TODO unter Java v. 5 in ein enum konvertieren
  */
-public class Category implements Serializable//, CategoryConstants
+public class Category implements Serializable
 {
 
   /**
@@ -102,7 +102,7 @@ public class Category implements Serializable//, CategoryConstants
   public static final Category DOC = new Category( "doc", 13);
 
   //----------------------------------------------------------
-  private static Category[] all = { NORMAL, COMMENT_1, COMMENT_2, STRINGVAL,
+  private static final Category[] all = { NORMAL, COMMENT_1, COMMENT_2, STRINGVAL,
       PREDEFVAL, NUMERICVAL, LABEL, KEYWORD_STATEMENT, KEYWORD, KEYWORD_TYPE,
       OPERATOR, IDENTIFIER_1, IDENTIFIER_2, DOC };
 
@@ -180,7 +180,7 @@ public class Category implements Serializable//, CategoryConstants
 
   public String toString()
   {
-    return getName() + ", id=" + categoryId;
+    return getName() + ",ord=" + categoryId;
   }
 
   public static Category[] values()

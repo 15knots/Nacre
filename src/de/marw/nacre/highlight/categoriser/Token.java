@@ -30,6 +30,13 @@ public class Token implements Cloneable
   public Category category = Category.NORMAL;
 
   /**
+   * <code>true</code> if this Token might span multiple lines (e.g.
+   * C-comments). This is used in conjunction of <code>category</code> to
+   * determine safe positions to rescan a document.
+   */
+  public boolean multiline = false;
+
+  /**
    * Returns a shallow copy of this <code>Token</code> instance.
    * 
    * @see java.lang.Object#clone()
@@ -47,6 +54,7 @@ public class Token implements Cloneable
 
   public String toString()
   {
-    return "start=" + start + ", length=" + length + ", cat=" + category;
+    return "start=" + start + ", length=" + length + ", cat=" + category
+        + (multiline ? ", multiline" : ", single line");
   }
 }

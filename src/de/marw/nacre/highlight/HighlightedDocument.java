@@ -115,6 +115,21 @@ public class HighlightedDocument extends PlainDocument
     }
   }
 
+  /**
+   * @param line
+   *          TODO
+   * @return
+   */
+  public boolean hasMark( Element line)
+  {
+    synchronized (this ) {
+      if (marks == null) {
+        return false;
+      }
+      return this.marks.containsKey( line);
+    }
+  }
+
   public Object getMark( Element line)
   {
     synchronized (this ) {

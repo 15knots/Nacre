@@ -16,6 +16,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.File;
 import java.io.FileReader;
 
@@ -40,6 +42,13 @@ import swing.text.highlight.HighlightingKit;
 public class HighlightKitTest
 {
 
+  /**
+   * This is used to test for appropriate handling of tokens that span multiple
+   * lines. <code>true</code>, if the first line of text to categorise is not
+   * at offset zero.
+   */
+  private static final boolean TEST_MULTILINE_TOKEN_PROOFNESS = false;
+
   public static void main( String[] args)
   {
     if (args.length != 1) {
@@ -47,12 +56,13 @@ public class HighlightKitTest
       System.exit( 1);
     }
     try {
-      GraphicsEnvironment env =
-        GraphicsEnvironment.getLocalGraphicsEnvironment();
-      String names[]=env.getAvailableFontFamilyNames();
-      for (int i = 0; i < names.length; i++ ) {
-        System.out.println("- "+i+": "+names[i]);
-      }
+      //      GraphicsEnvironment env =
+      //        GraphicsEnvironment.getLocalGraphicsEnvironment();
+      //      String names[]=env.getAvailableFontFamilyNames();
+      //      for (int i = 0; i < names.length; i++ ) {
+      //        System.out.println("- "+i+": "+names[i]);
+      //      }
+
       JEditorPane editor = new JEditorPane();
 
       HighlightingKit kit = new CHighlightingKit();
@@ -65,8 +75,8 @@ public class HighlightKitTest
       editor.setContentType( "text/x-c-src");
       //      editor.setContentType( "text/x-java");
       editor.setBackground( Color.white);
-//      editor.setFont( new Font( "Monospaced", Font.PLAIN, 30));
-//      editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
+      editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+      //      editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
       //      editor.setEditable( true);
 
       // PENDING(prinz) This should have a customizer and
@@ -74,8 +84,9 @@ public class HighlightKitTest
       HighlightingContext styles = kit.getStylePreferences();
       Style root = styles.getStyle( StyleContext.DEFAULT_STYLE);
       StyleConstants.setFontFamily( root, "Monospaced");
-      StyleConstants.setFontSize( root, 32);
-      
+      //      StyleConstants.setFontSize( root, 30);
+      //      editor.setFont( new Font( "Monospaced", Font.PLAIN, 30));
+
       Style s;
       s = styles.getStyleForCategory( Category.COMMENT_1);
       StyleConstants.setForeground( s, new Color( 0, 128, 0));
@@ -112,15 +123,28 @@ public class HighlightKitTest
       File file = new File( args[0]);
       editor.read( new FileReader( file), file);
       JScrollPane scroller = new JScrollPane();
-      JViewport vp = scroller.getViewport();
-      vp.add( editor);
+      scroller.setViewportView( editor);
 
       JFrame f = new JFrame( "JavaEditorKit: " + args[0]);
       f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
       f.getContentPane().setLayout( new BorderLayout());
       f.getContentPane().add( "Center", scroller);
+
       f.pack();
-      f.setSize( 200, 751);
+      f.setSize( 200, 300);
+      if (TEST_MULTILINE_TOKEN_PROOFNESS) {
+        // caret in letzte Zeile (test, ob repaint() immer in erster Zeile
+        // anfängt)
+        editor.setCaretPosition( editor.getDocument().getLength());
+        scroller.getViewport().setViewPosition( new Point( 10, 962));
+      }
+
+      /*
+       * NOTE: scrollRectToVisible() funktioniert nur, wenn der Frame visible
+       * ist. // caret in letzte Zeile (test, ob repaint() immer in erster Zeile
+       * anfängt) Rectangle rect=editor.getUI().modelToView(editor,
+       * editor.getDocument().getLength()); editor.scrollRectToVisible(rect );
+       */
       f.setVisible( true);
     }
     catch (Throwable e) {

@@ -34,14 +34,14 @@ public abstract class AbstractCategoriser implements Categoriser
    * 
    * @throws BadLocationException
    */
-  public void openInput( HighlightedDocument doc, int lineIndex)
+  public void openInput( HighlightedDocument doc, Segment lexerInput)
       throws BadLocationException
   {
     if (debug) {
       System.out
           .println( "# in AbstractCategoriser.openInput() ---------------------------");
     }
-    setInput( new Segment());
+    setInput( lexerInput);
   }
 
   public void closeInput()
