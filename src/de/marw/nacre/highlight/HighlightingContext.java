@@ -301,8 +301,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     private int getAdjustedStart( Element rootElement, int lineIndex)
     {
-      // walk backwards until we get a tagged line...
-      HighlightedDocument doc = (HighlightedDocument) getDocument();
+      // walk backwards until we get an untagged line...
       System.out.print( "# find start in line " + lineIndex);
       for (; lineIndex > 0; lineIndex-- ) {
         Element line = rootElement.getElement( lineIndex);
@@ -536,6 +535,60 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       }
     }
 
+    ///////////////////////////////////////////////////////////////////
+    // unsafe line marking
+    ///////////////////////////////////////////////////////////////////
+    /**
+     * Hold the marks for lines that are unsafe to restart scanning.
+     */
+    private Map unsafeLineMarks = null;
+
+    private Object getMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return null;
+      }
+      return unsafeLineMarks.get( line);
+    }
+
+    /**
+     * @param line
+     *          TODO
+     * @return
+     */
+    private boolean hasMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return false;
+      }
+      return this.unsafeLineMarks.containsKey( line);
+    }
+
+    /**
+     * Adds a mark that specifies a line as a position where to start the
+     * scanning is <strong>unsafe </strong>.
+     * 
+     * @param line
+     * @param value
+     */
+    private void putMark( Element line, Object value)
+    {
+      // lazy creation
+      if (unsafeLineMarks == null) {
+        unsafeLineMarks = new HashMap();
+      }
+      unsafeLineMarks.put( line, value);
+      //      System.out.println( "unsafeLineMarks put()=" + unsafeLineMarks);
+    }
+
+    private Object removeMark( Element line)
+    {
+      if (unsafeLineMarks == null) {
+        return null;
+      }
+      return unsafeLineMarks.remove( line);
+    }
+
     /**
      * Eine Queue für <code>Token</code>s.
      * 
@@ -630,56 +683,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 
     } // TokenQueue
 
-    /**
-     * Hold the marks for lines that are unsafe to restart scanning.
-     */
-    private Map unsafeLineMarks = null;
-
-    private Object getMark( Element line)
-    {
-      if (unsafeLineMarks == null) {
-        return null;
-      }
-      return unsafeLineMarks.get( line);
-    }
-
-    /**
-     * @param line
-     *          TODO
-     * @return
-     */
-    private boolean hasMark( Element line)
-    {
-      if (unsafeLineMarks == null) {
-        return false;
-      }
-      return this.unsafeLineMarks.containsKey( line);
-    }
-
-    /**
-     * Adds a mark that specifies a line as a position to safely start the
-     * scanning.
-     * 
-     * @param line
-     * @param value
-     */
-    private void putMark( Element line, Object value)
-    {
-      // lazy creation
-      if (unsafeLineMarks == null) {
-        unsafeLineMarks = new HashMap();
-      }
-      unsafeLineMarks.put( line, value);
-      //      System.out.println( "unsafeLineMarks put()=" + unsafeLineMarks);
-    }
-
-    private Object removeMark( Element line)
-    {
-      if (unsafeLineMarks == null) {
-        return null;
-      }
-      return unsafeLineMarks.remove( line);
-    }
   }
 
 }

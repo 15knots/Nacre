@@ -79,9 +79,6 @@ public class C_Categoriser extends AbstractCategoriser
    */
   public void insertUpdate( Element elem)
   {
-    // TODO Auto-generated method stub
-    // update multiline token marks
-    Element root = elem.getDocument().getDefaultRootElement();
   }
 
   /**
@@ -89,10 +86,6 @@ public class C_Categoriser extends AbstractCategoriser
    */
   public void removeUpdate( Element line)
   {
-    // TODO Auto-generated method stub
-    //throw new java.lang.UnsupportedOperationException("removeUpdate not
-    // implemented");
-
   }
 
   ///////////////////////////////////////////////////////////

@@ -53,10 +53,6 @@ public class JavaHighlightingKit extends HighlightingKit
 
     private static boolean debug = false;
 
-    private Segment lexerInput;
-
-    private int seg2docOffset;
-
     Java_Tokeniser()
     {
       super( new LocalEnvironment());
@@ -75,7 +71,6 @@ public class JavaHighlightingKit extends HighlightingKit
             + lexerInput.array[lexerInput.offset] + "', offset="
             + lexerInput.offset + ", count=" + lexerInput.count);
       }
-      this.lexerInput = lexerInput;
       try {
         /*
          * Note: This call will retrieve the first token too!
@@ -99,7 +94,7 @@ public class JavaHighlightingKit extends HighlightingKit
       }
       boolean locationOK = true;
 
-      token.start = getStartOffset() - seg2docOffset;
+      token.start = getStartOffset();
       token.length = getEndOffset() - token.start;
       token.category = Category.NORMAL;
       switch (super.token) {
@@ -310,7 +305,6 @@ public class JavaHighlightingKit extends HighlightingKit
      */
     public void closeInput()
     {
-      this.lexerInput = null;
     }
 
     /**
