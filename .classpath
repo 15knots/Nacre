@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry excluding="bin/" kind="src" path=""/>
+	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/j2sdk1.4.1_01"/>
 	<classpathentry kind="lib" path="/usr/java/j2sdk1.4.1_01/lib/tools.jar"/>
 	<classpathentry kind="output" path="bin"/>
