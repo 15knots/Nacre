@@ -3,8 +3,10 @@
 package swing.text.highlight;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.Rectangle;
 import java.awt.Shape;
 
 import javax.swing.event.DocumentEvent;
@@ -412,6 +414,29 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       // TODO Auto-generated method stub TEST
       System.out.println( "changedUpdate()--------------------");
       super.changedUpdate( e, a, f);
+    }
+
+    /**
+     * Repaints the given line range. Overwritten to repaint all lines, thus
+     * supporting highlighting tokens that span mutliple lines.
+     * 
+     * @param host
+     *          the component hosting the view (used to call repaint)
+     * @param a
+     *          the region allocated for the view to render into
+     * @param line0
+     *          the starting line number to repaint. This must be a valid line
+     *          number in the model.
+     * @param line1
+     *          the ending line number to repaint. This must be a valid line
+     *          number in the model.
+     */
+    protected void damageLineRange( int line0, int line1, Shape a,
+        Component host)
+    {
+      if (a != null) {
+        host.repaint();
+      }
     }
 
     /**
