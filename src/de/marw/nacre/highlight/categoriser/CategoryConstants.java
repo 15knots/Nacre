@@ -55,8 +55,6 @@ public interface CategoryConstants
 
   /**
    * Label category id. This can be used to mark labels.
-   * 
-   * @deprecated Bullshit, this requieres a Parser, not a Scanner!
    */
   public static final int LABEL       = 6;
 

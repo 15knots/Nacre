@@ -22,6 +22,7 @@ import java.awt.Shape;
 import javax.swing.event.DocumentEvent;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
+import javax.swing.text.PlainView;
 import javax.swing.text.Segment;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -29,7 +30,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
-import javax.swing.text.WrappedPlainView;
 
 import swing.text.highlight.categoriser.Categoriser;
 import swing.text.highlight.categoriser.CategoryConstants;
@@ -37,12 +37,12 @@ import swing.text.highlight.categoriser.Token;
 
 
 /**
- * A collection of styles used to render java text. This class also acts as a
- * factory for the views used to represent the java documents. Since the
+ * A collection of styles used to render highlighted text. This class also acts
+ * as a factory for the views used to represent the documents. Since the
  * rendering styles are based upon view preferences, the views need a way to
  * gain access to the style settings which is facilitated by implementing the
  * factory in the style storage. Both functionalities can be widely shared
- * across java document views.
+ * across the document views.
  * 
  * @author Timothy Prinzing (1.2 05/27/99)
  * @author Martin Weber
@@ -51,8 +51,8 @@ public class HighlightingContext extends StyleContext implements ViewFactory
 {
 
   /**
-   * Constructs a set of styles to represent java lexical tokens. By default
-   * there are no colors or fonts specified.
+   * Constructs a set of styles to represent lexical token categories. By
+   * default there are no colors or fonts specified.
    */
   public HighlightingContext()
   {
@@ -78,15 +78,16 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    */
   public Color getForeground( int code)
   {
-    if (tokenColors == null) {
-      tokenColors = new Color[CategoryConstants.MaximumId + 1];
+    if (categoryColors == null) {
+      categoryColors = new Color[CategoryConstants.MaximumId + 1];
     }
     //code--; // no mapping for Category.NORMAL
-    if ((code >= 0) && (code < tokenColors.length)) {
-      Color c = tokenColors[code];
+    if ((code >= 0) && (code < categoryColors.length)) {
+      Color c = categoryColors[code];
       if (c == null) {
         Style s = categoryStyles[code];
         c = StyleConstants.getForeground( s);
+        categoryColors[code] = c;
       }
       return c;
     }
@@ -98,15 +99,16 @@ public class HighlightingContext extends StyleContext implements ViewFactory
    */
   public Font getFont( int code)
   {
-    if (tokenFonts == null) {
-      tokenFonts = new Font[CategoryConstants.MaximumId + 1];
+    if (categoryFonts == null) {
+      categoryFonts = new Font[CategoryConstants.MaximumId + 1];
     }
     //code--; // no mapping for Category.NORMAL
-    if (code >= 0 && code < tokenFonts.length) {
-      Font f = tokenFonts[code];
+    if (code >= 0 && code < categoryFonts.length) {
+      Font f = categoryFonts[code];
       if (f == null) {
         Style s = categoryStyles[code];
         f = getFont( s);
+        categoryFonts[code] = f;
       }
       return f;
     }
@@ -136,27 +138,39 @@ public class HighlightingContext extends StyleContext implements ViewFactory
   // --- variables -----------------------------------------------
 
   /**
-   * The styles representing the actual token types.
+   * The styles representing the actual categories.
    */
   private Style[]           categoryStyles;
 
   /**
-   * Cache of foreground colors to represent the various tokens.
+   * Cache of foreground colors to represent the various categories.
    */
-  private transient Color[] tokenColors;
+  private transient Color[] categoryColors;
 
   /**
-   * Cache of fonts to represent the various tokens.
+   * Cache of fonts to represent the various categories.
    */
-  private transient Font[]  tokenFonts;
+  private transient Font[]  categoryFonts;
 
   /**
    * View that uses the lexical information to determine the style
    * characteristics of the text that it renders. This simply colorizes the
-   * various tokens and assumes a constant font family and size.
+   * various categories and assumes a constant font family and size.
    */
-  private class HiliteView extends WrappedPlainView
+  private class HiliteView extends PlainView
   {
+
+    /**
+     * used for text runs that spans multiple line (eg Javadoc comments). Set to
+     * <code>false</code> if the categorizer needs to adjust it's starting
+     * point.
+     */
+    private boolean lexerValid;
+
+    /**
+     * the category we are painting. Used to determine color and font.
+     */
+    private int     categoryPainting;
 
     /**
      * Construct a simple colorized view of java text.
@@ -181,8 +195,133 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      */
     public void paint( Graphics g, Shape a)
     {
-      super.paint( g, a);
       lexerValid = false;
+      categoryPainting = CategoryConstants.NORMAL;
+      System.out.println( "# invalidate lexer");
+      super.paint( g, a);
+      // notify lexer
+      //TODO lexer.closeInput();
+   }
+
+    /**
+     * Renders the given range in the model as normal unselected text. This is
+     * implemented to paint colors based upon the category-to-color
+     * translations. To reduce the number of calls to the Graphics object, text
+     * is batched up until a color change is detected or the entire requested
+     * range has been reached.
+     * 
+     * @param g
+     *          the graphics context
+     * @param x
+     *          the starting X coordinate
+     * @param y
+     *          the starting Y coordinate
+     * @param p0
+     *          the beginning position in the model
+     * @param p1
+     *          the ending position in the model
+     * @returns the location of the end of the range
+     * @exception BadLocationException
+     *              if the range is invalid
+     */
+    protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
+        throws BadLocationException
+    {
+      HighlightedDocument doc = (HighlightedDocument) getDocument();
+      Categoriser cato = doc.getCategoriser();
+      Segment text = getLineBuffer();
+
+      Token token = null;
+      Segment catoInput = new Segment();
+
+      Color lastColor = g.getColor();
+      Font lastFont = g.getFont();
+      //      System.out.println("paintloop ---------------------------------");
+
+      // get token
+      token = adjustScanner( doc, p0, cato, catoInput, token);
+      if (false) {
+        // print current token
+        Segment txt = new Segment();
+        System.out.print( "tok=" + token);
+        doc.getText( token.start, token.length, txt);
+        System.out.println( ", '" + txt + "'");
+      }
+      while (p0 < p1) {
+        int tokenEnd = token.start + token.length;
+
+        if (token.start == p0) {
+          // draw current token
+          doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
+          x = drawHighlightedText( token.categoryId, text, x, y, g, p0);
+          categoryPainting = token.categoryId;
+          p0 = tokenEnd;
+          token = cato.nextToken( doc, token);
+          continue;
+        }
+        if (token.start > p0) {
+          // draw what we have
+          doc.getText( p0, token.start - p0, text);
+          x = drawHighlightedText( categoryPainting, text, x, y, g, p0);
+          p0 = token.start;
+          continue; // with 'token.start == p0'
+        }
+        if (token.start < p0) {
+          if (tokenEnd >= p1) {
+            // draw complete line
+            doc.getText( p0, Math.min( tokenEnd, p1) - p0, text);
+            x = drawHighlightedText( token.categoryId, text, x, y, g, p0);
+            categoryPainting = token.categoryId;
+            p0 = p1;
+            break; // we're done
+          }
+          else {
+            categoryPainting = token.categoryId;
+            token = cato.nextToken( doc, token);
+            continue; // with 'token.start > p0'
+          }
+        }
+      }
+      g.setColor( lastColor);
+      g.setFont( lastFont);
+      return x;
+    }
+
+    /**
+     * Draws the given text, expanding any tabs that are contained using the
+     * given tab expansion technique. This is implemented to paint colors based
+     * upon the category-to-color translations.
+     * 
+     * @param categoryId
+     *          the category we are painting. Used to determine color and font.
+     * @param text
+     *          the source of the text
+     * @param x
+     *          the X origin >= 0
+     * @param y
+     *          the Y origin >= 0
+     * @param g
+     *          the graphics context
+     * @param startOffset
+     *          starting offset of the text in the document >= 0
+     * @return the X location at the end of the rendered text
+     * @exception BadLocationException
+     *              if the range is invalid
+     */
+    private int drawHighlightedText( int categoryId, Segment text, int x,
+        int y, Graphics g, int startOffset)
+    {
+      Color fg = getForeground( categoryId);
+      Font font = getFont( categoryId);
+      g.setColor( fg);
+      g.setFont( font);
+
+      if (true) {
+        System.out.print( "painting '" + text + "'");
+        System.out.println( " color=" + fg + ", font=" + font);
+      }
+      x = Utilities.drawTabbedText( text, x, y, g, this, startOffset);
+      return x;
     }
 
     /**
@@ -206,8 +345,105 @@ public class HighlightingContext extends StyleContext implements ViewFactory
      * @exception BadLocationException
      *              if the range is invalid
      */
-    protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
+    protected int drawUnselectedTextX( Graphics g, int x, int y, int p0, int p1)
         throws BadLocationException
+    {
+      HighlightedDocument doc = (HighlightedDocument) getDocument();
+      Categoriser cato = doc.getCategoriser();
+      Segment text = getLineBuffer();
+
+      Token token = null;
+      Segment catoInput = new Segment();
+
+      Color lastColor = getForeground( categoryPainting);
+      Font lastFont = getFont( categoryPainting);
+      int flushedIndex = p0;
+      //      System.out.println("paintloop ---------------------------------");
+      while (p0 < p1) {
+        // get token
+        token = adjustScanner( doc, p0, cato, catoInput, token);
+        if (true) {
+          // print current token
+          Segment txt = new Segment();
+          System.out.print( "tok=" + token);
+          try {
+            doc.getText( token.start, token.length, txt);
+            System.out.println( ", '" + txt + "'");
+          }
+          catch (BadLocationException ex) {
+            // ex.printStackTrace();
+            System.err.println( ex);
+          }
+        }
+
+        int flushMaxIndex = Math.min( token.start + token.length, p1);
+        flushMaxIndex = (flushMaxIndex <= p0) ? p1 : flushMaxIndex;
+        // determine color and font
+        if (token.categoryId != categoryPainting) {
+          Color fg = getForeground( token.categoryId);
+          Font font = getFont( token.categoryId);
+          // category changed, maybe highlighting changes, too
+          if (!fg.equals( lastColor) || !font.equals( lastFont)) {
+            // highlighting changed, flush what we have
+
+            if (p0 != flushedIndex) {
+              g.setColor( lastColor);
+              g.setFont( lastFont);
+
+              doc.getText( p0, p0 - flushedIndex, text);
+              if (true) {
+                System.out.print( "painting '" + text + "'");
+                System.out.println( " color=" + fg + ", font=" + font);
+              }
+              x = Utilities.drawTabbedText( text, x, y, g, this, p0);
+              flushedIndex = p0;
+            }
+            lastColor = fg;
+            lastFont = font;
+          }
+          categoryPainting = token.categoryId;
+        }
+        p0 = flushMaxIndex;
+      }
+      // notify lexer
+      cato.closeInput();
+      // flush remaining
+      if (p1 != p0) {
+        g.setColor( lastColor);
+        g.setFont( lastFont);
+        if (true) {
+          System.out.print( "painting '" + text + "'");
+          System.out.println( " color=" + lastColor + ", font=" + lastFont);
+        }
+        doc.getText( p0, p1 - p0, text);
+        x = Utilities.drawTabbedText( text, x, y, g, this, p0);
+      }
+      return x;
+    }
+
+    /**
+     * Renders the given range in the model as normal unselected text. This is
+     * implemented to paint colors based upon the token-to-color translations.
+     * To reduce the number of calls to the Graphics object, text is batched up
+     * until a color change is detected or the entire requested range has been
+     * reached.
+     * 
+     * @param g
+     *          the graphics context
+     * @param x
+     *          the starting X coordinate
+     * @param y
+     *          the starting Y coordinate
+     * @param p0
+     *          the beginning position in the model
+     * @param p1
+     *          the ending position in the model
+     * @returns the location of the end of the range
+     * @exception BadLocationException
+     *              if the range is invalid
+     */
+    protected int drawUnselectedTextXXX( Graphics g, int x, int y, int p0,
+        int p1) throws BadLocationException
     {
       HighlightedDocument doc = (HighlightedDocument) getDocument();
       Categoriser cato = doc.getCategoriser();
@@ -217,43 +453,51 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       Token token = null;
       Segment catoInput = new Segment();
 
-      Color lastColor = null;
-      Font lastFont = null;
-      int mark = p0;
+      Color lastColor = g.getColor();
+      Font lastFont = g.getFont();
+      int flushIndex = p0;
       //      System.out.println("paintloop ---------------------------------");
       for (; p0 < p1;) {
         // get token
         token = adjustScanner( doc, p0, cato, catoInput, token);
-
-        int p = Math.min( token.start + token.length, p1);
-        p = (p <= p0) ? p1 : p;
-
+        //TODO hier wird mit brute force COlor und FOnt gesetzt
+        int pt1 = Math.min( token.start + token.length, p1);
+        pt1 = (pt1 <= p0) ? p1 : pt1;
         // determine color and font
-        Color fg = getForeground( token.categoryId);
-        Font font = getFont( token.categoryId);
-        if ((fg != lastColor && lastColor != null)
-            || (font != lastFont && font != null)) {
-          // highlighting change, flush what we have
-          if (lastColor != null)
-            g.setColor( lastColor);
-          if (font != null)
-            g.setFont( lastFont);
-          doc.getText( mark, p0 - mark, text);
-          x = Utilities.drawTabbedText( text, x, y, g, this, mark);
-          mark = p0;
+        Color fg = getForeground( categoryPainting);
+        Font font = getFont( categoryPainting);
+        if (true || flushIndex != p0) {
+          g.setColor( fg);
+          g.setFont( font);
+          if (true) {
+            // print current token
+            Segment txt = new Segment();
+            System.out.print( "tok=" + token);
+            try {
+              doc.getText( token.start, token.length, txt);
+              System.out.println( ", '" + txt + "'");
+            }
+            catch (BadLocationException ex) {
+              // ex.printStackTrace();
+              System.err.println( ex);
+            }
+          }
+          doc.getText( p0, pt1 - p0, text);
+          if (true) {
+            System.out.print( "painting '" + text + "'");
+            System.out.println( " color=" + fg + ", font=" + font);
+          }
+          x = Utilities.drawTabbedText( text, x, y, g, this, p0);
+          flushIndex = p0;
         }
-        lastColor = fg;
-        lastFont = font;
-        p0 = p;
+        p0 = pt1;
       }
       // notify lexer
       cato.closeInput();
-      // flush remaining
       g.setColor( lastColor);
       g.setFont( lastFont);
-      doc.getText( mark, p1 - mark, text);
-      //      System.out.println("-> flush, cat="+token.categoryId+", '"+text+"'");
-      x = Utilities.drawTabbedText( text, x, y, g, this, mark);
+      categoryPainting = token.categoryId;
+
       return x;
     }
 
@@ -275,6 +519,7 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       try {
         int p = p0;
         if (!lexerValid) {
+          System.out.println( "# lexer invalid");
           // adjust categorizer's starting point (to start of line)
           p = lexer.getAdjustedStart( doc, p0);
           doc.getText( p, doc.getLength() - p, lexerInput);
@@ -282,30 +527,38 @@ public class HighlightingContext extends StyleContext implements ViewFactory
            * Bug in 1.41? Wenn das erste Zeichen gelöscht wird, kommt im
            * doc.getText() ein falscher Segmentoffset zu Stande.
            */
-          if (p == 0 && lexerInput.offset >= doc.getLength()) {
+          if (p == 0 && lexerInput.offset > doc.getLength()) {
             lexerInput.offset = 0;
+            token = new Token();
+            token.start = doc.getLength();
+            return token;
           }
 
           //          System.err.println("scanning \n'"+lexerInput+"'");
           lexer.setInput( lexerInput);
           lexerValid = true;
+          System.out.println( "# validated lexer");
         }
-        while (p <= p0) {
+        do {
           token = lexer.nextToken( doc, token);
+          token.start+= lexerInput.offset;  // adjust to document offset
+
           if (false) {
             // print current token
             Segment txt = new Segment();
             doc.getText( token.start, token.length, txt);
             System.out.println( "tok=" + token + ", '" + txt + "'");
           }
-          p += token.start + token.length;
-        }
+          p = token.start + token.length;
+        } while (p <= p0);
       }
       catch (Throwable e) {
         // can't adjust scanner... calling logic
         // will simply render the remaining text.
         e.printStackTrace();
       }
+      assert token.start + token.length > p0 : "end of token not at required position > "+p0;
+
       return token;
     }
 
@@ -332,13 +585,6 @@ public class HighlightingContext extends StyleContext implements ViewFactory
       super.removeUpdate( e, a, f);
       System.out.println( "### removeUpdate()  DONE --------------------");
     }
-
-    /**
-     * used for text runs that span multiple line (eg Javadoc comments). Set to
-     * <code>false</code> if the categorizer needs to adjust it's starting
-     * point.
-     */
-    private boolean lexerValid;
 
     /**
      * @see javax.swing.text.View#changedUpdate(javax.swing.event.DocumentEvent,

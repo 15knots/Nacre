@@ -18,6 +18,7 @@ import swing.text.highlight.HighlightedDocument;
 
 public class C_Categoriser extends AbstractCategoriser
 {
+  private static final boolean               debug              = true;
 
   public static final class RevStringByLengthComparator implements Comparator
   {
@@ -43,13 +44,15 @@ public class C_Categoriser extends AbstractCategoriser
   private static final String[]              kwOperator         = { "sizeof" };
 
   private static RevStringByLengthComparator byLenghtDescending = new RevStringByLengthComparator();
-  static {
-    // sort keyword arrays by keyword length (descending)
-    Arrays.sort( kwPredefVal, byLenghtDescending);
-    Arrays.sort( kwType, byLenghtDescending);
-    Arrays.sort( kwStmt, byLenghtDescending);
-    Arrays.sort( kwOperator, byLenghtDescending);
-  }
+
+  //  static {
+  //    // sort keyword arrays by keyword length (descending)
+  //    Arrays.sort( kwPredefVal, byLenghtDescending);
+  //    Arrays.sort( kwType, byLenghtDescending);
+  //    Arrays.sort( kwStmt, byLenghtDescending);
+  //    Arrays.sort( kwOperator, byLenghtDescending);
+  //  }
+
 
   public C_Categoriser()
   {
@@ -64,8 +67,10 @@ public class C_Categoriser extends AbstractCategoriser
   public void setInput( Segment input)
   {
     super.setInput( input);
-    System.out.println( "setInput ---------------------------");
-    input.setIndex( input.getBeginIndex()); // initialize CharIterator
+    if (debug) {
+      System.out.println( "setInput ---------------------------");
+    }
+    input.first(); // initialize CharIterator
   }
 
   /**
@@ -78,7 +83,7 @@ public class C_Categoriser extends AbstractCategoriser
     }
 
     getToken( token);
-    if (true) {
+    if (debug) {
       // print current token
       Segment txt = new Segment();
       System.out.print( "tok=" + token);
@@ -101,8 +106,9 @@ public class C_Categoriser extends AbstractCategoriser
    */
   public void closeInput()
   {
-    System.out.println( "closeInput ---------------------------");
-    // TODO Auto-generated method stub
+    if (debug) {
+      System.out.println( "closeInput ---------------------------");
+    } // TODO Auto-generated method stub
   }
 
   /**
@@ -330,7 +336,6 @@ public class C_Categoriser extends AbstractCategoriser
   private boolean matchInWordlist( int length, final String[] wordlist)
   {
     for (int i = 0; i < wordlist.length; i++ ) {
-      int len;
       if (wordlist[i].length() == length
           && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
               wordlist[i]) > 0)

@@ -37,13 +37,15 @@ public interface Categoriser
 
   /**
    * This gets called when the View is rendered. The start position of the
-   * returned token is expected to be relative to the start of the segment.
+   * returned token is expected to be relative to the start of the <strong>input
+   * segment </strong>.
    * 
    * @param doc
    * @param tokenBuf
    *          The buffer where the token is returned or <code>null</code> if a
    *          new buffer should be allocated.
    * @return the categorized token.
+   * @see #setInput(Segment)
    */
   public Token nextToken( HighlightedDocument doc, Token tokenBuf);
 

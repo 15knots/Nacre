@@ -23,6 +23,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 import javax.swing.text.GapContent;
 import javax.swing.text.PlainDocument;
+import javax.swing.text.AbstractDocument.Content;
 
 import swing.text.highlight.categoriser.Categoriser;
 
@@ -41,16 +42,34 @@ public class HighlightedDocument extends PlainDocument
   /**
    * the Categoriser used for highlighting text of this document.
    */
-  private Categoriser categoriser;
+  private final Categoriser categoriser;
 
   /**
+   * Constructs a plain text document. A default model using
+   * <code>GapContent</code> is constructed and set.
+   * 
    * @param categoriser
    *          the Categoriser used for highlighting text of this document or
    *          <code>null</code> if no highlighting is to be done.
    */
   public HighlightedDocument( Categoriser categoriser)
   {
-    super( new GapContent( 1024));
+    this( categoriser, new GapContent());
+  }
+
+  /**
+   * Constructs a plain text document. A default root element is created, and
+   * the tab size set to 8.
+   * 
+   * @param categoriser
+   *          the Categoriser used for highlighting text of this document or
+   *          <code>null</code> if no highlighting is to be done.
+   * @param c
+   *          the container for the content
+   */
+  public HighlightedDocument( Categoriser categoriser, Content c)
+  {
+    super( c);
     this.categoriser = categoriser;
   }
 

@@ -77,7 +77,7 @@ public class HighlightKitTest
       //      StyleConstants.setUnderline(s, true);
 
       s = styles.getStyleForCategory( CategoryConstants.OPERATOR);
-      StyleConstants.setForeground( s, Color.darkGray);
+      StyleConstants.setForeground( s, Color.CYAN);
       //      StyleConstants.setUnderline(s, true);
 
       Color keyword = new Color( 102, 102, 255);
@@ -101,6 +101,7 @@ public class HighlightKitTest
       vp.add( editor);
 
       JFrame f = new JFrame( "JavaEditorKit: " + args[0]);
+      f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
       f.getContentPane().setLayout( new BorderLayout());
       f.getContentPane().add( "Center", scroller);
       f.pack();
