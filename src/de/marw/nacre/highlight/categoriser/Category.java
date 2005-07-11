@@ -8,9 +8,6 @@
 
 package de.marw.javax.swing.text.highlight;
 
-import java.io.Serializable;
-
-import de.marw.javax.swing.text.highlight.categoriser.Token;
 
 
 /**
