@@ -342,23 +342,6 @@ public class C_Categoriser extends C_likeCategoriser
   }
 
   /**
-   * Matches white space until end of line.
-   * 
-   * @return the length of the matching text or <code>0</code> if no match was
-   *         found.
-   */
-  protected int matchWhitespaceNoNL()
-  {
-    int len = 0;
-    char c = LA( len);
-    // match WS until end of line..
-    while (Character.isWhitespace( c) && c != '\n') {
-      c = LA( ++len);
-    }
-    return len;
-  }
-
-  /**
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used in statements.
    * 
@@ -418,46 +401,6 @@ public class C_Categoriser extends C_likeCategoriser
   {
     /* C++ kennt true, false */
     return matchOneOfStrings( length, kwPredefVal);
-  }
-
-  /**
-   * Checks whether a subregion in the <code>input</code> starting at the
-   * current scanner input position is a custom identifier.
-   * 
-   * @see Category#IDENTIFIER_1
-   * @param identifierLen
-   *        the length of the region that must match.
-   * @return <code>true</code> if the subregion is one of the keywords,
-   *         otherwise <code>false</code>.
-   */
-  protected boolean isIdentifier1( int identifierLen)
-  {
-    // TODO Auto-generated method stub
-    /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
-     * matchen
-     */
-    return false; // no match
-  }
-
-  /**
-   * Checks whether a subregion in the <code>input</code> starting at the
-   * current scanner input position is a custom identifier.
-   * 
-   * @see Category#IDENTIFIER_2
-   * @param identifierLen
-   *        the length of the region that must match.
-   * @return <code>true</code> if the subregion is one of the keywords,
-   *         otherwise <code>false</code>.
-   */
-  protected boolean isIdentifier2( int identifierLen)
-  {
-    // TODO Auto-generated method stub
-    /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
-     * matchen
-     */
-    return false; // no match
   }
 
   // /////////////////////////////////////////////////////////

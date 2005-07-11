@@ -389,4 +389,44 @@ public abstract class AbstractCategoriser implements Categoriser
     return false;
   }
 
+  /**
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a custom identifier.
+   * 
+   * @see Category#IDENTIFIER_1
+   * @param identifierLen
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  protected boolean isIdentifier1( int identifierLen)
+  {
+    // TODO Auto-generated method stub
+    /*
+     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * matchen
+     */
+    return false; // no match
+  }
+
+  /**
+   * Checks whether a subregion in the <code>input</code> starting at the
+   * current scanner input position is a custom identifier.
+   * 
+   * @see Category#IDENTIFIER_2
+   * @param identifierLen
+   *        the length of the region that must match.
+   * @return <code>true</code> if the subregion is one of the keywords,
+   *         otherwise <code>false</code>.
+   */
+  protected boolean isIdentifier2( int identifierLen)
+  {
+    // TODO Auto-generated method stub
+    /*
+     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * matchen
+     */
+    return false; // no match
+  }
+
 }
