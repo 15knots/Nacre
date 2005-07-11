@@ -90,7 +90,7 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
   /**
    * Consumes a multiline comment which is started by '/*''.
    */
-  protected void consumeMLComment()
+  void consumeMLComment()
   {
 
     input.next(); // consume '/'
@@ -123,6 +123,23 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
       }
     }
     return;
+  }
+
+  /**
+   * Matches white space until end of line.
+   * 
+   * @return the length of the matching text or <code>0</code> if no match was
+   *         found.
+   */
+  protected int matchWhitespaceNoNL()
+  {
+    int len = 0;
+    char c = LA( len);
+    // match WS until end of line..
+    while (Character.isWhitespace( c) && c != '\n') {
+      c = LA( ++len);
+    }
+    return len;
   }
 
 }
