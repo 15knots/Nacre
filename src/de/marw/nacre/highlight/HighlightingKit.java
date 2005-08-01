@@ -78,16 +78,16 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
 
   /**
    * Returns the set of color and font style informations used to render
-   * highlighted text in the document for a specific content type. <br/>If a
-   * client application changes one of the styles contained in the set returned
-   * here, the change will be automatically reflected by any
+   * highlighted text in the document for a specific content type. <br>
+   * If a client application changes one of the styles contained in the set
+   * returned here, the change will be automatically reflected by any
    * <code>JEditorPane</code> in the application that has a subclass of
    * <code>HighlightingKit</code> installed.
    * <p>
    * NOTE for subclass implementors: The color and font style informations
    * returned here are designed to be shared with any <code>View</code> that
    * gets created by this view factory. Subclasses are expected to return a
-   * static variable <strong>(class variable) </strong> here.
+   * <strong>static variable</strong> (class variable) here.
    * </p>
    */
   public abstract CategoryStyles getCategoryStyles();
@@ -95,11 +95,11 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
   /**
    * Returns a Map that specifies each category as a <strong>localized </strong>
    * string that can be used as a label. If the returned Map yields a
-   * <code>null</code> -value for a Category, this editor kit does not
+   * <code>null</code> -string for a Category, the editor kit does not
    * highlight any text as the queried category.
    */
-  public abstract Map getCategoryDescriptions();
-  
+  public abstract Map<Category, String> getCategoryDescriptions();
+
   /**
    * Creates the Categoriser used for highlighting text of this document or
    * <code>null</code> if no highlighting is to be done.
@@ -110,7 +110,7 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    * Fetches the Categoriser used for highlighting text of this document or
    * <code>null</code> if no highlighting is to be done.
    */
-  protected Categoriser getCategoriser()
+  protected final Categoriser getCategoriser()
   {
     if (categoriser == null) {
       categoriser = createCategoriser();

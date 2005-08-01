@@ -75,7 +75,7 @@ public class JavaHighlightingKit extends HighlightingKit
   /**
    * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryDescriptions()
    */
-  public Map getCategoryDescriptions()
+  public Map<Category, String> getCategoryDescriptions()
   {
     // TODO Auto-generated method stub
     return null;

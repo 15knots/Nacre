@@ -83,7 +83,7 @@ public class CHighlightingKit extends HighlightingKit
    * <code>null</code> -value for a Category, this editor kit does not
    * highlight any text as the queried category.
    */
-  public Map getCategoryDescriptions()
+  public Map<Category, String> getCategoryDescriptions()
   {
     if (catDescriptions == null) {
       Map<Category, String> map = new EnumMap<Category, String>( Category.class);
