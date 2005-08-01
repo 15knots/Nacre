@@ -14,8 +14,8 @@ import java.util.List;
 
 
 /**
- * A set of color and font style informations used used to render highlighted
- * text of specific categories.
+ * A set of color and font style informations used to render highlighted text of
+ * specific categories.
  * 
  * @author Martin Weber
  */
@@ -249,6 +249,40 @@ public class CategoryStyles implements Serializable
         fireCategoryStylesChanged( cat);
       }
     } // for
+  }
+
+  /**
+   * Applies a built-in set of color and font style informations to the
+   * specified <code>CategoryStyles</code> object. Convenience funtion.
+   * 
+   * @return the specified <code>CategoryStyles</code> object
+   */
+  public static CategoryStyles setDefaults( CategoryStyles target)
+  {
+    final Color keywordCol_any = new Color( 109, 137, 164);
+    final Color keywordCol = new Color( 127, 0, 85);
+    final Color keywordCol_type = new Color( 181, 0, 121);
+    final Color literalColor = new Color( 42, 0, 255);
+    final Color commentColor = new Color( 63, 127, 95);
+
+    target.setColor( Category.COMMENT_1, commentColor);
+    target.setColor( Category.COMMENT_2, commentColor);
+    target.setColor( Category.STRINGVAL, literalColor);
+    target.setItalic( Category.STRINGVAL, true);
+    target.setColor( Category.NUMERICVAL, literalColor);
+    target.setColor( Category.PREDEFVAL, literalColor);
+    target.setBold( Category.PREDEFVAL, true);
+    target.setColor( Category.KEYWORD_STATEMENT, keywordCol);
+    target.setBold( Category.KEYWORD_STATEMENT, true);
+    target.setColor( Category.KEYWORD_OPERATOR, keywordCol);
+    target.setBold( Category.KEYWORD_OPERATOR, true);
+    target.setColor( Category.KEYWORD_TYPE, keywordCol_type);
+    target.setBold( Category.KEYWORD_TYPE, true);
+    target.setColor( Category.KEYWORD, keywordCol_any);
+    target.setBold( Category.KEYWORD, true);
+    target.setColor( Category.DOC, new Color( 6, 40, 143));
+
+    return target;
   }
 
   public void addCategoryStylesListener( CategoryStylesListener listener)
