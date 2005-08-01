@@ -20,7 +20,7 @@ import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
 
 
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -75,7 +75,7 @@ public class CustomizerFrame extends JFrame
     this.setTitle( "JFrame");
     HighlightingKit kit = ((HighlightingKit) jEditorPane.getEditorKit());
     CategoryStyles styles = kit.getCategoryStyles();
-    Map descriptions= kit.getCategoryDescriptions();
+    Map descriptions= kit.getCategoryDescriptions(null);
     this.jCategoryTable.setModel( new CategoryTableModel( descriptions, styles));
     this.jCategoryTable.setDefaultRenderer( Color.class, new ColorRenderer());
   }
