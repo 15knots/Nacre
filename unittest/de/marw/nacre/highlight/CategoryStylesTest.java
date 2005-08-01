@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -6,12 +6,16 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
+import java.awt.Font;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 
 import junit.framework.TestCase;
 
@@ -32,44 +36,125 @@ public class CategoryStylesTest extends TestCase
     testee = new CategoryStyles();
   }
 
-  public final void testIsDefined()
-  {
-    // TODO Implement isDefined().
-  }
-
   public final void testGetStyle()
   {
-    // TODO Implement getStyle().
+    for (Category cat : Category.values()) {
+      assertEquals( "style: " + cat, Font.PLAIN, testee.getStyle( cat));
+    }
+
+    Category cat2 = Category.OPERATOR;
+    testee.setBold( cat2, true);
+    assertEquals( "style: " + cat2, Font.BOLD, testee.getStyle( cat2));
+    testee.setItalic( cat2, true);
+    assertEquals( "style: " + cat2, Font.BOLD | Font.ITALIC, testee
+        .getStyle( cat2));
+    testee.setBold( cat2, false);
+    assertEquals( "style: " + cat2, Font.ITALIC, testee.getStyle( cat2));
+    testee.setItalic( cat2, false);
+    for (Category cat : Category.values()) {
+      assertEquals( "style: " + cat, Font.PLAIN, testee.getStyle( cat));
+    }
   }
 
   public final void testGetColor()
   {
-    // TODO Implement getColor().
+    for (Category cat : Category.values()) {
+      assertNull( "uninitialized: " + cat, testee.getColor( cat));
+    }
   }
 
   public final void testIsBold()
   {
-    // TODO Implement isBold().
+    for (Category cat : Category.values()) {
+      assertEquals( "bold: " + cat, false, testee.isBold( cat));
+    }
   }
 
   public final void testIsItalic()
   {
-    // TODO Implement isItalic().
+    for (Category cat : Category.values()) {
+      assertEquals( "italic: " + cat, false, testee.isItalic( cat));
+    }
   }
 
   public final void testSetColor()
   {
-    // TODO Implement setColor().
+    final Color commentColor = new Color( 63, 127, 95);
+
+    assertEquals( "color is null", null, testee
+        .getColor( Category.KEYWORD_STATEMENT));
+
+    testee.setColor( Category.KEYWORD_STATEMENT, commentColor);
+    assertEquals( "color", commentColor, testee
+        .getColor( Category.KEYWORD_STATEMENT));
+
+    testee.setColor( Category.KEYWORD_STATEMENT, null);
+    assertEquals( "color is null", null, testee
+        .getColor( Category.KEYWORD_STATEMENT));
   }
 
   public final void testSetBold()
   {
-    // TODO Implement setBold().
+    assertEquals( "bold", false, testee.isBold( Category.KEYWORD_STATEMENT));
+
+    testee.setBold( Category.KEYWORD_STATEMENT, true);
+    assertEquals( "bold", true, testee.isBold( Category.KEYWORD_STATEMENT));
+
+    testee.setBold( Category.KEYWORD_STATEMENT, false);
+    assertEquals( "bold", false, testee.isBold( Category.KEYWORD_STATEMENT));
+
+    testee.setBold( Category.KEYWORD_STATEMENT, true);
+    assertEquals( "bold", true, testee.isBold( Category.KEYWORD_STATEMENT));
   }
 
   public final void testSetItalic()
   {
-    // TODO Implement setItalic().
+    assertEquals( "italic", false, testee.isItalic( Category.KEYWORD));
+
+    testee.setItalic( Category.KEYWORD, true);
+    assertEquals( "italic", true, testee.isItalic( Category.KEYWORD));
+
+    testee.setItalic( Category.KEYWORD, false);
+    assertEquals( "italic", false, testee.isItalic( Category.KEYWORD));
+
+    testee.setItalic( Category.KEYWORD, true);
+    assertEquals( "italic", true, testee.isItalic( Category.KEYWORD));
+  }
+
+  public final void testIsDefined()
+  {
+    for (Category cat : Category.values()) {
+      assertEquals( "defined: " + cat, false, testee.isDefined( cat));
+    }
+    testee.setBold( Category.NUMERICVAL, true);
+    assertEquals( "bold: " + Category.NUMERICVAL, true, testee
+        .isBold( Category.NUMERICVAL));
+    for (Category cat : Category.values()) {
+      assertEquals( "defined: " + cat, cat == Category.NUMERICVAL, testee
+          .isDefined( cat));
+    }
+    testee.setBold( Category.NUMERICVAL, false);
+    assertEquals( "bold: " + Category.NUMERICVAL, false, testee
+        .isBold( Category.NUMERICVAL));
+    for (Category cat : Category.values()) {
+      assertEquals( "defined: " + cat, false, testee.isDefined( cat));
+    }
+
+    final Color commentColor = new Color( 63, 127, 95);
+    testee.setBold( Category.OPERATOR, true);
+    testee.setColor( Category.OPERATOR, commentColor);
+    testee.setItalic( Category.OPERATOR, true);
+    assertEquals( "defined: " + Category.OPERATOR, true, testee
+        .isDefined( Category.OPERATOR));
+    testee.setColor( Category.OPERATOR, null);
+    assertEquals( "defined: " + Category.OPERATOR, true, testee
+        .isDefined( Category.OPERATOR));
+    testee.setBold( Category.OPERATOR, false);
+    assertEquals( "defined: " + Category.OPERATOR, true, testee
+        .isDefined( Category.OPERATOR));
+    testee.setItalic( Category.OPERATOR, false);
+    assertEquals( "defined: " + Category.OPERATOR, false, testee
+        .isDefined( Category.OPERATOR));
   }
 
   public final void testSerialization() throws IOException,
@@ -86,19 +171,29 @@ public class CategoryStylesTest extends TestCase
     testee.setColor( Category.NUMERICVAL, literalColor);
     testee.setColor( Category.PREDEFVAL, literalColor);
     testee.setBold( Category.PREDEFVAL, true);
+    testee.setItalic( Category.PREDEFVAL, true);
     testee.setColor( Category.KEYWORD_STATEMENT, keywordCol);
     testee.setBold( Category.KEYWORD_STATEMENT, true);
 
-    File f = File.createTempFile( "test", null);
-    f.deleteOnExit();
-    FileOutputStream fos = new FileOutputStream( f);
-    ObjectOutputStream oos = new ObjectOutputStream( fos);
+    ByteArrayOutputStream os = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream( os);
     oos.writeObject( testee);
     oos.close();
 
-    FileInputStream fi = new FileInputStream( f);
-    ObjectInputStream ois = new ObjectInputStream( fi);
+    InputStream is = new ByteArrayInputStream( os.toByteArray());
+    ObjectInputStream ois = new ObjectInputStream( is);
     CategoryStyles cats = (CategoryStyles) ois.readObject();
     ois.close();
+
+    for (Category cat : Category.values()) {
+      assertEquals( "de-serialized " + cat, testee.isBold( cat), cats
+          .isBold( cat));
+      assertEquals( "de-serialized " + cat, testee.isItalic( cat), cats
+          .isItalic( cat));
+      assertEquals( "de-serialized " + cat, testee.getColor( cat), cats
+          .getColor( cat));
+      assertEquals( "de-serialized " + cat, testee.isDefined( cat), cats
+          .isDefined( cat));
+    }
   }
 }
