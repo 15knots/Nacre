@@ -10,9 +10,7 @@ import java.awt.Font;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -148,10 +146,16 @@ public class CategoryStyles implements Serializable
   public void setColor( Category category, Color newColor)
   {
     StyleEntry style = getOrCreateStyle( category);
-
+    Color oldColor = style.getColor();
+    boolean changed = !(newColor == null ? oldColor == null : newColor
+        .equals( oldColor));
     style.setColor( newColor);
-    checkDefaultRemove( style);
-    fireCategoryStylesChanged( category);
+    if (style.isDefault()) {
+      categoryStyles.remove( category);
+    }
+    if (changed) {
+      fireCategoryStylesChanged( category);
+    }
   }
 
   /**
@@ -169,9 +173,14 @@ public class CategoryStyles implements Serializable
   public void setBold( Category category, boolean bold)
   {
     StyleEntry style = getOrCreateStyle( category);
+    boolean changed = (style.isBold() != bold);
     style.setBold( bold);
-    checkDefaultRemove( style);
-    fireCategoryStylesChanged( category);
+    if (style.isDefault()) {
+      categoryStyles.remove( category);
+    }
+    if (changed) {
+      fireCategoryStylesChanged( category);
+    }
   }
 
   /**
@@ -189,9 +198,57 @@ public class CategoryStyles implements Serializable
   public void setItalic( Category category, boolean italic)
   {
     StyleEntry style = getOrCreateStyle( category);
+    boolean changed = (style.isItalic() != italic);
     style.setItalic( italic);
-    checkDefaultRemove( style);
-    fireCategoryStylesChanged( category);
+    if (style.isDefault()) {
+      categoryStyles.remove( category);
+    }
+    if (changed) {
+      fireCategoryStylesChanged( category);
+    }
+  }
+
+  /**
+   * Removes all styles in this <code>CategoryStyles</code> object and then
+   * adds the styles contained in <code>newStyles</code>.<br>
+   * This can be used in conjunction with
+   * {@link HighlightingKit#getCategoryStyles() getCategoryStyles()}to apply a
+   * (persistent) set of color and font style informations and automatically
+   * reflect the changes to any <code>JEditorPane</code> in the application.
+   * 
+   * @param newStyles
+   *        the new styles to add.
+   */
+  public void replaceWith( CategoryStyles newStyles)
+  {
+    for (Category cat : Category.values()) {
+      StyleEntry oldStyle = this.categoryStyles.get( cat);
+      StyleEntry newStyle = newStyles.categoryStyles.get( cat);
+
+      boolean changed = false;
+      if (oldStyle != null) {
+        if (newStyle == null) {
+          categoryStyles.remove( cat);
+          changed = true;
+        }
+        else {
+          if ( !oldStyle.equals( newStyle)) {
+            categoryStyles.put( cat, newStyle);
+            changed = true;
+          }
+        }
+      }
+      else { // oldstyle is null
+        if (newStyle != null) {
+          categoryStyles.put( cat, newStyle);
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        fireCategoryStylesChanged( cat);
+      }
+    } // for
   }
 
   public void addCategoryStylesListener( CategoryStylesListener listener)
@@ -236,21 +293,6 @@ public class CategoryStyles implements Serializable
       categoryStyles.put( category, style);
     }
     return style;
-  }
-
-  /**
-   * Determines whether the specyfied style can be safely replaced by the
-   * default style (no color, Font.PLAIN) and removes the style in the latter
-   * case.
-   * 
-   * @param style
-   *        the style to check.
-   */
-  private void checkDefaultRemove( StyleEntry style)
-  {
-    if (style.isDefault()) {
-      categoryStyles.remove( style);
-    }
   }
 
   // classes -------------------------------------------------------
@@ -387,6 +429,18 @@ public class CategoryStyles implements Serializable
       return getClass().getName() + "[" + ctext + ",s="
           + (isBold() ? "bold" : "") + (isItalic() ? "italic" : "")
           + ( !isItalic() && !isBold() ? "plain" : "") + "]";
+    }
+
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals( Object obj)
+    {
+      if (obj == null || obj.getClass() != StyleEntry.class)
+        return false;
+      StyleEntry ob = (StyleEntry) obj;
+      return ob.style == style
+          && (ob.color == null ? color == null : ob.color.equals( color));
     }
 
     /**
