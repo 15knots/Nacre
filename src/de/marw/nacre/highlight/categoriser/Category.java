@@ -22,7 +22,7 @@ public enum Category {
 
   /**
    * Comment 1 category. This can be used to mark a comment. (eg, Java and C
-   * modes use this to mark a multiple comment.)
+   * modes use this to mark a multiple line comment.)
    */
   COMMENT_1,
 
