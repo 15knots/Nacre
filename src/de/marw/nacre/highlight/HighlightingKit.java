@@ -4,6 +4,7 @@
 
 package de.marw.javax.swing.text.highlight;
 
+import java.util.Locale;
 import java.util.Map;
 
 import javax.swing.text.DefaultEditorKit;
@@ -97,8 +98,12 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    * string that can be used as a label. If the returned Map yields a
    * <code>null</code> -string for a Category, the editor kit does not
    * highlight any text as the queried category.
+   * 
+   * @param locale
+   *        the locale for which the localised strings are desired or
+   *        <code>null</code> if the default locale should be used.
    */
-  public abstract Map<Category, String> getCategoryDescriptions();
+  public abstract Map<Category, String> getCategoryDescriptions( Locale locale);
 
   /**
    * Creates the Categoriser used for highlighting text of this document or

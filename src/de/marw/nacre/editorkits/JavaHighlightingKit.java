@@ -5,7 +5,12 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.JavaCategoriser;
@@ -73,12 +78,43 @@ public class JavaHighlightingKit extends HighlightingKit
   }
 
   /**
-   * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryDescriptions()
+   * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryDescriptions(Locale)
    */
-  public Map<Category, String> getCategoryDescriptions()
+  public Map<Category, String> getCategoryDescriptions( Locale locale)
   {
-    // TODO Auto-generated method stub
-    return null;
+    String bundle_name = JavaHighlightingKit.class.getName();
+    ResourceBundle bundle = ResourceBundle.getBundle( bundle_name,
+        locale == null ? Locale.getDefault() : locale);
+
+    Map<Category, String> catDescriptions = new EnumMap<Category, String>(
+        Category.class);
+
+    catDescriptions.put( Category.COMMENT_1, getString( bundle, "Comment_1")); //$NON-NLS-1$
+    catDescriptions.put( Category.COMMENT_2, getString( bundle, "Comment_2")); //$NON-NLS-1$
+    catDescriptions.put( Category.DOC, getString( bundle, "DocComment")); //$NON-NLS-1$
+    catDescriptions.put( Category.STRINGVAL, getString( bundle, "StringVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.NUMERICVAL, getString( bundle, "NumericVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.PREDEFVAL, getString( bundle, "PredefVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_STATEMENT, getString( bundle,
+        "KeywordStatement")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_OPERATOR, getString( bundle,
+        "KeywordOperator")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_TYPE, getString( bundle,
+        "KeywordType")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD, getString( bundle, "Keyword")); //$NON-NLS-1$
+    catDescriptions.put( Category.OPERATOR, getString( bundle, "Operator")); //$NON-NLS-1$
+    return catDescriptions;
+  }
+
+  // localization issues...
+  private static String getString( final ResourceBundle bundle, String key)
+  {
+    try {
+      return bundle.getString( key);
+    }
+    catch (MissingResourceException e) {
+      return '!' + key + '!';
+    }
   }
 
 }

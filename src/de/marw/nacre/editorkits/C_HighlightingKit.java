@@ -5,8 +5,8 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
-import java.util.Collections;
 import java.util.EnumMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -34,11 +34,6 @@ public class CHighlightingKit extends HighlightingKit
    * @see HighlightingKit#getCategoryStyles()
    */
   private static CategoryStyles categoryStyles;
-
-  /**
-   * localized descriptions of categories, lazily instantiated.
-   */
-  private static Map<Category, String> catDescriptions;
 
   public CHighlightingKit() {
     super();
@@ -78,34 +73,6 @@ public class CHighlightingKit extends HighlightingKit
   }
 
   /**
-   * Returns a Map that specifies each category as a <strong>localized </strong>
-   * string that can be used as a label. If the returned Map yields a
-   * <code>null</code> -value for a Category, this editor kit does not
-   * highlight any text as the queried category.
-   */
-  public Map<Category, String> getCategoryDescriptions()
-  {
-    if (catDescriptions == null) {
-      Map<Category, String> map = new EnumMap<Category, String>( Category.class);
-      map.put( Category.COMMENT_1, getString( "CHighlightingKit.Comment_1")); //$NON-NLS-1$
-      map.put( Category.COMMENT_2, getString( "CHighlightingKit.Comment_2")); //$NON-NLS-1$
-      map.put( Category.STRINGVAL, getString( "CHighlightingKit.StringVal")); //$NON-NLS-1$
-      map.put( Category.NUMERICVAL, getString( "CHighlightingKit.NumericVal")); //$NON-NLS-1$
-      map.put( Category.PREDEFVAL, getString( "CHighlightingKit.PredefVal")); //$NON-NLS-1$
-      map.put( Category.KEYWORD_STATEMENT,
-          getString( "CHighlightingKit.KeywordStatement")); //$NON-NLS-1$
-      map.put( Category.KEYWORD_OPERATOR,
-          getString( "CHighlightingKit.KeywordOperator")); //$NON-NLS-1$
-      map.put( Category.KEYWORD_TYPE,
-          getString( "CHighlightingKit.KeywordType")); //$NON-NLS-1$
-      map.put( Category.KEYWORD, getString( "CHighlightingKit.Keyword")); //$NON-NLS-1$
-      map.put( Category.OPERATOR, getString( "CHighlightingKit.Operator")); //$NON-NLS-1$
-      catDescriptions = Collections.unmodifiableMap( map);
-    }
-    return catDescriptions;
-  }
-
-  /**
    * Creates a built-in set of color and font style informations used to render
    * highlighted text written in the C programming language.
    */
@@ -118,16 +85,43 @@ public class CHighlightingKit extends HighlightingKit
     return styleDefaults;
   }
 
+  /**
+   * Returns a Map that specifies each category as a <strong>localized </strong>
+   * string that can be used as a label. If the returned Map yields a
+   * <code>null</code> -value for a Category, this editor kit does not
+   * highlight any text as the queried category.
+   */
+  public Map<Category, String> getCategoryDescriptions( Locale locale)
+  {
+    String bundle_name = CHighlightingKit.class.getName();
+    ResourceBundle bundle = ResourceBundle.getBundle( bundle_name,
+        locale == null ? Locale.getDefault() : locale);
+
+    Map<Category, String> catDescriptions = new EnumMap<Category, String>(
+        Category.class);
+
+    catDescriptions.put( Category.COMMENT_1, getString( bundle, "Comment_1")); //$NON-NLS-1$
+    catDescriptions.put( Category.COMMENT_2, getString( bundle, "Comment_2")); //$NON-NLS-1$
+    catDescriptions.put( Category.DOC, getString( bundle, "DocComment")); //$NON-NLS-1$
+    catDescriptions.put( Category.STRINGVAL, getString( bundle, "StringVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.NUMERICVAL, getString( bundle, "NumericVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.PREDEFVAL, getString( bundle, "PredefVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_STATEMENT, getString( bundle,
+        "KeywordStatement")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_OPERATOR, getString( bundle,
+        "KeywordOperator")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD_TYPE, getString( bundle,
+        "KeywordType")); //$NON-NLS-1$
+    catDescriptions.put( Category.KEYWORD, getString( bundle, "Keyword")); //$NON-NLS-1$
+    catDescriptions.put( Category.OPERATOR, getString( bundle, "Operator")); //$NON-NLS-1$
+    return catDescriptions;
+  }
+
   // localization issues...
-  private static final String BUNDLE_NAME = CHighlightingKit.class.getName();
-
-  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
-      .getBundle( BUNDLE_NAME);
-
-  private static String getString( String key)
+  private static String getString( final ResourceBundle bundle, String key)
   {
     try {
-      return RESOURCE_BUNDLE.getString( key);
+      return bundle.getString( key);
     }
     catch (MissingResourceException e) {
       return '!' + key + '!';
