@@ -178,7 +178,6 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
   static final Color hexToColor( String value)
   {
     String digits;
-    int n = value.length();
     if (value.startsWith( "#")) {
       digits = value.substring( 1, Math.min( value.length(), 7));
     }

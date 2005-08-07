@@ -1,3 +1,7 @@
+// $Id$
+/*
+ * Copyright 2005 by Martin Weber
+ */
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -14,16 +18,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
 import de.marw.javax.swing.text.highlight.CHighlightingKit;
+import de.marw.javax.swing.text.highlight.Category;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
+import de.marw.javax.swing.text.highlight.JavaHighlightingKit;
 
-
-// $Id$
-/*
- * Copyright 2005 by Martin Weber
- */
 
 /**
  * @author weber
@@ -35,7 +37,7 @@ public class CustomizerFrame extends JFrame
 
   private JScrollPane jScrollPane_preview = null;
 
-  private JEditorPane jEditorPane = null;
+  private JEditorPane jPreviewEditorPane = null;
 
   private JLabel jLabel = null;
 
@@ -65,18 +67,20 @@ public class CustomizerFrame extends JFrame
 
   /**
    * This method initializes this
-   * 
    */
   private void initialize()
   {
     this.setContentPane( getJContentPane()); // Generated
     this.pack();
     this.setSize( 400, 500);
-    this.setTitle( "JFrame");
-    HighlightingKit kit = ((HighlightingKit) jEditorPane.getEditorKit());
+    HighlightingKit kit = ((HighlightingKit) jPreviewEditorPane.getEditorKit());
     CategoryStyles styles = kit.getCategoryStyles();
-    Map descriptions= kit.getCategoryDescriptions(null);
-    this.jCategoryTable.setModel( new CategoryTableModel( descriptions, styles));
+
+    setTitle( "HighlightingKit: " + kit.getContentType());
+    Map<Category, String> descriptions = kit.getCategoryDescriptions( null);
+    System.out.println( "[initialize] value of descriptions: " + descriptions);
+    this.jCategoryTable
+        .setModel( new CategoryTableModel( descriptions, styles));
     this.jCategoryTable.setDefaultRenderer( Color.class, new ColorRenderer());
   }
 
@@ -105,31 +109,49 @@ public class CustomizerFrame extends JFrame
   {
     if (jScrollPane_preview == null) {
       jScrollPane_preview = new JScrollPane();
-      jScrollPane_preview.setViewportView( getJEditorPane()); // Generated
+      jScrollPane_preview.setViewportView( getPreview()); // Generated
     }
     return jScrollPane_preview;
   }
 
   /**
-   * This method initializes jEditorPane
+   * This method initializes jPreviewEditorPane
    * 
    * @return javax.swing.JEditorPane
    */
-  private JEditorPane getJEditorPane()
+  private JEditorPane getPreview()
   {
-    if (jEditorPane == null) {
-      jEditorPane = new JEditorPane();
+    if (jPreviewEditorPane == null) {
+      jPreviewEditorPane = new JEditorPane();
+      // HighlightingKit kit = new JavaHighlightingKit();
+      // jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(),
+      // kit);
       HighlightingKit kit = new CHighlightingKit();
-      jEditorPane.setEditorKitForContentType( kit.getContentType(), kit);
+      jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(), kit);
       // 
-      jEditorPane.setContentType( "text/x-c-src");
-      jEditorPane.setBackground( Color.white);
-      jEditorPane.setFont( new Font( "Monospaced", Font.PLAIN, 12));
-      jEditorPane
-          .setText( "/** text for preview\n*/\nint foo= 4711;\nwhile(1) "
-              + "{\n\tfoo++;\nchar* txt= \"bla bla\";\n}"); // Generated
+      jPreviewEditorPane.setContentType( kit.getContentType());
+      jPreviewEditorPane.setBackground( Color.white);
+      jPreviewEditorPane.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+      jPreviewEditorPane.setText( getPreviewText());
     }
-    return jEditorPane;
+    return jPreviewEditorPane;
+  }
+
+  /**
+   * @return
+   */
+  private String getPreviewText()
+  {
+    String text = "/* text for preview\n" + "*/\n" + "\n"
+        + "# define falze (\'X\'==\'U\')  \n" + "#include <stdio.h>\n" + "\n"
+        + "int pain( int orkc, char** orks){\n"
+        + "   print( \"date= \" __DATE__ \"time=\" __TIME__);\n"
+        + "   int foo= 47.11;\n" + "   while(1) {\n"
+        + "       foo += sizeof(\'23\');\n"
+        + "       char* txt= \"bla bla\";\n" + "   }\n"
+        + "   if( *txt == \'a\')\n" + "       return 1;\n"
+        + "   return 0;   // success\n" + "}";
+    return text;
   }
 
   /**
@@ -202,16 +224,9 @@ public class CustomizerFrame extends JFrame
         }
       };
       jCategoryTable.setShowHorizontalLines( true); // Generated
-      // jCategoryTable
-      // .setPreferredScrollableViewportSize( new java.awt.Dimension( 200,
-      // 200)); // Generated
-      jCategoryTable.setAutoResizeMode( javax.swing.JTable.AUTO_RESIZE_OFF); // Generated
+      jCategoryTable.setAutoResizeMode( JTable.AUTO_RESIZE_OFF); // Generated
       jCategoryTable.setShowGrid( false); // Generated
-      jCategoryTable
-          .setSelectionMode( javax.swing.ListSelectionModel.SINGLE_SELECTION); // Generated
-
-//      jCategoryTable.setBorder( javax.swing.BorderFactory
-//          .createLineBorder( Color.BLUE));
+      jCategoryTable.setSelectionMode( ListSelectionModel.SINGLE_SELECTION); // Generated
     }
     return jCategoryTable;
   }
@@ -272,4 +287,16 @@ public class CustomizerFrame extends JFrame
     return jButton_OK;
   }
 
+  public static void main( String[] args)
+  {
+    try {
+      JFrame f = new CustomizerFrame();
+      f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
+      f.setVisible( true);
+    }
+    catch (Throwable e) {
+      e.printStackTrace();
+    }
+
+  }
 } // @jve:decl-index=0:visual-constraint="7,6"

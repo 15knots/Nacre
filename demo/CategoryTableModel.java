@@ -1,3 +1,7 @@
+// $Id$
+/*
+ * Copyright 2005 by Martin Weber
+ */
 
 import java.awt.Color;
 import java.util.Map;
@@ -9,28 +13,38 @@ import de.marw.javax.swing.text.highlight.CategoryStyles;
 
 
 /**
- * @author weber
+ * @author Martin Weber
  */
 public class CategoryTableModel extends AbstractTableModel
 {
 
-  private String[] columnNames = new String[] { "Category", "Color", "Bold",
+  /**
+   * 
+   */
+  private static final long serialVersionUID = -7437682496492287789L;
+
+  private final String[] columnNames = new String[] { "Category", "Color", "Bold",
       "Italic" };
 
-  private CategoryStyles styles;
+  private final CategoryStyles styles;
 
-  private Map descriptions;
+  private final Map<Category, String> descriptions;
+
+  private final Category[] rowToDescriptionMap;
 
   /**
    * 
    */
-  public CategoryTableModel( Map descriptions, CategoryStyles styles) {
+  public CategoryTableModel( Map<Category, String> descriptions,
+      CategoryStyles styles) {
     super();
     if (styles == null) {
       throw new NullPointerException( "styles");
     }
     this.styles = styles;
     this.descriptions = descriptions;
+    this.rowToDescriptionMap = descriptions.keySet().toArray(
+        new Category[getRowCount()]);
   }
 
   /**
@@ -119,7 +133,7 @@ public class CategoryTableModel extends AbstractTableModel
     if (cat != null) {
       switch (columnIndex) {
         case 0:
-          return descriptions.get(cat);
+          return descriptions.get( cat);
         case 1:
           return styles.getColor( cat);
         case 2:
@@ -137,15 +151,11 @@ public class CategoryTableModel extends AbstractTableModel
    */
   private Category getCategoryAt( int rowIndex)
   {
-    Category cat = null;
-    Category[] cats = Category.values();
-    for (int i = 0; i < cats.length; i++) {
-      if (rowIndex == cats[i].ordinal()) {
-        cat = cats[i];
-        break;
-      }
+
+    if (rowIndex < rowToDescriptionMap.length) {
+      return rowToDescriptionMap[rowIndex];
     }
-    return cat;
+    return null;
   }
 
 }

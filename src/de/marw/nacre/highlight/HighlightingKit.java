@@ -95,9 +95,9 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
 
   /**
    * Returns a Map that specifies each category as a <strong>localized </strong>
-   * string that can be used as a label. If the returned Map yields a
-   * <code>null</code> -string for a Category, the editor kit does not
-   * highlight any text as the queried category.
+   * string that can be used as a label. If the returned Map does not contain a
+   * specific Category, this means the editor kit implementation does not
+   * highlight any text of this missing category.
    * 
    * @param locale
    *        the locale for which the localised strings are desired or

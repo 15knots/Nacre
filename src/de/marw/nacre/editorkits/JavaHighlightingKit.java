@@ -27,6 +27,11 @@ public class JavaHighlightingKit extends HighlightingKit
 {
 
   /**
+   * 
+   */
+  private static final long serialVersionUID = 5360252654985043336L;
+
+  /**
    * The styles representing the actual categories.
    */
   private static CategoryStyles categoryStyles;
@@ -89,20 +94,27 @@ public class JavaHighlightingKit extends HighlightingKit
     Map<Category, String> catDescriptions = new EnumMap<Category, String>(
         Category.class);
 
-    catDescriptions.put( Category.COMMENT_1, getString( bundle, "Comment_1")); //$NON-NLS-1$
-    catDescriptions.put( Category.COMMENT_2, getString( bundle, "Comment_2")); //$NON-NLS-1$
-    catDescriptions.put( Category.DOC, getString( bundle, "DocComment")); //$NON-NLS-1$
-    catDescriptions.put( Category.STRINGVAL, getString( bundle, "StringVal")); //$NON-NLS-1$
-    catDescriptions.put( Category.NUMERICVAL, getString( bundle, "NumericVal")); //$NON-NLS-1$
-    catDescriptions.put( Category.PREDEFVAL, getString( bundle, "PredefVal")); //$NON-NLS-1$
+    catDescriptions.put( Category.COMMENT_1, getString( bundle,
+        Category.COMMENT_1.name()));
+    catDescriptions.put( Category.COMMENT_2, getString( bundle,
+        Category.COMMENT_2.name()));
+    catDescriptions.put( Category.DOC, getString( bundle, Category.DOC.name()));
+    catDescriptions.put( Category.STRINGVAL, getString( bundle,
+        Category.STRINGVAL.name()));
+    catDescriptions.put( Category.NUMERICVAL, getString( bundle,
+        Category.NUMERICVAL.name()));
+    catDescriptions.put( Category.PREDEFVAL, getString( bundle,
+        Category.PREDEFVAL.name()));
     catDescriptions.put( Category.KEYWORD_STATEMENT, getString( bundle,
-        "KeywordStatement")); //$NON-NLS-1$
+        Category.KEYWORD_STATEMENT.name()));
     catDescriptions.put( Category.KEYWORD_OPERATOR, getString( bundle,
-        "KeywordOperator")); //$NON-NLS-1$
+        Category.KEYWORD_OPERATOR.name()));
     catDescriptions.put( Category.KEYWORD_TYPE, getString( bundle,
-        "KeywordType")); //$NON-NLS-1$
-    catDescriptions.put( Category.KEYWORD, getString( bundle, "Keyword")); //$NON-NLS-1$
-    catDescriptions.put( Category.OPERATOR, getString( bundle, "Operator")); //$NON-NLS-1$
+        Category.KEYWORD_TYPE.name()));
+    catDescriptions.put( Category.KEYWORD, getString( bundle, Category.KEYWORD
+        .name()));
+    catDescriptions.put( Category.OPERATOR, getString( bundle,
+        Category.OPERATOR.name()));
     return catDescriptions;
   }
 
