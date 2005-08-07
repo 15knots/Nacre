@@ -19,6 +19,7 @@ import de.marw.javax.swing.text.highlight.CHighlightingKit;
 import de.marw.javax.swing.text.highlight.Category;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
+import de.marw.javax.swing.text.highlight.JavaHighlightingKit;
 
 
 /**
@@ -57,12 +58,16 @@ public class HighlightKitTest
           System.out.println( " - " + i + ": " + names[i]);
         }
       }
+      // create an editor pane
       JEditorPane editor = new JEditorPane();
 
+      // install an editor kit that does syntax highlighting
       configureEditor( editor);
 
+      // read file
       File file = new File( args[0]);
       editor.read( new FileReader( file), file);
+      // GUI setup
       JScrollPane scroller = new JScrollPane();
       scroller.setViewportView( editor);
       
@@ -96,22 +101,27 @@ public class HighlightKitTest
    */
   protected static void configureEditor( JEditorPane editor)
   {
+//    editor.setBackground( Color.white);
+    // add C highlighting
     HighlightingKit kit = new CHighlightingKit();
     editor.setEditorKitForContentType( kit.getContentType(), kit);
-    //     kit = new JavaHighlightingKit();
-    //     editor.setEditorKitForContentType( kit.getContentType(), kit);
     // add more EditorKits to support different content types here...
+    // add Java highlighting
+    kit = new JavaHighlightingKit();
+    editor.setEditorKitForContentType( kit.getContentType(), kit);
 
-    // 
+    // highlighting requires a font that has the same width, regardless
+    // whether the font is rendered PLAIN, BOLD or ITALIC.
+    editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+    //editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
+    //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 12));
+    
+    // select C highlighting
     editor.setContentType( "text/x-c-src");
     //      editor.setContentType( "text/x-java");
-    editor.setBackground( Color.white);
-    editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
-    editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
-    //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 14));
-    //editor.setFont( new Font( "Luxi Serif", Font.ITALIC, 30));
-    //editor.setEditable( false);
-
+    
+    // customise colour and font style of hightlighting
+    kit= (HighlightingKit) editor.getEditorKitForContentType(editor.getContentType());
     CategoryStyles styles = kit.getCategoryStyles();
     styles.setColor(Category.COMMENT_2, Color.YELLOW);
   }
