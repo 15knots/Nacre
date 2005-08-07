@@ -46,9 +46,9 @@ import de.marw.javax.swing.text.highlight.Category;
  * </tr>
  * <tr>
  * <td>PREDEFVAL</td>
- * <td>Literal predefined values. These are <code>true</code>,<code>false
- * </code>,<code>__DATE__</code>,<code>__FILE__</code>,<code>__LINE__
- * </code>,<code>__TIME__</code>.</td>
+ * <td>Literal predefined values. These are <code>true</code>, <code>false</code>,
+ * <code>__DATE__</code>, <code>__FILE__</code>, <code>__LINE__ </code>,
+ * <code>__TIME__</code>.</td>
  * </tr>
  * <tr>
  * <td>KEYWORD</td>
@@ -56,50 +56,35 @@ import de.marw.javax.swing.text.highlight.Category;
  * </tr>
  * <tr>
  * <td>KEYWORD_STATEMENT</td>
- * <td>Statement keywords: <code>asm</code>,<code>break</code>,<code>
- * case</code>,<code>continue</code>,<code>default</code>,<code>do
- * </code>,<code>else</code>,<code>for</code>,<code>goto</code>,
- * <code>if</code>,<code>return</code>,<code>switch</code>,<code>
- * while <code></td>
- </tr>
+ * <td>Statement keywords: <code>asm</code>, <code>break</code>, <code>
+ * case</code>, <code>continue</code>, <code>default</code>, <code>do
+ * </code>, <code>else</code>, <code>for</code>, <code>goto</code>,
+ * <code>if</code>, <code>return</code>, <code>switch</code>, <code>
+ * while<code>
+ * </td>
+ * </tr>
  <tr>
- <td>KEYWORD_TYPE</td> <td>Keywords for data types: <code>auto</code>, 
- <code>char</code>, 
- <code>const</code>, 
- <code>double</code>, 
- <code>enum</code>, 
- <code>extern</code>, 
- <code>far</code>, 
- <code>float</code>,
- <code>huge</code>, 
- <code>inline</code>, 
- <code>int</code>, 
- <code>long</code>, 
- <code>near</code>, 
- <code>pascal</code>, 
- <code>register</code>, 
- <code>short</code>, <code>signed</code>, 
- <code>static</code>,
- <code>struct</code>, 
- <code>typedef</code>, <code>union</code>,
- <code>unsigned</code>, 
- <code>void</code>,
- <code>volatile</code>.
+ <td>KEYWORD_TYPE</td> <td>Keywords for data types: <code>auto</code>,  
+ <code>char</code>, <code>const</code>, <code>double</code>, 
+ <code>enum</code>, <code>extern</code>, <code>far</code>, 
+ <code>float</code>, <code>huge</code>, <code>inline</code>, 
+ <code>int</code>, <code>long</code>, <code>near</code>, 
+ <code>pascal</code>,  <code>register</code>, <code>short</code>, 
+ <code>signed</code>, <code>static</code>, <code>struct</code>, 
+ <code>typedef</code>, <code>union</code>, <code>unsigned</code>, 
+ <code>void</code>, <code>volatile</code>.
  </td>
  </tr>
  <tr>
  <td>KEYWORD_OPERATOR</td> <td>Operator keywords: <code>sizeof</code></td>.
  </tr>
  <tr>
- <td>OPERATOR</td> <td>Any punctuation characters except semicolon, parentheses, brackets and character or string delemiters. </td>
+ <td>OPERATOR</td> <td>Any punctuation characters except semicolon, parentheses,
+ brackets and character or string delemiters.
+ </td>
  </tr>
- <tr>
- <td>LABEL</td> <td>Unused</td>
- </tr>
- <tr>
- <td>DOC</td> <td>Unused</td>
- </tr>
-
+ <tr> <td>LABEL</td> <td>Unused</td> </tr>
+ <tr> <td>DOC</td> <td>Unused</td> </tr>
  </table>
  
  * </p>
@@ -112,10 +97,10 @@ public class C_Categoriser extends C_likeCategoriser
   /**
    * Type keywords.
    */
-  private static final String[] kwType = { "auto", "cdecl", "char", "const", "double",
-      "enum", "extern", "far", "float", "huge", "inline", "int", "long",
-      "near", "pascal", "register", "short", "signed", "static", "struct",
-      "typedef", "union", "unsigned", "void", "volatile", };
+  private static final String[] kwType = { "auto", "cdecl", "char", "const",
+      "double", "enum", "extern", "far", "float", "huge", "inline", "int",
+      "long", "near", "pascal", "register", "short", "signed", "static",
+      "struct", "typedef", "union", "unsigned", "void", "volatile", };
 
   /**
    * statement keywords.
