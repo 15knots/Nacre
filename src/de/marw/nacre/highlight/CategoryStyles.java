@@ -51,7 +51,8 @@ public class CategoryStyles implements Serializable
    * 
    * @param category
    *        the category to check
-   * @return true if the category has a value specified
+   * @return <code>true</code> if the category has a value specified
+   * @see #undefine(Category)
    */
   public boolean isDefined( Category category)
   {
@@ -129,6 +130,27 @@ public class CategoryStyles implements Serializable
       return style.isItalic();
     }
     return false;
+  }
+
+  /**
+   * Sets the specified category to its default rendering style. This is
+   * equivalent to calling <code>
+   * <pre>
+   * setColor( category, null);
+   * setBold( category, false);
+   * setItalic( category, false);
+   * </pre></code>.
+   * 
+   * @param category
+   *        the category to undefine.
+   */
+  public void undefine( Category category)
+  {
+    boolean changed = isDefined( category);
+    if (changed) {
+      categoryStyles.remove( category);
+      fireCategoryStylesChanged( category);
+    }
   }
 
   /**
