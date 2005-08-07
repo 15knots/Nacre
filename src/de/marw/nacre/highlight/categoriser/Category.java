@@ -33,15 +33,21 @@ public enum Category {
   COMMENT_2,
 
   /**
-   * Literal string category. This can be used to mark a string literal (eg,
-   * Java and C modes use this to mark "..." literals.)
+   * Documentation category. Used to mark special documentation (eg Javadoc
+   * comments, Python's autodoc)
    */
-  STRINGVAL,
+  DOC,
 
   /**
    * Number category. Used to mark literal numbers.
    */
   NUMERICVAL,
+
+  /**
+   * Literal string category. This can be used to mark a string literal (eg,
+   * Java and C modes use this to mark "..." literals.)
+   */
+  STRINGVAL,
 
   /**
    * Literal predefined value category. This can be used to mark an object
@@ -84,12 +90,6 @@ public enum Category {
    * Label category. This can be used to mark labels.
    */
   LABEL,
-
-  /**
-   * Documentation category. Used to mark special documentation (eg Javadoc
-   * comments, Python's autodoc)
-   */
-  DOC,
 
   /**
    * Custom identifier 1 category. This can be used to mark identifiers of
