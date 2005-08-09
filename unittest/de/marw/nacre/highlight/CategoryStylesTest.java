@@ -36,6 +36,18 @@ public class CategoryStylesTest extends TestCase
     testee = new CategoryStyles();
   }
 
+  public final void testEquals()
+  {
+    CategoryStyles.setDefaults( testee);
+    CategoryStyles testee2 = new CategoryStyles();
+    assertFalse( testee.equals( testee2));
+    assertFalse( testee2.equals( testee));
+
+    CategoryStyles.setDefaults( testee2);
+    assertTrue( testee.equals( testee2));
+    assertTrue( testee2.equals( testee));
+  }
+
   public final void testGetStyle()
   {
     for (Category cat : Category.values()) {
@@ -157,6 +169,50 @@ public class CategoryStylesTest extends TestCase
         .isDefined( Category.OPERATOR));
   }
 
+  /*
+   * Test method for
+   * 'de.marw.javax.swing.text.highlight.CategoryStyles.undefine(Category)'
+   */
+  public void testUndefine()
+  {
+    for (Category cat : Category.values()) {
+      assertEquals( "defined: " + cat, false, testee.isDefined( cat));
+    }
+    final Color aColor = new Color( 63, 127, 95);
+    testee.setBold( Category.OPERATOR, true);
+    testee.setColor( Category.OPERATOR, aColor);
+    testee.setItalic( Category.OPERATOR, true);
+    assertEquals( "defined: " + Category.OPERATOR, true, testee
+        .isDefined( Category.OPERATOR));
+    testee.undefine( Category.OPERATOR);
+    assertEquals( "defined: " + Category.OPERATOR, false, testee
+        .isDefined( Category.OPERATOR));
+    assertEquals( "color", null, testee.getColor( Category.OPERATOR));
+    assertEquals( "style: ", Font.PLAIN, testee.getStyle( Category.OPERATOR));
+    assertEquals( "bold", false, testee.isBold( Category.OPERATOR));
+    assertEquals( "italic", false, testee.isItalic( Category.OPERATOR));
+
+  }
+
+  /*
+   * Test method for
+   * 'de.marw.javax.swing.text.highlight.CategoryStyles.replaceWith(CategoryStyles)'
+   */
+  public void testReplaceWith()
+  {
+    final Color aColor = new Color( 63, 127, 95);
+    testee.setBold( Category.OPERATOR, true);
+    testee.setColor( Category.OPERATOR, aColor);
+    testee.setItalic( Category.OPERATOR, true);
+
+    CategoryStyles testee2 = new CategoryStyles();
+    CategoryStyles.setDefaults( testee2);
+    testee.undefine(Category.OPERATOR);
+    assertFalse( testee2.equals( testee));
+    testee.replaceWith(testee2);
+    assertTrue( testee.equals( testee2));
+  }
+
   public final void testSerialization() throws IOException,
       ClassNotFoundException
   {
@@ -195,5 +251,6 @@ public class CategoryStylesTest extends TestCase
       assertEquals( "de-serialized " + cat, testee.isDefined( cat), cats
           .isDefined( cat));
     }
+    assertTrue( "de-serialized ", testee.equals(cats));
   }
 }
