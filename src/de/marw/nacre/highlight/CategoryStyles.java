@@ -10,6 +10,7 @@ import java.awt.Font;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.List;
 
 
@@ -305,6 +306,37 @@ public class CategoryStyles implements Serializable
     target.setColor( Category.DOC, new Color( 6, 40, 143));
 
     return target;
+  }
+
+  /**
+   * Determines whether another object is equal to this
+   * <code>CategoryStyles</code>. <br>
+   * The result is <code>true</code> if and only if the argument is not
+   * <code>null</code> and is a <code>CategoryStyles</code> object that has
+   * the same categories defined with equal colour and font style.
+   * 
+   * @param obj
+   *        the object to test for equality with this
+   *        <code>CategoryStyles</code>
+   * @return <code>true</code> if the objects are the same; <code>false</code>
+   *         otherwise.
+   */
+  public boolean equals( Object obj)
+  {
+    if (obj instanceof CategoryStyles) {
+      CategoryStyles that = (CategoryStyles) obj;
+      if (this.categoryStyles.size() == that.categoryStyles.size()) {
+        Iterator thatIter = that.categoryStyles.values().iterator();
+        Iterator thisIter = this.categoryStyles.values().iterator();
+        while (thisIter.hasNext()) {
+          if ( !thisIter.next().equals( thatIter.next())) {
+            return false;
+          }
+        }
+        return true;
+      }
+    }
+    return false;
   }
 
   public void addCategoryStylesListener( CategoryStylesListener listener)
