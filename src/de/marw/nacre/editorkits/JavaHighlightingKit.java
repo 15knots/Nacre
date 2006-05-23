@@ -5,7 +5,6 @@
 package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Map;
