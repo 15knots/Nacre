@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="javadoc">
-	<target name="javadoc">
-		<javadoc access="protected"
-		         author="true"
-		         classpath="/usr/share/eclipse/plugins/org.junit_3.8.1/junit.jar"
-		         destdir="doc"
-		         doctitle="Syntax Highlighting Kit"
-		         nodeprecated="false"
-		         nodeprecatedlist="false" encoding="ISO8859-1"
-		         noindex="false"
-		         nonavbar="false"
-		         notree="false"
-		         source="1.5"
-		         sourcefiles="src/de/marw/javax/swing/text/highlight/CHighlightingKit.java,src/de/marw/javax/swing/text/highlight/CategoryStylesListener.java,src/de/marw/javax/swing/text/highlight/CategoryStylesEvent.java,src/de/marw/javax/swing/text/highlight/JavaHighlightingKit.java,src/CustomizerFrame.java,src/de/marw/javax/swing/text/highlight/categoriser/Cpp_Categoriser.java,src/de/marw/javax/swing/text/highlight/CategoryStyles.java,src/de/marw/javax/swing/text/highlight/categoriser/JavaCategoriser.java,src/de/marw/javax/swing/text/highlight/HiliteView.java,src/de/marw/javax/swing/text/highlight/categoriser/C_Categoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/Token.java,src/de/marw/javax/swing/text/highlight/categoriser/C_likeCategoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/AbstractCategoriser.java,src/de/marw/javax/swing/text/highlight/HighlightingKit.java,src/ColorRenderer.java,src/de/marw/javax/swing/text/highlight/Category.java,src/de/marw/javax/swing/text/highlight/categoriser/Categoriser.java,src/CategoryTableModel.java,src/HighlightKitTest.java,src/de/marw/javax/swing/text/highlight/SegmentInputStream.java"
-		         sourcepath="unittest:src"
-		         splitindex="true"
-		         use="true"
-		         version="true"
-		/>
-	</target>
+  <target name="javadoc">
+    <javadoc access="protected"
+             author="true"
+             classpath="/usr/share/eclipse/plugins/org.junit_3.8.1/junit.jar"
+             destdir="doc"
+             doctitle="Syntax Highlighting Kit"
+             nodeprecated="false"
+             nodeprecatedlist="false"
+             encoding="ISO8859-1"
+             noindex="false"
+             nonavbar="false"
+             notree="false"
+             source="1.5"
+             sourcefiles="src/de/marw/javax/swing/text/highlight/CHighlightingKit.java,src/de/marw/javax/swing/text/highlight/CategoryStylesListener.java,src/de/marw/javax/swing/text/highlight/CategoryStylesEvent.java,src/de/marw/javax/swing/text/highlight/JavaHighlightingKit.java,src/CustomizerFrame.java,src/de/marw/javax/swing/text/highlight/categoriser/Cpp_Categoriser.java,src/de/marw/javax/swing/text/highlight/CategoryStyles.java,src/de/marw/javax/swing/text/highlight/categoriser/JavaCategoriser.java,src/de/marw/javax/swing/text/highlight/HiliteView.java,src/de/marw/javax/swing/text/highlight/categoriser/C_Categoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/Token.java,src/de/marw/javax/swing/text/highlight/categoriser/C_likeCategoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/AbstractCategoriser.java,src/de/marw/javax/swing/text/highlight/HighlightingKit.java,src/ColorRenderer.java,src/de/marw/javax/swing/text/highlight/Category.java,src/de/marw/javax/swing/text/highlight/categoriser/Categoriser.java,src/CategoryTableModel.java,src/HighlightKitTest.java,src/de/marw/javax/swing/text/highlight/SegmentInputStream.java"
+             sourcepath="src"
+             splitindex="true"
+             use="true"
+             version="true"
+    />
+  </target>
 </project>

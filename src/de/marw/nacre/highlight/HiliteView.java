@@ -36,7 +36,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
  * various categories and assumes a constant font family and size. <br>
  * The view represents each child element as a line of text.
  */
-public class HiliteView extends PlainView
+/*package*/ class HiliteView extends PlainView
 {
 
   /**

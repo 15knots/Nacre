@@ -47,8 +47,10 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Checks whether the category has a color or font style value specified in
-   * the set.
+   * Checks whether the category has a color and/or font style value specified in
+   * the set. If no style for a category is defined, any text of that
+   * category will be rendered in the default style of the {@link
+   * javax.swing.text.JTextComponent}.
    * 
    * @param category
    *        the category to check
@@ -235,7 +237,7 @@ public class CategoryStyles implements Serializable
    * Removes all styles in this <code>CategoryStyles</code> object and then
    * adds the styles contained in <code>newStyles</code>.<br>
    * This can be used in conjunction with
-   * {@link HighlightingKit#getCategoryStyles() getCategoryStyles()}to apply a
+   * {@link HighlightingKit#getCategoryStyles() getCategoryStyles()} to apply a
    * (persistent) set of color and font style informations and automatically
    * reflect the changes to any <code>JEditorPane</code> in the application.
    * 

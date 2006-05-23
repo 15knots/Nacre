@@ -8,13 +8,11 @@
 
 package de.marw.javax.swing.text.highlight;
 
-
-
 /**
  * Represents a lexical token category used to classify a piece of text for
- * syntax highlighting. Note that the identiers of the enumerated constants only
- * serve as a hint to programmers, the actual meaning of a category depends on
- * the <code>HighlightingKit</code>'s implementation.
+ * syntax highlighting. Note that the identifiers of the enumerated constants
+ * only serve as a hint to programmers, the actual meaning of a category depends
+ * on the actual <code>HighlightingKit</code>'s implementation.
  * 
  * @see de.marw.javax.swing.text.highlight.categoriser.Token
  */
@@ -101,6 +99,5 @@ public enum Category {
    * Custom identifier 2 category. This can be used to mark identifiers of
    * interest, so the user can easily spot them.
    */
-  IDENTIFIER_2
-  ;
+  IDENTIFIER_2;
 }

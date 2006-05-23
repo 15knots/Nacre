@@ -393,7 +393,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see Category#IDENTIFIER_1
+   * @see de.marw.javax.swing.text.highlight.Category#IDENTIFIER_1
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -413,7 +413,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see Category#IDENTIFIER_2
+   * @see de.marw.javax.swing.text.highlight.Category#IDENTIFIER_2
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
