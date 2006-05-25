@@ -1,7 +1,6 @@
 /* $Id$ */
 
 // Copyright © 2004 Martin Weber
-
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -10,6 +9,7 @@ import java.awt.Point;
 import java.io.File;
 import java.io.FileReader;
 
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -25,11 +25,9 @@ import de.marw.javax.swing.text.highlight.JavaHighlightingKit;
 /**
  * Simple wrapper around JEditorPane to browse program code using the
  * HighlightingKit plug-in. Run with
- * 
  * <pre>
- * 
+ *  Usage:
  *       java HighlightKitTest filename
- *  
  * </pre>
  */
 public class HighlightKitTest
@@ -40,39 +38,78 @@ public class HighlightKitTest
    * lines. <code>true</code>, if the first line of text to categorise is not
    * at offset zero.
    */
-  private static final boolean TEST_MULTILINE_TOKEN_PROOFNESS = true;
+  private static final boolean TEST_MULTILINE_TOKEN_PROOFNESS = false;
 
   public static void main( String[] args)
   {
+    GraphicsEnvironment env = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    if (false) {
+      System.out.println( "## available fonts...");
+      String names[] = env.getAvailableFontFamilyNames();
+      for (String name : names) {
+        System.out.println( " - " + name);
+      }
+    }
+
+    if (true) {
+      System.out.println( "## fonts available for use with HighlightingKit...");
+      JComponent dummy = new JEditorPane();
+      final String pattern = ".M|_|M.";
+      for (String name : env.getAvailableFontFamilyNames()) {
+        Font font = new Font( name, Font.PLAIN, 100);
+        if (dummy.getFontMetrics( font).stringWidth( "   ") == dummy
+            .getFontMetrics( font).stringWidth( "MMM")) {
+          // monospaced font...
+
+          int plainW = dummy.getFontMetrics( font).stringWidth( pattern);
+          int boldW = dummy.getFontMetrics( font.deriveFont( Font.BOLD))
+              .stringWidth( pattern);
+          int italW = dummy.getFontMetrics( font.deriveFont( Font.ITALIC))
+              .stringWidth( pattern);
+          int boldItalW = dummy.getFontMetrics(
+              font.deriveFont( Font.BOLD | Font.ITALIC)).stringWidth( pattern);
+          // System.out.println( "Font: plain=" + plainW + ", bold=" + boldW
+          // + ", italic=" + italW +", bold+italic=" + boldItalW + "\t Name="
+          // +
+          // font.getFamily());
+
+          /*
+           * highlighting requires a font that has the same width, regardless
+           * whether the font is rendered PLAIN, BOLD or ITALIC.
+           */
+          if (plainW == boldW && plainW == italW && plainW == boldItalW) {
+            System.out.println( " - " + name);
+          }
+        }
+      }
+    }
+
     if (args.length != 1) {
       System.err.println( "need filename argument");
       System.exit( 1);
     }
+    // create an editor pane
+    JEditorPane editor = new JEditorPane();
+    // install an editor kit that does syntax highlighting
+    configureEditor( editor);
+
     try {
-      if (false) {
-        GraphicsEnvironment env = GraphicsEnvironment
-            .getLocalGraphicsEnvironment();
-        String names[] = env.getAvailableFontFamilyNames();
-        System.out.println( "## available fonts...");
-        for (int i = 0; i < names.length; i++) {
-          System.out.println( " - " + i + ": " + names[i]);
-        }
-      }
-      // create an editor pane
-      JEditorPane editor = new JEditorPane();
-
-      // install an editor kit that does syntax highlighting
-      configureEditor( editor);
-
       // read file
       File file = new File( args[0]);
+      // select highlighting
+      if (args[0].endsWith( ".c")) {
+        editor.setContentType( "text/x-c-src");
+      }
+      else if (args[0].endsWith( ".java")) {
+        editor.setContentType( "text/x-java");
+      }
       editor.read( new FileReader( file), file);
       // GUI setup
       JScrollPane scroller = new JScrollPane();
       scroller.setViewportView( editor);
-      
-      Document doc=editor.getDocument();
-      Object docDesc= doc.getProperty(Document.StreamDescriptionProperty);
+
+      Document doc = editor.getDocument();
+      Object docDesc = doc.getProperty( Document.StreamDescriptionProperty);
       JFrame f = new JFrame( "HighlightingKit: " + docDesc.toString() + " ("
           + editor.getContentType() + ")");
       f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
@@ -101,7 +138,7 @@ public class HighlightKitTest
    */
   protected static void configureEditor( JEditorPane editor)
   {
-//    editor.setBackground( Color.white);
+    // editor.setBackground( Color.white);
     // add C highlighting
     HighlightingKit kit = new CHighlightingKit();
     editor.setEditorKitForContentType( kit.getContentType(), kit);
@@ -112,18 +149,26 @@ public class HighlightKitTest
 
     // highlighting requires a font that has the same width, regardless
     // whether the font is rendered PLAIN, BOLD or ITALIC.
-    editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
-    //editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
-    //editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 12));
-    
+    // editor.setFont( new Font( "Courier", Font.PLAIN, 12));
+    // editor.setFont( new Font( "Courier 10 Pitch", Font.PLAIN, 12));
+    editor.setFont( new Font( "Courier New", Font.PLAIN, 13));
+    // # editor.setFont( new Font( "Cumberland AMT", Font.PLAIN, 13));
+    // editor.setFont( new Font( "DialogInput", Font.PLAIN, 12));
+    // # editor.setFont( new Font( "Lucida Sans Typewriter", Font.PLAIN, 12));
+    // editor.setFont( new Font( "Luxi Mono", Font.PLAIN, 12));
+    // editor.setFont( new Font( "Monospaced", Font.PLAIN, 12));
+    // editor.setFont( new Font( "Nimbus Mono L", Font.PLAIN, 14));
+    // editor.setFont( new Font( "SUSE Sans Mono", Font.PLAIN, 12));
+
     // select C highlighting
     editor.setContentType( "text/x-c-src");
-    //      editor.setContentType( "text/x-java");
-    
+    // editor.setContentType( "text/x-java");
+
     // customise colour and font style of hightlighting
-    kit= (HighlightingKit) editor.getEditorKitForContentType(editor.getContentType());
+    kit = (HighlightingKit) editor.getEditorKitForContentType( editor
+        .getContentType());
     CategoryStyles styles = kit.getCategoryStyles();
-    styles.setColor(Category.COMMENT_2, Color.YELLOW);
+    styles.setColor( Category.COMMENT_2, Color.YELLOW);
   }
 
 }
