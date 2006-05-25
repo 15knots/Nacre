@@ -56,7 +56,7 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used in statements.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_STATEMENT
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#KEYWORD_STATEMENT
    * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -71,7 +71,7 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used for types.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_TYPE
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#KEYWORD_TYPE
    * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -86,7 +86,7 @@ public class Cpp_Categoriser extends C_Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a keyword used as operator.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#KEYWORD_OPERATOR
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#KEYWORD_OPERATOR
    * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -102,7 +102,7 @@ public class Cpp_Categoriser extends C_Categoriser
    * current scanner input position is a keyword used for predefined value
    * literals.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#PREDEFVAL
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#PREDEFVAL
    * @param length
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,

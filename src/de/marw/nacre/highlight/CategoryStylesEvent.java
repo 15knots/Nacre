@@ -7,6 +7,9 @@ package de.marw.javax.swing.text.highlight;
 
 import java.util.EventObject;
 
+import de.marw.javax.swing.text.highlight.categoriser.Category;
+
+
 
 /**
  * @author weber

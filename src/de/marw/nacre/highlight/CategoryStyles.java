@@ -13,6 +13,9 @@ import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.List;
 
+import de.marw.javax.swing.text.highlight.categoriser.Category;
+
+
 
 /**
  * A set of color and font style informations used to render highlighted text of

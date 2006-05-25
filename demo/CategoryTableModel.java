@@ -8,8 +8,8 @@ import java.util.Map;
 
 import javax.swing.table.AbstractTableModel;
 
-import de.marw.javax.swing.text.highlight.Category;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
+import de.marw.javax.swing.text.highlight.categoriser.Category;
 
 
 /**

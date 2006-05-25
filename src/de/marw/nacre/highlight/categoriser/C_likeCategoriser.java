@@ -21,14 +21,13 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
   /**
    * This is an abstract class that cannot be instantiated directly.
    */
-  protected C_likeCategoriser()
-  {
+  protected C_likeCategoriser() {
     super();
   }
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // categoriser helper methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
   /**
    * Matches an Identifer or a keyword.

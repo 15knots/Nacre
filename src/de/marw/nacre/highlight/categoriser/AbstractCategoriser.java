@@ -25,8 +25,7 @@ public abstract class AbstractCategoriser implements Categoriser
   /**
    * This is an abstract class that cannot be instantiated directly.
    */
-  protected AbstractCategoriser()
-  {
+  protected AbstractCategoriser() {
   }
 
   /*
@@ -62,9 +61,9 @@ public abstract class AbstractCategoriser implements Categoriser
     return this.input;
   }
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // matcher methods for use by subclasses
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
   /**
    * Matches white space.
@@ -85,22 +84,22 @@ public abstract class AbstractCategoriser implements Categoriser
    * Matches a number. <br>
    * 
    * <pre>
-   * 
    *  
    *   
    *    
    *     
    *      
-   *        Number 
-   *           : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *           | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *           | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *       
+   *         Number 
+   *            : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *            | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *            | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *        
    *       
    *      
    *     
    *    
    *   
-   *  
    * </pre>
    * 
    * @return the length of the matching text or <code>0</code> if no match was
@@ -249,9 +248,9 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   protected abstract int matchIntSuffix( int lookAhead);
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // categoriser helper methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
   /**
    * Fetches the lookahead character at the specified position.
@@ -285,9 +284,9 @@ public abstract class AbstractCategoriser implements Categoriser
     input.setIndex( num + input.getIndex());
   }
 
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
   // other helper methods
-  ///////////////////////////////////////////////////////////
+  // /////////////////////////////////////////////////////////
 
   /**
    * Looks if a subregion in the <code>input</code> starting at the current
@@ -393,7 +392,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#IDENTIFIER_1
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#IDENTIFIER_1
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -413,7 +412,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see de.marw.javax.swing.text.highlight.Category#IDENTIFIER_2
+   * @see de.marw.javax.swing.text.highlight.categoriser.Category#IDENTIFIER_2
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,

@@ -6,7 +6,7 @@
 
 // Copyright © 2004 Martin Weber
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.javax.swing.text.highlight.categoriser;
 
 /**
  * Represents a lexical token category used to classify a piece of text for

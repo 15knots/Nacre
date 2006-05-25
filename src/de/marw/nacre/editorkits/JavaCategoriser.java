@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2005 by Martin Weber
  */
@@ -8,8 +8,6 @@ package de.marw.javax.swing.text.highlight.categoriser;
 import java.text.CharacterIterator;
 
 import javax.swing.text.Document;
-
-import de.marw.javax.swing.text.highlight.Category;
 
 
 /**
@@ -22,9 +20,9 @@ public class JavaCategoriser extends C_likeCategoriser
    * Type keywords.
    */
 
-  private static final String[] kwType = { "abstract", "boolean",
-      "byte", "char", "class", "const", "double", "enum", "extends", "final",
-      "float", "implements", "int", "interface", "long", "native", "private",
+  private static final String[] kwType = { "abstract", "boolean", "byte",
+      "char", "class", "const", "double", "enum", "extends", "final", "float",
+      "implements", "int", "interface", "long", "native", "private",
       "protected", "public", "short", "static", "strictfp", "synchronized",
       "throws", "transient", "void", "volatile", };
 
@@ -209,8 +207,8 @@ public class JavaCategoriser extends C_likeCategoriser
   {
     int len = 0;
     char c = Character.toUpperCase( LA( lookahead));
-      if ((c == 'D' || c == 'F') ) {
-        len++;
+    if ((c == 'D' || c == 'F')) {
+      len++;
     }
     return len;
   }

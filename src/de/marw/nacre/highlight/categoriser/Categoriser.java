@@ -8,7 +8,6 @@ import javax.swing.text.Document;
 import javax.swing.text.Segment;
 
 
-
 /**
  * A source code scanner and token categoriser.
  * 

@@ -4,9 +4,6 @@
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
-import de.marw.javax.swing.text.highlight.Category;
-
-
 /**
  * The tokens returned by Categoriser objects.
  * 

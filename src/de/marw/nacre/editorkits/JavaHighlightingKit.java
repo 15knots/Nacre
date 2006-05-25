@@ -12,6 +12,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Category;
 import de.marw.javax.swing.text.highlight.categoriser.JavaCategoriser;
 
 

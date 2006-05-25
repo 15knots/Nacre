@@ -8,8 +8,6 @@ import java.text.CharacterIterator;
 
 import javax.swing.text.Document;
 
-import de.marw.javax.swing.text.highlight.Category;
-
 
 /**
  * A source code scanner and token categoriser for the C programming language.
@@ -17,8 +15,8 @@ import de.marw.javax.swing.text.highlight.Category;
  * comments as well.
  * <p>
  * In detail, this categoriser maps lexical elements to a
- * {@link de.marw.javax.swing.text.highlight.Category Category}</code> as
- * follows: <table border="1">
+ * {@link de.marw.javax.swing.text.highlight.categoriser.Category Category}</code>
+ * as follows: <table border="1">
  * <tr>
  * <th>Category</th>
  * <th>Lexical element</th>

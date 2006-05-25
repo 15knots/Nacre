@@ -13,6 +13,7 @@ import java.util.ResourceBundle;
 
 import de.marw.javax.swing.text.highlight.categoriser.C_Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Category;
 
 
 /**

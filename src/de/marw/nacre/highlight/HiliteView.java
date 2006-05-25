@@ -27,6 +27,7 @@ import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
+import de.marw.javax.swing.text.highlight.categoriser.Category;
 import de.marw.javax.swing.text.highlight.categoriser.Token;
 
 
