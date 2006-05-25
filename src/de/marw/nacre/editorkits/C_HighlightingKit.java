@@ -85,7 +85,7 @@ public class CHighlightingKit extends HighlightingKit
   private CategoryStyles createDefaultStyles()
   {
     CategoryStyles styleDefaults = new CategoryStyles();
-    CategoryStyles.setDefaults( styleDefaults);
+    CategoryStyles.applyDefaultStyles( styleDefaults);
     styleDefaults.setColor( Category.IDENTIFIER_1, Color.cyan.darker());
     styleDefaults.setColor( Category.IDENTIFIER_2, Color.cyan.darker());
     return styleDefaults;

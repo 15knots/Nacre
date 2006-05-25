@@ -23,6 +23,7 @@ import java.util.List;
 public class CategoryStyles implements Serializable
 {
 
+  private static final long serialVersionUID = 831911764472254522L;
 
   /**
    * the categories and the styles managed by this object.
@@ -34,6 +35,18 @@ public class CategoryStyles implements Serializable
    * Listeners, lazily created
    */
   private transient List<CategoryStylesListener> listeners;
+
+  private static final Color keywordCol_any = new Color( 109, 137, 164);
+
+  private static final Color keywordCol = new Color( 127, 0, 85);
+
+  private static final Color literalColor = new Color( 42, 0, 255);
+
+  private static final Color keywordCol_type = new Color( 181, 0, 121);
+
+  private static final Color commentColor = new Color( 63, 127, 95);
+
+  private static final Color docCommentColor = new Color( 6, 40, 143);
 
   /**
    * Constructs an empty set of color and font style informations.
@@ -274,18 +287,10 @@ public class CategoryStyles implements Serializable
 
   /**
    * Applies a built-in set of color and font style informations to the
-   * specified <code>CategoryStyles</code> object. Convenience funtion.
-   * 
-   * @return the specified <code>CategoryStyles</code> object
+   * specified <code>CategoryStyles</code> object. Convenience method.
    */
-  public static void setDefaults( CategoryStyles target)
+  public static void applyDefaultStyles( CategoryStyles target)
   {
-    final Color keywordCol_any = new Color( 109, 137, 164);
-    final Color keywordCol = new Color( 127, 0, 85);
-    final Color keywordCol_type = new Color( 181, 0, 121);
-    final Color literalColor = new Color( 42, 0, 255);
-    final Color commentColor = new Color( 63, 127, 95);
-
     target.setColor( Category.COMMENT_1, commentColor);
     target.setColor( Category.COMMENT_2, commentColor);
     target.setColor( Category.STRINGVAL, literalColor);
@@ -301,7 +306,7 @@ public class CategoryStyles implements Serializable
     target.setBold( Category.KEYWORD_TYPE, true);
     target.setColor( Category.KEYWORD, keywordCol_any);
     target.setBold( Category.KEYWORD, true);
-    target.setColor( Category.DOC, new Color( 6, 40, 143));
+    target.setColor( Category.DOC, docCommentColor);
   }
 
   /**
