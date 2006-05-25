@@ -35,12 +35,12 @@ public class CategoryStylesTest extends TestCase
 
   public final void testEquals()
   {
-    CategoryStyles.setDefaults( testee);
+    CategoryStyles.applyDefaultStyles( testee);
     CategoryStyles testee2 = new CategoryStyles();
     assertFalse( testee.equals( testee2));
     assertFalse( testee2.equals( testee));
 
-    CategoryStyles.setDefaults( testee2);
+    CategoryStyles.applyDefaultStyles( testee2);
     assertTrue( testee.equals( testee2));
     assertTrue( testee2.equals( testee));
   }
@@ -203,7 +203,7 @@ public class CategoryStylesTest extends TestCase
     testee.setItalic( Category.OPERATOR, true);
 
     CategoryStyles testee2 = new CategoryStyles();
-    CategoryStyles.setDefaults( testee2);
+    CategoryStyles.applyDefaultStyles( testee2);
     testee.undefine(Category.OPERATOR);
     assertFalse( testee2.equals( testee));
     testee.replaceWith(testee2);

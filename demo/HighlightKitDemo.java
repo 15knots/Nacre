@@ -30,7 +30,7 @@ import de.marw.javax.swing.text.highlight.JavaHighlightingKit;
  *       java HighlightKitTest filename
  * </pre>
  */
-public class HighlightKitTest
+public class HighlightKitDemo
 {
 
   /**
