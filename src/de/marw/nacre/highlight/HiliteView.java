@@ -1,6 +1,6 @@
 // $Id$
 /*
- * Copyright 2005 by Martin Weber
+ * Copyright 2005-2006 by Martin Weber
  */
 
 package de.marw.javax.swing.text.highlight;
@@ -36,7 +36,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
  * various categories and assumes a constant font family and size. <br>
  * The view represents each child element as a line of text.
  */
-/*package*/ class HiliteView extends PlainView
+/* package */class HiliteView extends PlainView
 {
 
   /**
@@ -113,7 +113,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *        the set of color and font style informations used used to render
    *        highlighted text.
    */
-  public HiliteView( Element elem, Categoriser categoriser,
+  /* package */HiliteView( Element elem, Categoriser categoriser,
       CategoryStyles styles) {
     super( elem);
     if (categoriser == null) {
@@ -135,7 +135,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *        the set of color and font style informations used used to render
    *        highlighted text.
    */
-  public void setCategoryStyles( CategoryStyles styles)
+  /* package */void setCategoryStyles( CategoryStyles styles)
   {
     if (styles == null) {
       throw new NullPointerException( "styles");
@@ -162,7 +162,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *        the allocated region to render into
    * @see View#paint(java.awt.Graphics, java.awt.Shape)
    */
-  @Override public void paint( Graphics g, Shape a)
+  @Override
+  public void paint( Graphics g, Shape a)
   {
     JTextComponent host = (JTextComponent) getContainer();
     {
@@ -312,7 +313,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * @see PlainView#drawUnselectedText
    * @see PlainView#drawSelectedText
    */
-  @Override protected void drawLine( int lineIndex, Graphics g, int x, int y)
+  @Override
+  protected void drawLine( int lineIndex, Graphics g, int x, int y)
   {
     // System.out.println( "# drawLine() " + lineIndex + " -------");
     super.drawLine( lineIndex, g, x, y);
@@ -391,8 +393,9 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * @throws BadLocationException
    *         if the range is invalid
    */
-  @Override protected int drawUnselectedText( Graphics g, int x, int y, int p0,
-      int p1) throws BadLocationException
+  @Override
+  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
+      throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, false);
   }
@@ -416,6 +419,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * @throws BadLocationException
    *         if the range is invalid
    */
+  @Override
   protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
       throws BadLocationException
   {
@@ -441,7 +445,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * @throws BadLocationException
    *         if the range is invalid
    */
-  protected int drawText( Graphics g, int x, int y, int p0, int p1,
+  private int drawText( Graphics g, int x, int y, int p0, int p1,
       boolean selected) throws BadLocationException
   {
     Document doc = getDocument();
@@ -536,7 +540,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   /**
    * Overwritten to remove listeners when going to be garbage collected.
    */
-  @Override public void setParent( View parent)
+  @Override
+  public void setParent( View parent)
   {
     if (parent == null) {
       // we are going to be garbage collected
@@ -572,8 +577,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * are added or removed, damages the whole view. Overridden to update the line
    * marks. The field <code>requiredScanStart</code> is updated.
    */
-  @Override protected void updateDamage( DocumentEvent changes, Shape a,
-      ViewFactory f)
+  @Override
+  protected void updateDamage( DocumentEvent changes, Shape a, ViewFactory f)
   {
     Element elem = getElement();
     DocumentEvent.ElementChange ec = changes.getChange( elem);
@@ -830,8 +835,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      * Line mark: this line is safe to restart scanning, the following line(s)
      * are unsafe to restart scanning.
      */
-    UnsafeRestartFollows
-    ;
+    UnsafeRestartFollows;
   }
 
   /**
