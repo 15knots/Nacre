@@ -1,6 +1,6 @@
 // $Id$
 /*
- * Copyright 2005 by Martin Weber
+ * Copyright 2005-2006 by Martin Weber
  */
 
 package de.marw.javax.swing.text.highlight;
@@ -23,10 +23,6 @@ import java.util.List;
 public class CategoryStyles implements Serializable
 {
 
-  /**
-   * Comment for <code>serialVersionUID</code>
-   */
-  private static final long serialVersionUID = 3978148737866741304L;
 
   /**
    * the categories and the styles managed by this object.
@@ -47,30 +43,14 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Checks whether the category has a color and/or font style value specified in
-   * the set. If no style for a category is defined, any text of that
-   * category will be rendered in the default style of the {@link
-   * javax.swing.text.JTextComponent}.
-   * 
-   * @param category
-   *        the category to check
-   * @return <code>true</code> if the category has a value specified
-   * @see #undefine(Category)
-   */
-  public boolean isDefined( Category category)
-  {
-    return categoryStyles.containsKey( category);
-  }
-
-  /**
    * Fetches the font style to use for the given category.
    * 
    * @param category
    *        the category to get the font style for.
    * @return The style constant for the <code>Font</code> to render the
    *         specified category. The style is an integer bitmask that may be
-   *         Font.PLAIN, or a bitwise union of Font.BOLD and/or Font.ITALIC (for
-   *         example, Font.ITALIC or Font.BOLD|Font.ITALIC).
+   *         {@link Font.PLAIN}, or a bitwise union of Font.BOLD and/or
+   *         Font.ITALIC (for example, Font.ITALIC or Font.BOLD|Font.ITALIC).
    */
   public int getStyle( Category category)
   {
@@ -79,24 +59,6 @@ public class CategoryStyles implements Serializable
       return style.style;
     }
     return Font.PLAIN;
-  }
-
-  /**
-   * Fetches the color to use for the given category.
-   * 
-   * @param category
-   *        the category to get the color for.
-   * @return The <code>Color</code> to render the specified category or
-   *         <code>null</code> if the default text component's color is to be
-   *         used.
-   */
-  public Color getColor( Category category)
-  {
-    StyleEntry style = categoryStyles.get( category);
-    if (style != null) {
-      return style.color;
-    }
-    return null;
   }
 
   /**
@@ -118,6 +80,31 @@ public class CategoryStyles implements Serializable
   }
 
   /**
+   * Sets whether or not the <code>Font</code> object's style to use for the
+   * given category is BOLD.
+   * 
+   * @param category
+   *        the category to set a bold font style for.
+   * @param bold
+   *        <code>true</code> if the <code>Font</code> object's style is
+   *        BOLD; <code>false</code> otherwise.
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
+   */
+  public void setBold( Category category, boolean bold)
+  {
+    StyleEntry style = getOrCreateStyle( category);
+    boolean changed = (style.isBold() != bold);
+    style.setBold( bold);
+    if (style.isDefault()) {
+      categoryStyles.remove( category);
+    }
+    if (changed) {
+      fireCategoryStylesChanged( category);
+    }
+  }
+
+  /**
    * Indicates whether or not the <code>Font</code> object's style to use for
    * the given category is ITALIC.
    * 
@@ -136,24 +123,46 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Sets the specified category to its default rendering style. This is
-   * equivalent to calling <code>
-   * <pre>
-   * setColor( category, null);
-   * setBold( category, false);
-   * setItalic( category, false);
-   * </pre></code>.
+   * Sets whether or not the <code>Font</code> object's style to use for the
+   * given category is ITALIC.
    * 
    * @param category
-   *        the category to undefine.
+   *        the category to set an italic font style for.
+   * @param italic
+   *        <code>true</code> if the <code>Font</code> object's style is
+   *        ITALIC; <code>false</code> otherwise.
+   * @throws IllegalArgumentException
+   *         if the category is <code>null</code>.
    */
-  public void undefine( Category category)
+  public void setItalic( Category category, boolean italic)
   {
-    boolean changed = isDefined( category);
-    if (changed) {
+    StyleEntry style = getOrCreateStyle( category);
+    boolean changed = (style.isItalic() != italic);
+    style.setItalic( italic);
+    if (style.isDefault()) {
       categoryStyles.remove( category);
+    }
+    if (changed) {
       fireCategoryStylesChanged( category);
     }
+  }
+
+  /**
+   * Fetches the color to use for the given category.
+   * 
+   * @param category
+   *        the category to get the color for.
+   * @return The <code>Color</code> to render the specified category or
+   *         <code>null</code> if the default text component's color is to be
+   *         used.
+   */
+  public Color getColor( Category category)
+  {
+    StyleEntry style = categoryStyles.get( category);
+    if (style != null) {
+      return style.color;
+    }
+    return null;
   }
 
   /**
@@ -184,51 +193,38 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Sets whether or not the <code>Font</code> object's style to use for the
-   * given category is BOLD.
+   * Checks whether the category has a color and/or font style value specified
+   * in the set. If no style for a category is defined, any text of that
+   * category will be rendered in the default style of the {@link
+   * javax.swing.text.JTextComponent}.
    * 
    * @param category
-   *        the category to set a bold font style for.
-   * @param bold
-   *        <code>true</code> if the <code>Font</code> object's style is
-   *        BOLD; <code>false</code> otherwise.
-   * @throws IllegalArgumentException
-   *         if the category is <code>null</code>.
+   *        the category to check
+   * @return <code>true</code> if the category has a value specified
+   * @see #undefine(Category)
    */
-  public void setBold( Category category, boolean bold)
+  public boolean isDefined( Category category)
   {
-    StyleEntry style = getOrCreateStyle( category);
-    boolean changed = (style.isBold() != bold);
-    style.setBold( bold);
-    if (style.isDefault()) {
-      categoryStyles.remove( category);
-    }
-    if (changed) {
-      fireCategoryStylesChanged( category);
-    }
+    return categoryStyles.containsKey( category);
   }
 
   /**
-   * Sets whether or not the <code>Font</code> object's style to use for the
-   * given category is ITALIC.
+   * Sets the specified category to its default rendering style. This is
+   * equivalent to calling <code>
+   * <pre>
+   * setColor( category, null);
+   * setBold( category, false);
+   * setItalic( category, false);
+   * </pre></code>.
    * 
    * @param category
-   *        the category to set an italic font style for.
-   * @param italic
-   *        <code>true</code> if the <code>Font</code> object's style is
-   *        ITALIC; <code>false</code> otherwise.
-   * @throws IllegalArgumentException
-   *         if the category is <code>null</code>.
+   *        the category to undefine.
    */
-  public void setItalic( Category category, boolean italic)
+  public void undefine( Category category)
   {
-    StyleEntry style = getOrCreateStyle( category);
-    boolean changed = (style.isItalic() != italic);
-    style.setItalic( italic);
-    if (style.isDefault()) {
-      categoryStyles.remove( category);
-    }
+    boolean changed = isDefined( category);
     if (changed) {
+      categoryStyles.remove( category);
       fireCategoryStylesChanged( category);
     }
   }
@@ -282,7 +278,7 @@ public class CategoryStyles implements Serializable
    * 
    * @return the specified <code>CategoryStyles</code> object
    */
-  public static CategoryStyles setDefaults( CategoryStyles target)
+  public static void setDefaults( CategoryStyles target)
   {
     final Color keywordCol_any = new Color( 109, 137, 164);
     final Color keywordCol = new Color( 127, 0, 85);
@@ -306,8 +302,6 @@ public class CategoryStyles implements Serializable
     target.setColor( Category.KEYWORD, keywordCol_any);
     target.setBold( Category.KEYWORD, true);
     target.setColor( Category.DOC, new Color( 6, 40, 143));
-
-    return target;
   }
 
   /**
