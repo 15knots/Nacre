@@ -215,7 +215,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     Document doc = map.getDocument();
     Element line1 = map.getElement( startLine);
     // Element line2 = map.getElement( endLine);
-    // bisschen mehr Text scannen für besseres forcedRepaint..
+    // bisschen mehr Text scannen fï¿½r besseres forcedRepaint..
     Element line2 = map.getElement( Math.min( endLine + 5, lineCount - 1));
     int p0 = line1.getStartOffset();
     int p1 = Math.min( doc.getLength(), line2.getEndOffset());
@@ -863,7 +863,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   }
 
   /**
-   * Eine Queue für <code>Token</code>s.
+   * Eine Queue fï¿½r <code>Token</code>s.
    * 
    * @author Martin Weber
    */

@@ -1,6 +1,6 @@
 /* $Id$ */
 
-// Copyright © 2004 Martin Weber
+// Copyright Â© 2004 Martin Weber
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
@@ -402,7 +402,7 @@ public abstract class AbstractCategoriser implements Categoriser
   {
     // TODO Auto-generated method stub
     /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * mittels vom Anwender gefÃƒÂ¼llter Worttabelle (auc Document-Attribute?)
      * matchen
      */
     return false; // no match
@@ -422,7 +422,7 @@ public abstract class AbstractCategoriser implements Categoriser
   {
     // TODO Auto-generated method stub
     /*
-     * mittels vom Anwender gefüllter Worttabelle (auc Document-Attribute?)
+     * mittels vom Anwender gefÃƒÂ¼llter Worttabelle (auc Document-Attribute?)
      * matchen
      */
     return false; // no match

@@ -1,6 +1,6 @@
 // $Id$
 /*
- * Copyright 2005-2006 by Martin Weber
+ * Copyright � 2005-2006 by Martin Weber
  */
 
 package de.marw.javax.swing.text.highlight;
