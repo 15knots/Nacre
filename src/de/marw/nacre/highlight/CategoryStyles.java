@@ -7,6 +7,7 @@ package de.marw.javax.swing.text.highlight;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -546,6 +547,20 @@ public class CategoryStyles implements Serializable
     private boolean isDefault()
     {
       return ((color == null) && (style == Font.PLAIN));
+    }
+
+    private void writeObject( java.io.ObjectOutputStream out)
+        throws IOException
+    {
+      out.writeByte( style);
+      out.writeInt( color.getRGB());
+    }
+
+    private void readObject( java.io.ObjectInputStream in) throws IOException,
+        ClassNotFoundException
+    {
+      style = in.readByte();
+      color = new Color( in.readInt(), true);
     }
 
   }
