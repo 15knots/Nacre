@@ -1,6 +1,6 @@
 // $Id$
 /*
- * Copyright 2005 by Martin Weber
+ * Copyright 2005-2006 by Martin Weber
  */
 
 package de.marw.javax.swing.text.highlight;
@@ -10,8 +10,12 @@ import java.util.EventObject;
 import de.marw.javax.swing.text.highlight.categoriser.Category;
 
 
-
 /**
+ * The <code>CategoryStylesEvent</code> class encapsulates information that a
+ * {@link de.marw.javax.swing.text.highlight.CategoryStyles} object sends its
+ * listeners whenever the visual representation of a
+ * {@link de.marw.javax.swing.text.highlight.categoriser.Category} is changed.
+ * 
  * @author weber
  */
 public class CategoryStylesEvent extends EventObject
@@ -25,19 +29,26 @@ public class CategoryStylesEvent extends EventObject
   /**
    * the Category where the style change occured.
    */
-  private Category category;
+  private final Category category;
 
   /**
    * @param source
+   *        The object on which the Event initially occurred.
    * @param category
+   *        The Category where the style change occured.
+   * @throws IllegalArgumentException
+   *         if source or category is <code>null</code>.
    */
   public CategoryStylesEvent( Object source, Category category) {
     super( source);
+    if (category == null) {
+      throw new IllegalArgumentException( "category is null");
+    }
     this.category = category;
   }
 
   /**
-   * Return the Category where the style change occured.
+   * Returns the Category where the style change occured.
    * 
    * @return The category.
    */
