@@ -10,11 +10,9 @@ import java.awt.Font;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.Iterator;
 import java.util.List;
 
 import de.marw.javax.swing.text.highlight.categoriser.Category;
-
 
 
 /**
@@ -327,20 +325,18 @@ public class CategoryStyles implements Serializable
    */
   public boolean equals( Object obj)
   {
+    if (this == obj)
+      return true;
     if (obj instanceof CategoryStyles) {
       CategoryStyles that = (CategoryStyles) obj;
-      if (this.categoryStyles.size() == that.categoryStyles.size()) {
-        Iterator thatIter = that.categoryStyles.values().iterator();
-        Iterator thisIter = this.categoryStyles.values().iterator();
-        while (thisIter.hasNext()) {
-          if ( !thisIter.next().equals( thatIter.next())) {
-            return false;
-          }
-        }
-        return true;
-      }
+      return this.categoryStyles.equals( that.categoryStyles);
     }
     return false;
+  }
+
+  public int hashCode()
+  {
+    return categoryStyles.hashCode();
   }
 
   public void addCategoryStylesListener( CategoryStylesListener listener)
@@ -533,6 +529,11 @@ public class CategoryStyles implements Serializable
       StyleEntry ob = (StyleEntry) obj;
       return ob.style == style
           && (ob.color == null ? color == null : ob.color.equals( color));
+    }
+
+    public int hashCode()
+    {
+      return color == null ? style : style + color.hashCode();
     }
 
     /**
