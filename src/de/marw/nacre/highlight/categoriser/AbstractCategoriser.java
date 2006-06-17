@@ -18,12 +18,14 @@ public abstract class AbstractCategoriser implements Categoriser
   private static final boolean debug = false;
 
   /**
-   * The input segment currently in use
+   * The input segment currently in use.
+   * 
+   * @see #getInput()
    */
   protected Segment input;
 
   /**
-   * This is an abstract class that cannot be instantiated directly.
+   * Constructor for subclasses.
    */
   protected AbstractCategoriser() {
   }
@@ -84,22 +86,22 @@ public abstract class AbstractCategoriser implements Categoriser
    * Matches a number. <br>
    * 
    * <pre>
-   *  
    *   
    *    
    *     
    *      
    *       
-   *         Number 
-   *            : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *            | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *            | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *        
+   *          Number 
+   *             : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *             | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *             | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   *         
    *        
    *       
    *      
    *     
    *    
-   *   
    * </pre>
    * 
    * @return the length of the matching text or <code>0</code> if no match was

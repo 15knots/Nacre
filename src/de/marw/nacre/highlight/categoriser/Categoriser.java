@@ -1,6 +1,6 @@
 /* $Id$ */
 
-// Copyright © 2004 Martin Weber
+// Copyright ï¿½ 2004 Martin Weber
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
@@ -28,7 +28,7 @@ public interface Categoriser
   /**
    * This gets called when the View is rendered. The start position of the
    * returned token is expected to be relative to the start of the <strong>input
-   * segment </strong> set with <code>setInput()</code> earlier.
+   * segment </strong> set with <code>{@link #openInput()}</code> earlier.
    * 
    * @param doc
    * @param tokenBuf
