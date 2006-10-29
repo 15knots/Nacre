@@ -15,7 +15,7 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.text.Document;
 
-import de.marw.javax.swing.text.editorkits.CHighlightingKit;
+import de.marw.javax.swing.text.editorkits.C_HighlightingKit;
 import de.marw.javax.swing.text.editorkits.JavaHighlightingKit;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
@@ -140,7 +140,7 @@ public class HighlightKitDemo
   {
     // editor.setBackground( Color.white);
     // add C highlighting
-    HighlightingKit kit = new CHighlightingKit();
+    HighlightingKit kit = new C_HighlightingKit();
     editor.setEditorKitForContentType( kit.getContentType(), kit);
     // add more EditorKits to support different content types here...
     // add Java highlighting

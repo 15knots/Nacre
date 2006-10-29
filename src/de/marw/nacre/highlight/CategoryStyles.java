@@ -64,7 +64,7 @@ public class CategoryStyles implements Serializable
    *        the category to get the font style for.
    * @return The style constant for the <code>Font</code> to render the
    *         specified category. The style is an integer bitmask that may be
-   *         {@link Font.PLAIN}, or a bitwise union of Font.BOLD and/or
+   *         {@link Font#PLAIN}, or a bitwise union of Font.BOLD and/or
    *         Font.ITALIC (for example, Font.ITALIC or Font.BOLD|Font.ITALIC).
    */
   public int getStyle( Category category)

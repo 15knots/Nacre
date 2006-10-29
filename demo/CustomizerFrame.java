@@ -20,7 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import de.marw.javax.swing.text.editorkits.CHighlightingKit;
+import de.marw.javax.swing.text.editorkits.C_HighlightingKit;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
 import de.marw.javax.swing.text.highlight.categoriser.Category;
@@ -125,7 +125,7 @@ public class CustomizerFrame extends JFrame
       // HighlightingKit kit = new JavaHighlightingKit();
       // jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(),
       // kit);
-      HighlightingKit kit = new CHighlightingKit();
+      HighlightingKit kit = new C_HighlightingKit();
       jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(), kit);
       // 
       jPreviewEditorPane.setContentType( kit.getContentType());

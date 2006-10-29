@@ -11,7 +11,7 @@ package de.marw.javax.swing.text.editorkits;
  * 
  * @author Martin Weber
  */
-public class Cpp_Categoriser extends C_Categoriser
+public class CppCategoriser extends C_Categoriser
 {
 
   /**
@@ -48,7 +48,7 @@ public class Cpp_Categoriser extends C_Categoriser
   /**
    * 
    */
-  public Cpp_Categoriser() {
+  public CppCategoriser() {
     super();
   }
 

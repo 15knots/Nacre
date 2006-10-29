@@ -27,7 +27,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Category;
  *      code.
  * @version $Revision$
  */
-public class CHighlightingKit extends HighlightingKit
+public class C_HighlightingKit extends HighlightingKit
 {
 
   /**
@@ -42,7 +42,7 @@ public class CHighlightingKit extends HighlightingKit
    */
   private static CategoryStyles categoryStyles;
 
-  public CHighlightingKit() {
+  public C_HighlightingKit() {
     super();
   }
 
@@ -101,7 +101,7 @@ public class CHighlightingKit extends HighlightingKit
    */
   public Map<Category, String> getCategoryDescriptions( Locale locale)
   {
-    String bundle_name = CHighlightingKit.class.getName();
+    String bundle_name = C_HighlightingKit.class.getName();
     ResourceBundle bundle = ResourceBundle.getBundle( bundle_name,
         locale == null ? Locale.getDefault() : locale);
 
