@@ -2,7 +2,7 @@
 
 // Copyright � 2004 Martin Weber
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.javax.swing.text.editorkits;
 
 import java.awt.Color;
 import java.util.EnumMap;
@@ -11,9 +11,10 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import de.marw.javax.swing.text.highlight.CategoryStyles;
+import de.marw.javax.swing.text.highlight.HighlightingKit;
 import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
 import de.marw.javax.swing.text.highlight.categoriser.Category;
-import de.marw.javax.swing.text.highlight.categoriser.JavaCategoriser;
 
 
 /**

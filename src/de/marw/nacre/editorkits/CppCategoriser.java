@@ -3,7 +3,7 @@
  * Copyright 2005 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.javax.swing.text.editorkits;
 
 /**
  * A source code scanner and token categoriser for the Cplusplus programming

@@ -14,10 +14,8 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import de.marw.javax.swing.text.highlight.categoriser.Category;
-
-
 import junit.framework.TestCase;
+import de.marw.javax.swing.text.highlight.categoriser.Category;
 
 
 /**

@@ -5,6 +5,8 @@
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
+import de.marw.javax.swing.text.editorkits.C_Categoriser;
+
 
 
 /**
@@ -51,7 +53,7 @@ public class C_CategoriserTest extends AbstractCategoriserImplsTest
 
     String text;
     text = "1234567890abcdeghijkmnopqrstuvwxyzABCDEGHIJKMNOPQRSTUVWXYZ"
-        + "<>|,;.:-_#'+*~^°!\"§$%&/{([)])]0=}ß?\\´`";
+        + "<>|,;.:-_#'+*~^ï¿½!\"ï¿½$%&/{([)])]0=}ï¿½?\\ï¿½`";
     input( text);
     for (i = 0; i < text.length(); i++) {
       len = testee.matchFloatSuffix( i);
@@ -86,7 +88,7 @@ public class C_CategoriserTest extends AbstractCategoriserImplsTest
 
     String text;
     text = "1234567890abcdefghijkmnopqrstvwxyzABCDEFGHIJKMNOPQRSTVWXYZ"
-        + "<>|,;.:-_#'+*~^°!\"§$%&/{([)])]0=}ß?\\´`";
+        + "<>|,;.:-_#'+*~^ï¿½!\"ï¿½$%&/{([)])]0=}ï¿½?\\ï¿½`";
     input( text);
     for (i = 0; i < text.length(); i++) {
       len = testee.matchIntSuffix( i);

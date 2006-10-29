@@ -89,7 +89,7 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
   /**
    * Consumes a multiline comment which is started by '/*''.
    */
-  void consumeMLComment()
+  protected void consumeMLComment()
   {
 
     input.next(); // consume '/'

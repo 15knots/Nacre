@@ -1,6 +1,6 @@
 /* $Id$ */
 
-// Copyright © 2004 Martin Weber
+// Copyright ï¿½ 2004 Martin Weber
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
@@ -15,10 +15,10 @@ import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.text.Document;
 
-import de.marw.javax.swing.text.highlight.CHighlightingKit;
+import de.marw.javax.swing.text.editorkits.CHighlightingKit;
+import de.marw.javax.swing.text.editorkits.JavaHighlightingKit;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
-import de.marw.javax.swing.text.highlight.JavaHighlightingKit;
 import de.marw.javax.swing.text.highlight.categoriser.Category;
 
 
@@ -120,7 +120,7 @@ public class HighlightKitDemo
       f.setSize( 211, 701);
       if (TEST_MULTILINE_TOKEN_PROOFNESS) {
         // caret in letzte Zeile (test, ob repaint() immer in erster Zeile
-        // anfängt)
+        // anfï¿½ngt)
         f.setSize( 211, 301);
         editor.setCaretPosition( editor.getDocument().getLength() - 1);
         scroller.getViewport().setViewPosition( new Point( 0, 9999));

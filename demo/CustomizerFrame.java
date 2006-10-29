@@ -20,7 +20,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import de.marw.javax.swing.text.highlight.CHighlightingKit;
+import de.marw.javax.swing.text.editorkits.CHighlightingKit;
 import de.marw.javax.swing.text.highlight.CategoryStyles;
 import de.marw.javax.swing.text.highlight.HighlightingKit;
 import de.marw.javax.swing.text.highlight.categoriser.Category;
