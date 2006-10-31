@@ -130,11 +130,8 @@ public class C_Categoriser extends C_likeCategoriser
   /*
    * interface Categoriser
    */
-  public Token nextToken( Document doc, Token token)
+  public void nextToken( Document doc, Token token)
   {
-    if (token == null) {
-      token = new Token();
-    }
 
     getToken( doc, token);
     if (false) {
@@ -143,7 +140,6 @@ public class C_Categoriser extends C_likeCategoriser
       String txt = new String( input.array, token.start, token.length);
       System.out.println( ", '" + txt + "'");
     }
-    return token;
   }
 
   // /////////////////////////////////////////////////////////

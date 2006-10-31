@@ -6,24 +6,29 @@ package de.marw.javax.swing.text.highlight.categoriser;
 
 import javax.swing.text.Document;
 
+
 /**
  * The tokens returned by Categoriser objects.
  * 
  * @see Categoriser#nextToken(Document, Token)
  * @author Martin Weber
  */
-public class Token implements Cloneable
+public class Token
 {
   /** the start position of the token */
   public int start = 0;
 
-  /** the length of the token */
+  /**
+   * the length of the token, which must be greater or equal tha zero. A zero
+   * value indicates the end of the current portion of text (the
+   * <code>Segment</code>) to scan.
+   */
   public int length = 0;
 
   /**
    * the token's Category. This is <code>null</code> to indicate an undefined
    * text category. Categorisers will use this to mark their unititialized
-   * state. The rendering mechanism will treat a <code>null</code> -values as
+   * state. The rendering mechanism will treat a <code>null</code> values as
    * normal text without any highlighting.
    */
   public Category category = null;
@@ -34,22 +39,6 @@ public class Token implements Cloneable
    * determine safe positions to rescan a document.
    */
   public boolean multiline = false;
-
-  /**
-   * Returns a shallow copy of this <code>Token</code> instance.
-   * 
-   * @see java.lang.Object#clone()
-   */
-  public Object clone()
-  {
-    try {
-      return super.clone();
-    }
-    catch (CloneNotSupportedException ex) {
-      // this shouldn't happen, since we are Cloneable
-      throw new InternalError();
-    }
-  }
 
   public String toString()
   {

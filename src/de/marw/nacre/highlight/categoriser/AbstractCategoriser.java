@@ -37,10 +37,11 @@ public abstract class AbstractCategoriser implements Categoriser
   {
     if (debug) {
       System.out.println( "# AbstractCategoriser.openInput(), offset="
-          + lexerInput.offset + ", count=" + lexerInput.count);
+          + lexerInput.getBeginIndex() + ", count="
+          + (lexerInput.getEndIndex() - lexerInput.getBeginIndex()));
     }
     this.input = lexerInput;
-    lexerInput.first(); // initialize CharIterator
+    this.input.first(); // initialize CharIterator
   }
 
   /*
@@ -86,22 +87,10 @@ public abstract class AbstractCategoriser implements Categoriser
    * Matches a number. <br>
    * 
    * <pre>
-   *   
-   *    
-   *     
-   *      
-   *       
-   *        
-   *          Number 
-   *             : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *             | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *             | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
-   *         
-   *        
-   *       
-   *      
-   *     
-   *    
+   *             Number 
+   *                : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *                | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *                | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
    * </pre>
    * 
    * @return the length of the matching text or <code>0</code> if no match was
@@ -259,14 +248,14 @@ public abstract class AbstractCategoriser implements Categoriser
    * 
    * @see #input
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the lookahead character or <code>CharacterIterator.DONE</code> at
    *         end of input is reached.
    */
   protected final char LA( int lookAhead)
   {
     int offset = input.getIndex();
-    if (offset + lookAhead >= input.offset + input.count) {
+    if (offset + lookAhead >= input.getEndIndex()) {
       return CharacterIterator.DONE;
     }
     return input.array[lookAhead + offset];
@@ -335,7 +324,7 @@ public abstract class AbstractCategoriser implements Categoriser
     int endpos = offset + match.length();
     char[] textArray = text.array;
 
-    if (endpos > (text.offset + text.count)) {
+    if (endpos > text.getEndIndex()) {
       return 0; // no match
     }
     int j = 0;

@@ -107,7 +107,7 @@ public abstract class C_likeCategoriser extends AbstractCategoriser
   }
 
   /**
-   * Consumes a multiline comment which is started by '//''.
+   * Consumes a single line comment which is started by '//''.
    */
   protected void consumeEOLComment()
   {

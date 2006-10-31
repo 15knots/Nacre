@@ -881,6 +881,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     public TokenQueue( Document doc) {
       super();
       this.doc = doc;
+      tokenBuf = new Token();
     }
 
     /**
@@ -954,7 +955,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      */
     public void remove()
     {
-      tokenBuf = HiliteView.this.categoriser.nextToken( doc, tokenBuf);
+      HiliteView.this.categoriser.nextToken( doc, tokenBuf);
       tokenBuf.start -= seg2docOffset;
     }
 

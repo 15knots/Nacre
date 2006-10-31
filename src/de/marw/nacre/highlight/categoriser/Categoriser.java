@@ -28,17 +28,15 @@ public interface Categoriser
   /**
    * This gets called when the View is rendered. The start position of the
    * returned token is expected to be relative to the start of the <strong>input
-   * segment </strong> set with <code>{@link #openInput(Segment))}</code>
+   * segment </strong> set with <code>{@link #openInput(Segment)}</code>
    * earlier.
    * 
    * @param doc
    * @param tokenBuf
-   *        The buffer where the token is returned or <code>null</code> if a
-   *        new buffer should be allocated.
-   * @return the categorized token.
+   *        The buffer where the token is returned.
    * @see #openInput(Segment)
    */
-  public Token nextToken( Document doc, Token tokenBuf);
+  public void nextToken( Document doc, Token tokenBuf);
 
   /**
    * Notifies the categoriser of the end of the current scanninng process.

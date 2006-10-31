@@ -42,7 +42,7 @@ public class AbstractCategoriserImplsTest extends TestCase
         return 0;
       }
 
-      public Token nextToken( Document doc, Token tokenBuf)
+      public void nextToken( Document doc, Token tokenBuf)
       {
         throw new UnsupportedOperationException( "method not implemented");
       }
@@ -411,9 +411,9 @@ public class AbstractCategoriserImplsTest extends TestCase
     len = AbstractCategoriser.regionMatches( true, seg, 3, "DEFGHIJABC ");
     assertEquals( "no match", 0, len);
 
-    ca = "aäoöuü".toCharArray();
+    ca = "aï¿½oï¿½uï¿½".toCharArray();
     seg = new Segment( ca, 0, ca.length);
-    len = AbstractCategoriser.regionMatches( true, seg, 0, "AÄOÖUÜ");
+    len = AbstractCategoriser.regionMatches( true, seg, 0, "Aï¿½Oï¿½Uï¿½");
     assertEquals( "match len", 6, len);
   }
 
