@@ -1,6 +1,6 @@
 /* $Id$ */
 
-// Copyright � 2004 Martin Weber
+// Copyright © 2004 Martin Weber
 
 package de.marw.javax.swing.text.highlight.categoriser;
 

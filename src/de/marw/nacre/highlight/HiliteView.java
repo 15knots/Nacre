@@ -871,7 +871,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   {
     private final Document doc;
 
-    private transient Token tokenBuf;
+    private transient RecycledToken tokenBuf;
 
     private transient int seg2docOffset;
 
@@ -881,7 +881,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     public TokenQueue( Document doc) {
       super();
       this.doc = doc;
-      tokenBuf = new Token();
+      tokenBuf = new RecycledToken();
     }
 
     /**
@@ -955,10 +955,31 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      */
     public void remove()
     {
+      tokenBuf.reset();
       HiliteView.this.categoriser.nextToken( doc, tokenBuf);
       tokenBuf.start -= seg2docOffset;
     }
 
+    /**
+     * The tokens returned by Categoriser objects.
+     * 
+     * @see Categoriser#nextToken(Document, Token)
+     * @author Martin Weber
+     */
+    private class RecycledToken extends Token
+    {
+      /**
+       */
+      private RecycledToken() {
+        reset();
+      }
+
+      public String toString()
+      {
+        return "start=" + start + ", length=" + length + ", cat=" + category
+            + (multiline ? ", multiline" : ", single line");
+      }
+    }
   } // TokenQueue
 
 }

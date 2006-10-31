@@ -5,44 +5,55 @@
 package de.marw.javax.swing.text.highlight.categoriser;
 
 import javax.swing.text.Document;
+import javax.swing.text.Segment;
 
 
 /**
- * The tokens returned by Categoriser objects.
+ * Represents a portion of categorised text from a {@link Segment}. These are
+ * the tokens returned by Categoriser objects from a
+ * {@link Categoriser#nextToken(Document, Token)} method implementation. Only
+ * for performance reasons, access to fields is public and not handled via
+ * method invocation.
  * 
  * @see Categoriser#nextToken(Document, Token)
  * @author Martin Weber
  */
-public class Token
+public abstract class Token
 {
-  /** the start position of the token */
-  public int start = 0;
+  /**
+   * the start position of the token, relative to the
+   * {@link Segment#getBeginIndex() begin index} of the segment.
+   */
+  public int start;
 
   /**
-   * the length of the token, which must be greater or equal tha zero. A zero
-   * value indicates the end of the current portion of text (the
-   * <code>Segment</code>) to scan.
+   * the length of the categorised toxt, which must be greater or equal than
+   * zero. A zero value indicates the end of the current text (the
+   * <code>Segment</code>) is reached; no more tokens will be requested then.
    */
-  public int length = 0;
+  public int length;
 
   /**
-   * the token's Category. This is <code>null</code> to indicate an undefined
-   * text category. Categorisers will use this to mark their unititialized
-   * state. The rendering mechanism will treat a <code>null</code> values as
-   * normal text without any highlighting.
+   * the token's Category. This is <code>null</code> to indicate an
+   * undefined/unrecognised text category. The rendering mechanism will treat a
+   * <code>null</code> value as normal text without any highlighting.
    */
-  public Category category = null;
+  public Category category;
 
   /**
    * <code>true</code> if this Token might span multiple lines (e.g.
-   * C-comments). This is used in conjunction of <code>category</code> to
-   * determine safe positions to rescan a document.
+   * C-comments). The rendering mechanism uses this to determine safe positions
+   * to rescan a document partiallly.
    */
-  public boolean multiline = false;
+  public boolean multiline;
 
-  public String toString()
+  /**
+   * Resets this Token to its newly constructed state
+   */
+  public final void reset()
   {
-    return "start=" + start + ", length=" + length + ", cat=" + category
-        + (multiline ? ", multiline" : ", single line");
+    start = length = 0;
+    category = null;
+    multiline = false;
   }
 }

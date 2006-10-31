@@ -153,8 +153,6 @@ public class C_Categoriser extends C_likeCategoriser
   {
     consumeChars( matchWhitespace());
 
-    token.category = null;
-    token.multiline = false;
     token.start = input.getIndex();
     char c = input.current();
     switch (c) {
