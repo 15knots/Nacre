@@ -17,8 +17,9 @@ public interface Categoriser
 {
 
   /**
-   * (Re-)Initialises the categoriser to scan the specified <code>Segment</code>.
-   * This gets called when the View is going to be rendered. <br>
+   * (Re-)Initialises the categoriser to start scanniing of the specified
+   * <code>Segment</code>. This gets called before the View is going to be
+   * rendered.
    * 
    * @param lexerInput
    *        the run of text to categorise.
@@ -33,13 +34,15 @@ public interface Categoriser
    * 
    * @param doc
    * @param tokenBuf
-   *        The buffer where the token is returned.
+   *        The buffer where the token is returned. Upon invocation, the buffer
+   *        is garanteed to have been {@link Token#reset() reset} to its newly
+   *        constructed state.
    * @see #openInput(Segment)
    */
   public void nextToken( Document doc, Token tokenBuf);
 
   /**
-   * Notifies the categoriser of the end of the current scanninng process.
+   * Notifies the categoriser of the end of the current scanning process.
    * 
    * @see #openInput(Segment)
    */

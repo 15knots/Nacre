@@ -18,7 +18,7 @@ public abstract class AbstractCategoriser implements Categoriser
   private static final boolean debug = false;
 
   /**
-   * The input segment currently in use.
+   * The input segment currently in use or <code>null</code>.
    * 
    * @see #getInput()
    */
@@ -57,7 +57,9 @@ public abstract class AbstractCategoriser implements Categoriser
   }
 
   /**
-   * @return The input segment.
+   * Gets input segment currently in use or <code>null</code>.
+   * 
+   * @return The input segment currently in use or <code>null</code>.
    */
   protected final Segment getInput()
   {
