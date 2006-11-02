@@ -115,16 +115,17 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *        highlighted text.
    */
   /* package */HiliteView( Element elem, Categoriser categoriser,
-      CategoryStyles styles) {
+      CategoryStyles styles)
+  {
     super( elem);
     if (categoriser == null) {
       throw new NullPointerException( "categoriser");
     }
-    this.categoriser = categoriser;
-    cacheInvalidator = new CacheInvalidator();
+    this.categoriser= categoriser;
+    cacheInvalidator= new CacheInvalidator();
     setCategoryStyles( styles);
-    this.tokenQueue = new TokenQueue( elem.getDocument());
-    requiredScanStart = 0;
+    this.tokenQueue= new TokenQueue( elem.getDocument());
+    requiredScanStart= 0;
     // System.out.println( "Ctor: " + this);
   }
 
@@ -144,10 +145,10 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     if (categoryStyles != null) {
       categoryStyles.removeCategoryStylesListener( cacheInvalidator);
     }
-    categoryStyles = styles;
+    categoryStyles= styles;
     categoryStyles.addCategoryStylesListener( cacheInvalidator);
 
-    Container host = getContainer();
+    Container host= getContainer();
     if (host != null)
       host.repaint();
   }
@@ -166,19 +167,19 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   @Override
   public void paint( Graphics g, Shape a)
   {
-    JTextComponent host = (JTextComponent) getContainer();
+    JTextComponent host= (JTextComponent) getContainer();
     {
-      normalColor = (host.isEnabled()) ? host.getForeground() : host
-          .getDisabledTextColor();
-      Caret c = host.getCaret();
-      selectedColor = c.isSelectionVisible() ? host.getSelectedTextColor()
-          : normalColor;
+      normalColor= (host.isEnabled())
+        ? host.getForeground() : host.getDisabledTextColor();
+      Caret c= host.getCaret();
+      selectedColor= c.isSelectionVisible()
+        ? host.getSelectedTextColor() : normalColor;
       // host font changes invalidate the font cache
-      Font f = host.getFont();
-      metrics = host.getFontMetrics( f);
+      Font f= host.getFont();
+      metrics= host.getFontMetrics( f);
       if (hostFont != f) {
-        categoryFonts = null; // invalidate cache
-        hostFont = f;
+        categoryFonts= null; // invalidate cache
+        hostFont= f;
       }
     }
 
@@ -188,60 +189,60 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     // is quick.
     int linesBelow, linesAbove, linesTotal;
     {
-      Rectangle alloc = (Rectangle) a;
-      Rectangle clip = g.getClipBounds();
-      int fontHeight = metrics.getHeight();
-      int heightBelow = (alloc.y + alloc.height) - (clip.y + clip.height);
-      linesBelow = Math.max( 0, heightBelow / fontHeight);
-      int heightAbove = clip.y - alloc.y;
-      linesAbove = Math.max( 0, heightAbove / fontHeight);
-      linesTotal = alloc.height / fontHeight;
+      Rectangle alloc= (Rectangle) a;
+      Rectangle clip= g.getClipBounds();
+      int fontHeight= metrics.getHeight();
+      int heightBelow= (alloc.y + alloc.height) - (clip.y + clip.height);
+      linesBelow= Math.max( 0, heightBelow / fontHeight);
+      int heightAbove= clip.y - alloc.y;
+      linesAbove= Math.max( 0, heightAbove / fontHeight);
+      linesTotal= alloc.height / fontHeight;
 
       if (alloc.height % fontHeight != 0) {
         // linesTotal++;
       }
     }
     // update the visible lines
-    Element map = getElement();
-    int lineCount = map.getElementCount();
-    int startLine = Math.min( requiredScanStart, linesAbove);
-    startLine = Math.min( startLine, lineCount - 1);
-    int endLine = Math.min( lineCount, linesTotal - linesBelow);
-    endLine = Math.max( endLine - 1, 0);
+    Element map= getElement();
+    int lineCount= map.getElementCount();
+    int startLine= Math.min( requiredScanStart, linesAbove);
+    startLine= Math.min( startLine, lineCount - 1);
+    int endLine= Math.min( lineCount, linesTotal - linesBelow);
+    endLine= Math.max( endLine - 1, 0);
 
     if (false)
       System.out.println( "# paint() lines: " + startLine + ", " + linesAbove
           + ".." + (endLine) + " -------");
-    Document doc = map.getDocument();
-    Element line1 = map.getElement( startLine);
+    Document doc= map.getDocument();
+    Element line1= map.getElement( startLine);
     // Element line2 = map.getElement( endLine);
     // bisschen mehr Text scannen f�r besseres forcedRepaint..
-    Element line2 = map.getElement( Math.min( endLine + 5, lineCount - 1));
-    int p0 = line1.getStartOffset();
-    int p1 = Math.min( doc.getLength(), line2.getEndOffset());
+    Element line2= map.getElement( Math.min( endLine + 5, lineCount - 1));
+    int p0= line1.getStartOffset();
+    int p1= Math.min( doc.getLength(), line2.getEndOffset());
     /*
      * (Re-)Initialise the categoriser to point to the appropriate token for the
      * given start position needed for rendering. The start position adjustment
      * is required by text runs that span multiple lines (eg '/*'-comments).
      */
     try {
-      int p0Adj = p0;
+      int p0Adj= p0;
       if (startLine > 0) {
-        p0Adj = Math.min( getAdjustedStart( startLine), p0Adj);
+        p0Adj= Math.min( getAdjustedStart( startLine), p0Adj);
       }
-      Segment lexerInput = new Segment();
+      Segment lexerInput= new Segment();
       doc.getText( p0Adj, p1 - p0Adj, lexerInput);
       tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
 
       // mark lines without rendering...
       while (requiredScanStart < linesAbove && requiredScanStart < lineCount) {
         // scan current line...
-        Element line = map.getElement( requiredScanStart);
-        p0 = line.getStartOffset();
-        p1 = Math.min( doc.getLength(), line.getEndOffset());
+        Element line= map.getElement( requiredScanStart);
+        p0= line.getStartOffset();
+        p1= Math.min( doc.getLength(), line.getEndOffset());
         consumeTokens( p0, p1);
         // line is scanned, determine marks
-        requiredScanStart = addMarks( map, requiredScanStart) + 1;
+        requiredScanStart= addMarks( map, requiredScanStart) + 1;
       }
     }
     catch (BadLocationException ex) {
@@ -251,7 +252,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
       throw new /* StateInvariantError */Error( "Can't render", ex);
     }
 
-    forceRepaintTo = -1; // gets set by drawLine()
+    forceRepaintTo= -1; // gets set by drawLine()
     super.paint( g, a);
     // rendering complete, notify categoriser
     tokenQueue.close();
@@ -279,18 +280,18 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   private void consumeTokens( int p0, int p1)
   {
     if ( !tokenQueue.isEmpty()) {
-      Token token = null;
+      TokenQueue.RecycledToken token= null;
       // scan current line...
       while (p0 < p1) {
         // get token
-        token = tokenQueue.peek();
-        if (token.start > p0) {
+        token= tokenQueue.peek();
+        if (token.docStart > p0) {
           // gap between tokens
-          p0 = Math.min( token.start, p1);
+          p0= Math.min( token.docStart, p1);
         }
-        if (token.start <= p0) {
-          p0 = Math.min( token.start + token.length, p1);
-          if (token.start + token.length < p1) {
+        if (token.docStart <= p0) {
+          p0= Math.min( token.docEnd, p1);
+          if (token.docEnd < p1) {
             // token was completely consumed: remove from queue
             tokenQueue.remove();
           }
@@ -319,19 +320,19 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   {
     // System.out.println( "# drawLine() " + lineIndex + " -------");
     super.drawLine( lineIndex, g, x, y);
-    int forceRepaintFrom = lineIndex;
+    int forceRepaintFrom= lineIndex;
 
     // Check which line(s) following are unsafe to restart scanning and mark
     // these
-    lineIndex = addMarks( getElement(), lineIndex);
-    requiredScanStart = lineIndex + 1; // document has been scanned up to here
+    lineIndex= addMarks( getElement(), lineIndex);
+    requiredScanStart= lineIndex + 1; // document has been scanned up to here
     /*
      * force the component to repaint the following lines, thus supporting
      * highlighting tokens that span multiple lines.
      */
     if (lineIndex > forceRepaintFrom && lineIndex > forceRepaintTo) {
       // System.out.println( "# forcing repaint up to " + lineIndex);
-      forceRepaintTo = lineIndex;
+      forceRepaintTo= lineIndex;
     }
   }
 
@@ -348,27 +349,26 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   private int addMarks( Element rootElement, int lineIndex)
   {
     if ( !tokenQueue.isEmpty()) {
-      Document doc = rootElement.getDocument();
-      Element line = rootElement.getElement( lineIndex);
+      Document doc= rootElement.getDocument();
+      Element line= rootElement.getElement( lineIndex);
 
       // get last token highlighted
-      Token token = tokenQueue.peek();
-      int endOffset = Math.min( doc.getLength(), line.getEndOffset());
-      if (token.multiline && token.start < endOffset) {
-        line = rootElement.getElement( lineIndex);
+      TokenQueue.RecycledToken token= tokenQueue.peek();
+      int endOffset= Math.min( doc.getLength(), line.getEndOffset());
+      if (token.multiline && token.docStart < endOffset) {
+        line= rootElement.getElement( lineIndex);
         synchronized (UNSAFE_LINE_MARKS_LOCK ) {
           // the following line(s) are unsafe to restart scanning
-          ScanState mark = getMark( line);
+          ScanState mark= getMark( line);
           if (mark != ScanState.UnsafeRestartHere)
             putMark( line, ScanState.UnsafeRestartFollows);
           // mark following lines as unsafe to restart scanning
-          for (int numLines = rootElement.getElementCount() - 1; token.start
-              + token.length >= endOffset
+          for (int numLines= rootElement.getElementCount() - 1; token.docEnd >= endOffset
               && lineIndex < numLines;) {
             lineIndex++;
-            line = rootElement.getElement( lineIndex);
+            line= rootElement.getElement( lineIndex);
             putMark( line, ScanState.UnsafeRestartHere);
-            endOffset = Math.min( doc.getLength(), line.getEndOffset());
+            endOffset= Math.min( doc.getLength(), line.getEndOffset());
           } // while
         } // synchronized
       }
@@ -395,8 +395,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *         if the range is invalid
    */
   @Override
-  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
-      throws BadLocationException
+  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1) throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, false);
   }
@@ -421,8 +420,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *         if the range is invalid
    */
   @Override
-  protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
-      throws BadLocationException
+  protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1) throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, true);
   }
@@ -449,36 +447,36 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   private int drawText( Graphics g, int x, int y, int p0, int p1,
       boolean selected) throws BadLocationException
   {
-    Document doc = getDocument();
+    Document doc= getDocument();
 
-    Segment text = getLineBuffer();
-    Token token = null;
+    Segment text= getLineBuffer();
+    TokenQueue.RecycledToken token= null;
     while (p0 < p1) {
-      Category category = null;
-      int flushTo = p1;
+      Category category= null;
+      int flushTo= p1;
 
       if ( !tokenQueue.isEmpty()) {
         // get token
-        token = tokenQueue.peek();
+        token= tokenQueue.peek();
         // Abschnitte ohne Kategorie zusammenziehen...
-        for (; !tokenQueue.isEmpty() && token.category == null; token = tokenQueue
-            .peek()) {
+        for (; !tokenQueue.isEmpty() && token.category == null; token=
+            tokenQueue.peek()) {
           tokenQueue.remove();
         }
 
-        if (token.start > p0) {
+        if (token.docStart > p0) {
           // gap between tokens: draw as normal text
-          category = null;
-          flushTo = Math.min( token.start, p1);
+          category= null;
+          flushTo= Math.min( token.docStart, p1);
           doc.getText( p0, flushTo - p0, text);
-          x = drawHighlightedText( category, selected, text, x, y, g, p0);
-          p0 = flushTo;
+          x= drawHighlightedText( category, selected, text, x, y, g, p0);
+          p0= flushTo;
         }
-        if (token.start <= p0) {
+        if (token.docStart <= p0) {
           // draw current token
-          category = token.category;
-          flushTo = Math.min( token.start + token.length, p1);
-          if (token.start + token.length < p1) {
+          category= token.category;
+          flushTo= Math.min( token.docEnd, p1);
+          if (token.docEnd < p1) {
             // token was completely consumed: remove from queue
             tokenQueue.remove();
           }
@@ -487,8 +485,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
       // flush what we have..
       if (flushTo > p0) {
         doc.getText( p0, flushTo - p0, text);
-        x = drawHighlightedText( category, selected, text, x, y, g, p0);
-        p0 = flushTo;
+        x= drawHighlightedText( category, selected, text, x, y, g, p0);
+        p0= flushTo;
       }
     }
 
@@ -517,8 +515,9 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
       Segment text, int x, int y, Graphics g, int startOffset)
   {
     if (text.count > 0) {
-      Color fg = selected ? selectedColor : getForeground( category);
-      Font font = getFont( category);
+      Color fg= selected
+        ? selectedColor : getForeground( category);
+      Font font= getFont( category);
 
       if (false) {
         System.out.print( "painting '" + text + "', offs=" + startOffset
@@ -533,7 +532,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
         g.setFont( font);
       }
 
-      x = Utilities.drawTabbedText( text, x, y, g, this, startOffset);
+      x= Utilities.drawTabbedText( text, x, y, g, this, startOffset);
     }
     return x;
   }
@@ -581,33 +580,35 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   @Override
   protected void updateDamage( DocumentEvent changes, Shape a, ViewFactory f)
   {
-    Element elem = getElement();
-    DocumentEvent.ElementChange ec = changes.getChange( elem);
+    Element elem= getElement();
+    DocumentEvent.ElementChange ec= changes.getChange( elem);
 
-    Element[] added = (ec != null) ? ec.getChildrenAdded() : null;
-    Element[] removed = (ec != null) ? ec.getChildrenRemoved() : null;
+    Element[] added= (ec != null)
+      ? ec.getChildrenAdded() : null;
+    Element[] removed= (ec != null)
+      ? ec.getChildrenRemoved() : null;
     if (((added != null) && (added.length > 0))
         || ((removed != null) && (removed.length > 0))) {
       // lines were added or removed...
       if (removed != null) {
-        for (int i = 0; i < removed.length; i++) {
+        for (int i= 0; i < removed.length; i++) {
           removeMark( removed[i]);
         }
       }
     }
     else {
-      int lineIdx = elem.getElementIndex( changes.getOffset());
-      Element line = elem.getElement( lineIdx);
+      int lineIdx= elem.getElementIndex( changes.getOffset());
+      Element line= elem.getElement( lineIdx);
       synchronized (UNSAFE_LINE_MARKS_LOCK ) {
-        ScanState mark = getMark( line);
+        ScanState mark= getMark( line);
         if (mark != null) {
           if (mark == ScanState.UnsafeRestartHere) {
-            requiredScanStart = Math.min( requiredScanStart, lineIdx - 1);
+            requiredScanStart= Math.min( requiredScanStart, lineIdx - 1);
           }
           else if (mark == ScanState.UnsafeRestartFollows) {
-            requiredScanStart = Math.min( requiredScanStart, lineIdx);
+            requiredScanStart= Math.min( requiredScanStart, lineIdx);
           }
-          int endline = removeConsecutiveMarks( lineIdx);
+          int endline= removeConsecutiveMarks( lineIdx);
           damageLineRange( lineIdx, endline, a, getContainer());
         }
       }
@@ -627,11 +628,11 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    */
   private int getAdjustedStart( int lineIndex)
   {
-    Element element = getElement();
+    Element element= getElement();
     // walk backwards until we get an untagged line...
     // System.out.print( "# find start in line " + lineIndex);
     for (; lineIndex > 0; lineIndex--) {
-      Element line = element.getElement( lineIndex);
+      Element line= element.getElement( lineIndex);
       if ( !hasMark( line)) {
         // System.out.println( " found start in " + lineIndex);
         return line.getStartOffset();
@@ -651,9 +652,9 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   {
     synchronized (UNSAFE_LINE_MARKS_LOCK ) {
       if (unsafeLineMarks != null) {
-        Element element = getElement();
+        Element element= getElement();
         for (;; lineIndex++) {
-          Element line = element.getElement( lineIndex);
+          Element line= element.getElement( lineIndex);
           if (line == null || !unsafeLineMarks.containsKey( line)) {
             break;
           }
@@ -671,13 +672,13 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * The locking object for atomic operations that rely on
    * <code>unsafeLineMarks</code>.
    */
-  private final Object UNSAFE_LINE_MARKS_LOCK = new Object();
+  private final Object UNSAFE_LINE_MARKS_LOCK= new Object();
 
   /**
    * Holds the marks for lines that are unsafe to restart scanning. Lazily
    * created.
    */
-  private Map<Element, ScanState> unsafeLineMarks = null;
+  private Map<Element, ScanState> unsafeLineMarks= null;
 
   /**
    * Gets the mark that specifies a line as a position where to start the
@@ -738,7 +739,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     synchronized (UNSAFE_LINE_MARKS_LOCK ) {
       // lazy creation
       if (unsafeLineMarks == null) {
-        unsafeLineMarks = new HashMap<Element, ScanState>();
+        unsafeLineMarks= new HashMap<Element, ScanState>();
       }
       unsafeLineMarks.put( line, value);
     }
@@ -778,16 +779,16 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     }
 
     if (categoryColors == null) {
-      categoryColors = new Color[Category.values().length];
+      categoryColors= new Color[Category.values().length];
     }
-    int categoryCode = category.ordinal();
-    Color c = categoryColors[categoryCode];
+    int categoryCode= category.ordinal();
+    Color c= categoryColors[categoryCode];
     if (c == null && categoryStyles.isDefined( category)) {
-      c = categoryStyles.getColor( category);
-      categoryColors[categoryCode] = c;
+      c= categoryStyles.getColor( category);
+      categoryColors[categoryCode]= c;
     }
     if (c == null)
-      c = normalColor;
+      c= normalColor;
     return c;
   }
 
@@ -804,20 +805,20 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     }
 
     if (categoryFonts == null) {
-      categoryFonts = new Font[Category.values().length];
+      categoryFonts= new Font[Category.values().length];
     }
-    int categoryCode = category.ordinal();
-    Font font = categoryFonts[categoryCode];
+    int categoryCode= category.ordinal();
+    Font font= categoryFonts[categoryCode];
     if (font == null && categoryStyles.isDefined( category)) {
-      font = hostFont;
-      int style = categoryStyles.getStyle( category);
+      font= hostFont;
+      int style= categoryStyles.getStyle( category);
       if (style != Font.PLAIN) {
-        font = font.deriveFont( style);
+        font= font.deriveFont( style);
       }
-      categoryFonts[categoryCode] = font;
+      categoryFonts[categoryCode]= font;
     }
     if (font == null)
-      font = hostFont;
+      font= hostFont;
     return font;
   }
 
@@ -827,7 +828,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    * @see HiliteView#getAdjustedStart(int)
    * @author Martin Weber
    */
-  private enum ScanState {
+  private enum ScanState
+  {
     /**
      * Line mark: this line is unsafe to restart scanning.
      */
@@ -850,13 +852,13 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     public void styleChanged( CategoryStylesEvent evt)
     {
 
-      int categoryCode = evt.getCategory().ordinal();
+      int categoryCode= evt.getCategory().ordinal();
       // invalidate caches
       if (categoryFonts != null) {
-        HiliteView.this.categoryFonts[categoryCode] = null;
+        HiliteView.this.categoryFonts[categoryCode]= null;
       }
       if (categoryColors != null) {
-        HiliteView.this.categoryColors[categoryCode] = null;
+        HiliteView.this.categoryColors[categoryCode]= null;
       }
       HiliteView.this.getContainer().repaint();
     }
@@ -878,10 +880,11 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     /**
      * @param doc
      */
-    public TokenQueue( Document doc) {
+    public TokenQueue( Document doc)
+    {
       super();
-      this.doc = doc;
-      tokenBuf = new RecycledToken();
+      this.doc= doc;
+      tokenBuf= new RecycledToken();
     }
 
     /**
@@ -902,12 +905,13 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
     {
       // System.out.println( "# TokenQueue.initialise()");
 
-      this.seg2docOffset = seg2docOffset;
+      this.seg2docOffset= seg2docOffset;
+      // for assert's only..
+      tokenBuf.start= 0;
       HiliteView.this.categoriser.openInput( lexerInput);
-
       do {
         remove();
-      } while ( !isEmpty() && tokenBuf.start + tokenBuf.length <= p0);
+      } while ( !isEmpty() && tokenBuf.docEnd <= p0);
     }
 
     /**
@@ -926,19 +930,23 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      */
     public boolean isEmpty()
     {
+      assert tokenBuf.length >= 0 : "got negative token length: "
+          + tokenBuf.length;
       return tokenBuf.length <= 0;
     }
 
     /**
-     * Retrieves, but does not remove, the head of this queue.
+     * Retrieves, but does not remove, the head of this queue. <br>
+     * NOTE: The returned Token is bogus if this queue is empty. Make sure to
+     * call {@link #isEmpty()} first.
      */
-    public Token peek()
+    public RecycledToken peek()
     {
       if (false) {
         // print current tokenBuf
         System.out.print( "tok=" + tokenBuf + ", seg2docoffs=" + seg2docOffset);
         try {
-          Segment txt = new Segment();
+          Segment txt= new Segment();
           doc.getText( tokenBuf.start, tokenBuf.length, txt);
           System.out.println( ", '" + txt + "'");
         }
@@ -955,9 +963,14 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      */
     public void remove()
     {
+      final int start= tokenBuf.start;
       tokenBuf.reset();
       HiliteView.this.categoriser.nextToken( doc, tokenBuf);
-      tokenBuf.start -= seg2docOffset;
+      assert (tokenBuf.length > 0
+        ? tokenBuf.start >= start : true) : "got backward token: " + start
+          + " < " + tokenBuf.start;
+      tokenBuf.docStart= tokenBuf.start - seg2docOffset;
+      tokenBuf.docEnd= tokenBuf.docStart + tokenBuf.length;
     }
 
     /**
@@ -968,16 +981,22 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
      */
     private class RecycledToken extends Token
     {
+      public int docEnd;
+
+      public int docStart;
+
       /**
        */
-      private RecycledToken() {
+      private RecycledToken()
+      {
         reset();
       }
 
       public String toString()
       {
         return "start=" + start + ", length=" + length + ", cat=" + category
-            + (multiline ? ", multiline" : ", single line");
+            + (multiline
+              ? ", multiline" : ", single line");
       }
     }
   } // TokenQueue
