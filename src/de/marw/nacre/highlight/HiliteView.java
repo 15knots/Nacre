@@ -76,6 +76,11 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   private final transient TokenQueue tokenQueue;
 
   /**
+   * Only used by paint() to avoid frequent object allocation.
+   */
+  private final Segment paintBuffer= new Segment();
+
+  /**
    * the last known host's (the text component's) color used to render selected
    * text.
    */
@@ -230,9 +235,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
       if (startLine > 0) {
         p0Adj= Math.min( getAdjustedStart( startLine), p0Adj);
       }
-      Segment lexerInput= new Segment();
-      doc.getText( p0Adj, p1 - p0Adj, lexerInput);
-      tokenQueue.open( p0, lexerInput, lexerInput.offset - p0Adj);
+      doc.getText( p0Adj, p1 - p0Adj, paintBuffer);
+      tokenQueue.open( p0, paintBuffer, paintBuffer.offset - p0Adj);
 
       // mark lines without rendering...
       while (requiredScanStart < linesAbove && requiredScanStart < lineCount) {
@@ -395,7 +399,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *         if the range is invalid
    */
   @Override
-  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1) throws BadLocationException
+  protected int drawUnselectedText( Graphics g, int x, int y, int p0, int p1)
+      throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, false);
   }
@@ -420,7 +425,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
    *         if the range is invalid
    */
   @Override
-  protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1) throws BadLocationException
+  protected int drawSelectedText( Graphics g, int x, int y, int p0, int p1)
+      throws BadLocationException
   {
     return drawText( g, x, y, p0, p1, true);
   }
@@ -587,8 +593,8 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
       ? ec.getChildrenAdded() : null;
     Element[] removed= (ec != null)
       ? ec.getChildrenRemoved() : null;
-    if (((added != null) && (added.length > 0))
-        || ((removed != null) && (removed.length > 0))) {
+    if ((added != null && added.length > 0)
+        || (removed != null && removed.length > 0)) {
       // lines were added or removed...
       if (removed != null) {
         for (int i= 0; i < removed.length; i++) {
