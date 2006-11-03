@@ -43,59 +43,6 @@ public class HighlightKitDemo
 
   public static void main( String[] args)
   {
-    GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-    if (false) {
-      System.out.println( "## available fonts...");
-      String names[]= env.getAvailableFontFamilyNames();
-      for (String name : names) {
-        System.out.println( " - " + name);
-      }
-    }
-
-    if (false) {
-      System.out
-          .println( "## Family names of available fonts for use with HighlightingKit...");
-      JComponent dummy= new JEditorPane();
-      final String pattern= "TaTeTiTuToIW|M.";
-      int found= 0;
-      for (String name : env.getAvailableFontFamilyNames()) {
-        Font font= new Font( name, Font.PLAIN, 100);
-        final FontMetrics fontMetrics= dummy.getFontMetrics( font);
-        boolean isMono= false;
-        if (fontMetrics.stringWidth( " .|") == fontMetrics.stringWidth( "MMM")) {
-          isMono= true;
-        }
-        if (true || isMono) {
-          // monospaced font...
-          int plainW= fontMetrics.stringWidth( pattern);
-          int boldW=
-              dummy.getFontMetrics( font.deriveFont( Font.BOLD)).stringWidth(
-                  pattern);
-          int italW=
-              dummy.getFontMetrics( font.deriveFont( Font.ITALIC)).stringWidth(
-                  pattern);
-          int boldItalW=
-              dummy.getFontMetrics( font.deriveFont( Font.BOLD | Font.ITALIC))
-                  .stringWidth( pattern);
-          // System.out.println( "Font: plain=" + plainW + ", bold=" + boldW
-          // + ", italic=" + italW +", bold+italic=" + boldItalW + "\t Name="
-          // +
-          // font.getFamily());
-
-          /*
-           * highlighting requires a font that has the same width, regardless
-           * whether the font is rendered PLAIN, BOLD or ITALIC.
-           */
-          if (plainW == boldW && plainW == italW && plainW == boldItalW) {
-            found++;
-            System.out.println( " - " + name + (isMono
-              ? " (monospaced)" : ""));
-          }
-        }
-      }
-      System.out.println( "Found " + found + " fonts.");
-    }
-
     if (args.length != 1) {
       System.err.println( "need filename argument");
       System.exit( 1);
