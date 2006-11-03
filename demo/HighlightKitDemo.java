@@ -1,16 +1,13 @@
 /* $Id$ */
 
-// Copyright � 2004 Martin Weber
+// Copyright 2004-2006 Martin Weber
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GraphicsEnvironment;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileReader;
 
-import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
@@ -26,9 +23,10 @@ import de.marw.javax.swing.text.highlight.categoriser.Category;
 /**
  * Simple wrapper around JEditorPane to browse program code using the
  * HighlightingKit plug-in. Run with
+ * 
  * <pre>
- *  Usage:
- *       java HighlightKitTest filename
+ *   Usage:
+ *        java HighlightKitTest filename
  * </pre>
  */
 public class HighlightKitDemo

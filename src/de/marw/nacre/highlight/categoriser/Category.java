@@ -1,10 +1,10 @@
 /*
- * $Header:
+ * $Id:
  * /home/weber/cvsRepos/highlighting/src/de/marw/javax/swing/text/highlight/Category.java,v
  * 1.13 2005/01/22 18:00:33 weber Exp $
  */
 
-// Copyright © 2004 Martin Weber
+// Copyright ï¿½ 2004 Martin Weber
 
 package de.marw.javax.swing.text.highlight.categoriser;
 
