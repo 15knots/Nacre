@@ -2,7 +2,7 @@
 
 // Copyright © 2004-2006 Martin Weber
 
-package de.marw.javax.swing.text.editorkits;
+package de.marw.nacre.editorkits;
 
 import java.awt.Color;
 import java.util.EnumMap;
@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import de.marw.javax.swing.text.highlight.CategoryStyles;
-import de.marw.javax.swing.text.highlight.HighlightingKit;
-import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.CategoryStyles;
+import de.marw.nacre.highlight.HighlightingKit;
+import de.marw.nacre.highlight.categoriser.Categoriser;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**
@@ -23,7 +23,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Category;
  * lexical structure of the document as best it can.
  * 
  * @author Martin Weber
- * @see de.marw.javax.swing.text.highlight.HighlightingKit for sample usage
+ * @see de.marw.nacre.highlight.HighlightingKit for sample usage
  *      code.
  * @version $Revision$
  */

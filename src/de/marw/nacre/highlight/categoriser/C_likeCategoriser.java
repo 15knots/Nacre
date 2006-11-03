@@ -3,7 +3,7 @@
  * Copyright 2004 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.nacre.highlight.categoriser;
 
 import java.text.CharacterIterator;
 

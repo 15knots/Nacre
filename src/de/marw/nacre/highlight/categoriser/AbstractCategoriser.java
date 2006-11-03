@@ -2,7 +2,7 @@
 
 // Copyright © 2004 Martin Weber
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.nacre.highlight.categoriser;
 
 import java.text.CharacterIterator;
 
@@ -385,7 +385,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see de.marw.javax.swing.text.highlight.categoriser.Category#IDENTIFIER_1
+   * @see de.marw.nacre.highlight.categoriser.Category#IDENTIFIER_1
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,
@@ -405,7 +405,7 @@ public abstract class AbstractCategoriser implements Categoriser
    * Checks whether a subregion in the <code>input</code> starting at the
    * current scanner input position is a custom identifier.
    * 
-   * @see de.marw.javax.swing.text.highlight.categoriser.Category#IDENTIFIER_2
+   * @see de.marw.nacre.highlight.categoriser.Category#IDENTIFIER_2
    * @param identifierLen
    *        the length of the region that must match.
    * @return <code>true</code> if the subregion is one of the keywords,

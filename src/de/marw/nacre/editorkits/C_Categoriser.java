@@ -2,15 +2,15 @@
 
 // Copyright � 2004 Martin Weber
 
-package de.marw.javax.swing.text.editorkits;
+package de.marw.nacre.editorkits;
 
 import java.text.CharacterIterator;
 
 import javax.swing.text.Document;
 
-import de.marw.javax.swing.text.highlight.categoriser.C_likeCategoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
-import de.marw.javax.swing.text.highlight.categoriser.Token;
+import de.marw.nacre.highlight.categoriser.C_likeCategoriser;
+import de.marw.nacre.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Token;
 
 
 /**
@@ -19,7 +19,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
  * comments as well.
  * <p>
  * In detail, this categoriser maps lexical elements to a
- * {@link de.marw.javax.swing.text.highlight.categoriser.Category Category}</code>
+ * {@link de.marw.nacre.highlight.categoriser.Category Category}</code>
  * as follows: <table border="1">
  * <tr>
  * <th>Category</th>

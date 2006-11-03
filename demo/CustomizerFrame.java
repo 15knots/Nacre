@@ -20,10 +20,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 
-import de.marw.javax.swing.text.editorkits.C_HighlightingKit;
-import de.marw.javax.swing.text.highlight.CategoryStyles;
-import de.marw.javax.swing.text.highlight.HighlightingKit;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.editorkits.C_HighlightingKit;
+import de.marw.nacre.highlight.CategoryStyles;
+import de.marw.nacre.highlight.HighlightingKit;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**

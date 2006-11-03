@@ -2,7 +2,7 @@
 
 // Copyright � 2004-2006 Martin Weber
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.nacre.highlight;
 
 import java.util.Locale;
 import java.util.Map;
@@ -13,8 +13,8 @@ import javax.swing.text.PlainView;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
-import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Categoriser;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**

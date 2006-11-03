@@ -3,18 +3,18 @@
  * Copyright 2005-2006 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.nacre.highlight;
 
 import java.util.EventObject;
 
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**
  * The <code>CategoryStylesEvent</code> class encapsulates information that a
- * {@link de.marw.javax.swing.text.highlight.CategoryStyles} object sends its
+ * {@link de.marw.nacre.highlight.CategoryStyles} object sends its
  * listeners whenever the visual representation of a
- * {@link de.marw.javax.swing.text.highlight.categoriser.Category} is changed.
+ * {@link de.marw.nacre.highlight.categoriser.Category} is changed.
  * 
  * @author weber
  */

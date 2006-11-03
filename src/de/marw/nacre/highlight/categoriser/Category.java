@@ -6,7 +6,7 @@
 
 // Copyright � 2004 Martin Weber
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.nacre.highlight.categoriser;
 
 /**
  * Represents a lexical token category used to classify a piece of text for
@@ -14,7 +14,7 @@ package de.marw.javax.swing.text.highlight.categoriser;
  * only serve as a hint to programmers, the actual meaning of a category depends
  * on the actual <code>HighlightingKit</code>'s implementation.
  * 
- * @see de.marw.javax.swing.text.highlight.categoriser.Token
+ * @see de.marw.nacre.highlight.categoriser.Token
  */
 public enum Category {
 

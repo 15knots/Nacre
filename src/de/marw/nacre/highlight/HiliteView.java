@@ -3,7 +3,7 @@
  * Copyright 2005-2006 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.nacre.highlight;
 
 import java.awt.Color;
 import java.awt.Container;
@@ -26,9 +26,9 @@ import javax.swing.text.Utilities;
 import javax.swing.text.View;
 import javax.swing.text.ViewFactory;
 
-import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
-import de.marw.javax.swing.text.highlight.categoriser.Token;
+import de.marw.nacre.highlight.categoriser.Categoriser;
+import de.marw.nacre.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Token;
 
 
 /**
@@ -853,7 +853,7 @@ import de.marw.javax.swing.text.highlight.categoriser.Token;
   private class CacheInvalidator implements CategoryStylesListener
   {
     /**
-     * @see de.marw.javax.swing.text.highlight.CategoryStylesListener#styleChanged(de.marw.javax.swing.text.highlight.CategoryStylesEvent)
+     * @see de.marw.nacre.highlight.CategoryStylesListener#styleChanged(de.marw.nacre.highlight.CategoryStylesEvent)
      */
     public void styleChanged( CategoryStylesEvent evt)
     {

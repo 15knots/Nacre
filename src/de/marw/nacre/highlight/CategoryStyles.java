@@ -3,7 +3,7 @@
  * Copyright � 2005-2006 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.nacre.highlight;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**

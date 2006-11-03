@@ -3,9 +3,9 @@
  * Copyright 2004 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.nacre.highlight.categoriser;
 
-import de.marw.javax.swing.text.editorkits.C_Categoriser;
+import de.marw.nacre.editorkits.C_Categoriser;
 
 
 

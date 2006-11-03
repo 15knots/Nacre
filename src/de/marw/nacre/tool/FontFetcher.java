@@ -3,7 +3,7 @@
  * Copyright 2006 by Martin Weber
  */
 
-package de.marw.javax.swing.text.tool;
+package de.marw.nacre.tool;
 
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 
-import de.marw.javax.swing.text.highlight.HighlightingKit;
+import de.marw.nacre.highlight.HighlightingKit;
 
 
 /**

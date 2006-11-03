@@ -2,7 +2,7 @@
 
 // Copyright � 2004 Martin Weber
 
-package de.marw.javax.swing.text.editorkits;
+package de.marw.nacre.editorkits;
 
 import java.awt.Color;
 import java.util.EnumMap;
@@ -11,10 +11,10 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
-import de.marw.javax.swing.text.highlight.CategoryStyles;
-import de.marw.javax.swing.text.highlight.HighlightingKit;
-import de.marw.javax.swing.text.highlight.categoriser.Categoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.CategoryStyles;
+import de.marw.nacre.highlight.HighlightingKit;
+import de.marw.nacre.highlight.categoriser.Categoriser;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**
@@ -60,7 +60,7 @@ public class JavaHighlightingKit extends HighlightingKit
   }
 
   /**
-   * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryStyles()
+   * @see de.marw.nacre.highlight.HighlightingKit#getCategoryStyles()
    */
   public CategoryStyles getCategoryStyles()
   {
@@ -84,7 +84,7 @@ public class JavaHighlightingKit extends HighlightingKit
   }
 
   /**
-   * @see de.marw.javax.swing.text.highlight.HighlightingKit#getCategoryDescriptions(Locale)
+   * @see de.marw.nacre.highlight.HighlightingKit#getCategoryDescriptions(Locale)
    */
   public Map<Category, String> getCategoryDescriptions( Locale locale)
   {

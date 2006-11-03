@@ -2,7 +2,7 @@
 
 // Copyright � 2004 Martin Weber
 
-package de.marw.javax.swing.text.highlight.categoriser;
+package de.marw.nacre.highlight.categoriser;
 
 import javax.swing.text.Document;
 import javax.swing.text.Segment;

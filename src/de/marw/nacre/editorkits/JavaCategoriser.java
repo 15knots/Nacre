@@ -3,15 +3,15 @@
  * Copyright 2005 by Martin Weber
  */
 
-package de.marw.javax.swing.text.editorkits;
+package de.marw.nacre.editorkits;
 
 import java.text.CharacterIterator;
 
 import javax.swing.text.Document;
 
-import de.marw.javax.swing.text.highlight.categoriser.C_likeCategoriser;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
-import de.marw.javax.swing.text.highlight.categoriser.Token;
+import de.marw.nacre.highlight.categoriser.C_likeCategoriser;
+import de.marw.nacre.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Token;
 
 
 /**

@@ -3,7 +3,7 @@
  * Copyright 2005 by Martin Weber
  */
 
-package de.marw.javax.swing.text.highlight;
+package de.marw.nacre.highlight;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -15,7 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 import junit.framework.TestCase;
-import de.marw.javax.swing.text.highlight.categoriser.Category;
+import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**
@@ -169,7 +169,7 @@ public class CategoryStylesTest extends TestCase
 
   /*
    * Test method for
-   * 'de.marw.javax.swing.text.highlight.CategoryStyles.undefine(Category)'
+   * 'de.marw.nacre.highlight.CategoryStyles.undefine(Category)'
    */
   public void testUndefine()
   {
@@ -194,7 +194,7 @@ public class CategoryStylesTest extends TestCase
 
   /*
    * Test method for
-   * 'de.marw.javax.swing.text.highlight.CategoryStyles.replaceWith(CategoryStyles)'
+   * 'de.marw.nacre.highlight.CategoryStyles.replaceWith(CategoryStyles)'
    */
   public void testReplaceWith()
   {
