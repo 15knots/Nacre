@@ -1,4 +1,4 @@
-// $Header$
+// $Id$
 /*
  * Copyright 2006 by Martin Weber
  */
@@ -79,8 +79,8 @@ public abstract class DemoFrame extends JFrame
           contentType= conType;
         }
       }
-      setTitle( getDemoName() + ": " + (docName != null
-        ? docName : "") + (contentType != null
+      setTitle( getDemoName() + (docName != null
+        ? "- " + docName : "") + (contentType != null
         ? (" (" + contentType + ")") : ""));
     }
   }
