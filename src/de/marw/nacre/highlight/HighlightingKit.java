@@ -18,9 +18,9 @@ import de.marw.nacre.highlight.categoriser.Category;
 
 
 /**
- * This kit supports a fairly minimal handling of editing a programming language
- * text content. It supports syntax highlighting and produces the lexical
- * structure of the document as best it can. <br>
+ * This kit supports handling of editing a programming language text content. It
+ * supports syntax highlighting and produces the lexical structure of the
+ * document as best it can. <br>
  * A <code>HighlightingKit</code> or one of its subclasses can be used with
  * any JTextcomponent.
  * <p>
@@ -30,34 +30,26 @@ import de.marw.nacre.highlight.categoriser.Category;
  * <li>First instantiate a subclass of <code>HighlightingKit</code> according
  * to the programming language you want to highlight, </li>
  * <li>then
- * {@link javax.swing.JEditorPane#setEditorKitForContentType(java.lang.String, javax.swing.text.EditorKit)
- * register the editor kit(s) to use} for the content type of the programming
- * language.</li>
- * <li>After that,
- * {@link javax.swing.JEditorPane#setContentType(java.lang.String) set the selected content type}
- * to activate highlighting.</li>
- * </ul>
+ * {@link javax.swing.JEditorPane#setEditorKit(javax.swing.text.EditorKit)
+ * register the editor kit(s) to use} for the programming language.</li>
  * </p>
  * <code><pre>
- * JEditorPane editor = new JEditorPane();
+ * JEditorPane editor= new JEditorPane();
  * // ...
  * // add highlighting for Java code
- * HighlightingKit kit = new JavaHighlightingKit();
- * String contentTyoe = kit.getContentType();
- * editor.setEditorKitForContentType( contentType, kit);
+ * HighlightingKit kit= new JavaHighlightingKit();
+ * editor.setEditorKit( kit);
  * //...
- * // activate highlighting 
- * editor.setContentType( contentType);
  * </pre></code>
  * <p>
  * It is also possible to register multiple editor kits, each for a different
  * programming language and later to select the style of highlighting on demand.
  * </p>
  * <code><pre>
- * JEditorPane editor = new JEditorPane();
+ * JEditorPane editor= new JEditorPane();
  * // ...
- * HighlightingKit kit1 = new JavaHighlightingKit();
- * HighlightingKit kit2 = new CHighlightingKit();
+ * HighlightingKit kit1= new JavaHighlightingKit();
+ * HighlightingKit kit2= new CHighlightingKit();
  * 
  * editor.setEditorKitForContentType( kit1.getContentType(), kit1);
  * editor.setEditorKitForContentType( kit2.getContentType(), kit2);
@@ -70,11 +62,10 @@ import de.marw.nacre.highlight.categoriser.Category;
  * </p>
  * 
  * @author Martin Weber
- * @version $Revision$
  * @see javax.swing.text.DefaultEditorKit#getContentType()
  */
 public abstract class HighlightingKit extends DefaultEditorKit implements
-    ViewFactory
+  ViewFactory
 {
 
   /**
@@ -86,21 +77,21 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
   /**
    * Default constructor used by subclasses.
    */
-  protected HighlightingKit() {
-  }
+  protected HighlightingKit()
+  {}
 
   // interface ViewFactory
   public View create( Element elem)
   {
-    CategoryStyles styles = getCategoryStyles();
-    Categoriser categoriser = getCategoriser();
-    return (categoriser != null && styles != null) ? new HiliteView( elem,
-        categoriser, styles) : new PlainView( elem);
+    CategoryStyles styles= getCategoryStyles();
+    Categoriser categoriser= getCategoriser();
+    return (categoriser != null && styles != null)
+      ? new HiliteView( elem, categoriser, styles) : new PlainView( elem);
   }
 
   /**
    * Returns the set of color and font style informations used to render
-   * highlighted text in the document for a specific content type. <br>
+   * highlighted text in the document. <br>
    * If a client application changes one of the styles contained in the set
    * returned here, the change will be automatically reflected by any
    * <code>JEditorPane</code> in the application that has a subclass of
@@ -108,7 +99,7 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    * <p>
    * NOTE for subclass implementors: The color and font style informations
    * returned here are designed to be shared with any
-   * <code>[@linkplain View}</code> that gets created by this view factory.
+   * <code>{@linkplain View}</code> that gets created by this view factory.
    * Subclasses are expected to return a <strong>static variable</strong>
    * (class variable) here.
    * </p>
@@ -143,7 +134,7 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
   private Categoriser getCategoriser()
   {
     if (categoriser == null) {
-      categoriser = createCategoriser();
+      categoriser= createCategoriser();
     }
 
     return categoriser;
