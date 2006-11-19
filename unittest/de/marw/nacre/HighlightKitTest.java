@@ -127,7 +127,7 @@ public class HighlightKitTest
     kit=
         (HighlightingKit) editor.getEditorKitForContentType( editor
             .getContentType());
-    CategoryStyles styles= kit.getCategoryStyles();
+    CategoryStyles styles= kit.getDefaultCategoryStyles();
     styles.setColor( Category.COMMENT_2, Color.YELLOW);
   }
 

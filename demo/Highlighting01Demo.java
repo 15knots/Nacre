@@ -10,20 +10,20 @@ import de.marw.nacre.editorkits.C_HighlightingKit;
 
 
 /**
- * This basic demo shows how to set up a <code>JEditorPane</code> to support
- * highlighting of <em>C</em> program code.<br>
+ * This basic demo shows how to set up a single <code>JEditorPane</code> to
+ * support highlighting of <em>C</em> program code.<br>
  */
 public class Highlighting01Demo extends DemoFrame
 {
 
   private static final String sampleText=
-      "/* Sample C code.\n" + "  Sorry for the typos in here, just fix them\n"
-          + "* /\n\n" + " #  include <stdio.h>\n\n" + "#ifndef HELLO\n"
-          + " #define HELLO \"Hello\"\n" + "#endif\n\n"
-          + "int main( int argc, char ** argv)\n" + "{\n" + "  int i;\n"
-          + "  for( i=0; i< argc; i++)\n"
-          + "    printf( HELLO \" world!\");\n\n"
-          + "  return 0 * sizeof(int);\n" + "}\n";
+    "/* Sample C code.\n"
+      + "  Sorry for the typos in here, just fix them and see how it works.\n"
+      + "* /\n\n" + " #  include <stdio.h>\n\n" + "#ifndef HELLO\n"
+      + " #define HELLO \"Hello\"\n" + "#endif\n\n"
+      + "int main( int argc, char ** argv)\n" + "{\n" + "  int i;\n"
+      + "  for( i=0; i< argc; i++)\n" + "    printf( HELLO \" world!\");\n\n"
+      + "  return 0 * sizeof(int);\n" + "}\n";
 
   /**
    */
@@ -82,7 +82,7 @@ public class Highlighting01Demo extends DemoFrame
   {
 
     // set up the GUI
-    Highlighting01Demo frame= new Highlighting01Demo();
+    DemoFrame frame= new Highlighting01Demo();
     // put text into the editor
     JEditorPane editor= frame.getEditor();
     editor.setText( sampleText);

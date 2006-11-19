@@ -248,7 +248,7 @@ public class CategoryStyles implements Serializable
    * Removes all styles in this <code>CategoryStyles</code> object and then
    * adds the styles contained in <code>newStyles</code>.<br>
    * This can be used in conjunction with
-   * {@link HighlightingKit#getCategoryStyles() getCategoryStyles()} to apply a
+   * {@link HighlightingKit#getDefaultCategoryStyles() getCategoryStyles()} to apply a
    * (persistent) set of color and font style informations and automatically
    * reflect the changes to any <code>JEditorPane</code> in the application.
    * 

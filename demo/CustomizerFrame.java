@@ -73,7 +73,7 @@ public class CustomizerFrame extends JFrame
     this.pack();
     this.setSize( 400, 500);
     HighlightingKit kit = ((HighlightingKit) jPreviewEditorPane.getEditorKit());
-    CategoryStyles styles = kit.getCategoryStyles();
+    CategoryStyles styles = kit.getDefaultCategoryStyles();
 
     setTitle( "HighlightingKit: " + kit.getContentType());
     Map<Category, String> descriptions = kit.getCategoryDescriptions( null);
