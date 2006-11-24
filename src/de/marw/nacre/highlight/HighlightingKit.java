@@ -75,6 +75,11 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
   private Categoriser categoriser;
 
   /**
+   * The styles representing the actual categories.
+   */
+  private CategoryStyles categoryStyles;
+
+  /**
    * Default constructor used by subclasses.
    */
   protected HighlightingKit()
@@ -94,17 +99,16 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    * highlighted text in the document. <br>
    * If a client application changes one of the styles contained in the set
    * returned here, the change will be automatically reflected by any
-   * <code>JEditorPane</code> in the application that has a subclass of
+   * <code>JEditorPane</code> in the application that has this
    * <code>HighlightingKit</code> installed.
-   * <p>
-   * NOTE for subclass implementors: The color and font style informations
-   * returned here are designed to be shared with any
-   * <code>{@linkplain View}</code> that gets created by this view factory.
-   * Subclasses are expected to return a <strong>static variable</strong>
-   * (class variable) here.
-   * </p>
    */
-  public abstract CategoryStyles getCategoryStyles();
+  public final CategoryStyles getCategoryStyles()
+  {
+    if (categoryStyles == null) {
+      categoryStyles= createCategoryStyles();
+    }
+    return categoryStyles;
+  }
 
   /**
    * Returns a Map that specifies each category as a <strong>localized</strong>
@@ -120,6 +124,14 @@ public abstract class HighlightingKit extends DefaultEditorKit implements
    * @see Category
    */
   public abstract Map<Category, String> getCategoryDescriptions( Locale locale);
+
+  /**
+   * Returns the set of color and font style informations used to render
+   * highlighted text in the document.
+   * 
+   * @see #getCategoryStyles()
+   */
+  protected abstract CategoryStyles createCategoryStyles();
 
   /**
    * Creates the Categoriser used for highlighting text of this document or

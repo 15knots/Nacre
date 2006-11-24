@@ -27,17 +27,11 @@ import de.marw.nacre.highlight.categoriser.Category;
 public class JavaHighlightingKit extends HighlightingKit
 {
 
-  /**
-   * 
-   */
-  private static final long serialVersionUID = 5360252654985043336L;
+  /**   */
+  private static final long serialVersionUID= 5360252654985043336L;
 
-  /**
-   * The styles representing the actual categories.
-   */
-  private static CategoryStyles categoryStyles;
-
-  public JavaHighlightingKit() {
+  public JavaHighlightingKit()
+  {
     super();
   }
 
@@ -60,24 +54,13 @@ public class JavaHighlightingKit extends HighlightingKit
   }
 
   /**
-   * @see de.marw.nacre.highlight.HighlightingKit#getCategoryStyles()
-   */
-  public CategoryStyles getCategoryStyles()
-  {
-    if (categoryStyles == null) {
-      categoryStyles = createDefaultStyles();
-    }
-    return categoryStyles;
-  }
-
-  /**
    * Creates a built-in set of color and font style informations used used to
    * render highlighted text written in the C programming language.
    */
-  private CategoryStyles createDefaultStyles()
+  protected CategoryStyles createCategoryStyles()
   {
-    CategoryStyles styleDefaults = new CategoryStyles();
-    CategoryStyles.applyDefaultStyles( styleDefaults);
+    CategoryStyles styleDefaults= new CategoryStyles();
+    styleDefaults.applyDefaultStyles();
     styleDefaults.setColor( Category.IDENTIFIER_1, Color.cyan.darker());
     styleDefaults.setColor( Category.IDENTIFIER_2, Color.cyan.darker());
     return styleDefaults;
@@ -88,34 +71,36 @@ public class JavaHighlightingKit extends HighlightingKit
    */
   public Map<Category, String> getCategoryDescriptions( Locale locale)
   {
-    String bundle_name = JavaHighlightingKit.class.getName();
-    ResourceBundle bundle = ResourceBundle.getBundle( bundle_name,
-        locale == null ? Locale.getDefault() : locale);
+    String bundle_name= JavaHighlightingKit.class.getName();
+    ResourceBundle bundle=
+      ResourceBundle.getBundle( bundle_name, locale == null
+        ? Locale.getDefault() : locale);
 
-    Map<Category, String> catDescriptions = new EnumMap<Category, String>(
-        Category.class);
+    Map<Category, String> catDescriptions=
+      new EnumMap<Category, String>( Category.class);
 
     catDescriptions.put( Category.COMMENT_1, getString( bundle,
-        Category.COMMENT_1.name()));
+      Category.COMMENT_1.name()));
     catDescriptions.put( Category.COMMENT_2, getString( bundle,
-        Category.COMMENT_2.name()));
+      Category.COMMENT_2.name()));
     catDescriptions.put( Category.DOC, getString( bundle, Category.DOC.name()));
     catDescriptions.put( Category.STRINGVAL, getString( bundle,
-        Category.STRINGVAL.name()));
+      Category.STRINGVAL.name()));
     catDescriptions.put( Category.NUMERICVAL, getString( bundle,
-        Category.NUMERICVAL.name()));
+      Category.NUMERICVAL.name()));
     catDescriptions.put( Category.PREDEFVAL, getString( bundle,
-        Category.PREDEFVAL.name()));
+      Category.PREDEFVAL.name()));
     catDescriptions.put( Category.KEYWORD_STATEMENT, getString( bundle,
-        Category.KEYWORD_STATEMENT.name()));
+      Category.KEYWORD_STATEMENT.name()));
     catDescriptions.put( Category.KEYWORD_OPERATOR, getString( bundle,
-        Category.KEYWORD_OPERATOR.name()));
+      Category.KEYWORD_OPERATOR.name()));
     catDescriptions.put( Category.KEYWORD_TYPE, getString( bundle,
-        Category.KEYWORD_TYPE.name()));
+      Category.KEYWORD_TYPE.name()));
     catDescriptions.put( Category.KEYWORD, getString( bundle, Category.KEYWORD
-        .name()));
+      .name()));
     catDescriptions.put( Category.OPERATOR, getString( bundle,
-        Category.OPERATOR.name()));
+      Category.OPERATOR.name()));
+
     return catDescriptions;
   }
 

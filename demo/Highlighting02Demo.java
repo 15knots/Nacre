@@ -49,7 +49,7 @@ public class Highlighting02Demo extends Highlighting01Demo
     super.configureEditor( editor);
     // customise colour and font style of hightlighting
     HighlightingKit kit= (HighlightingKit) editor.getEditorKit();
-    CategoryStyles styles= kit.getDefaultCategoryStyles();
+    CategoryStyles styles= kit.getCategoryStyles();
     // comments are yellow..
     styles.setColor( Category.COMMENT_2, Color.YELLOW);
     styles.setColor( Category.KEYWORD, Color.ORANGE);
