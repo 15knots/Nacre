@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import de.marw.nacre.highlight.categoriser.Category;
 
@@ -25,35 +26,26 @@ import de.marw.nacre.highlight.categoriser.Category;
 public class CategoryStyles implements Serializable
 {
 
-  private static final long serialVersionUID = 831911764472254522L;
+  private static final long serialVersionUID= 831911764472254522L;
 
   /**
    * the categories and the styles managed by this object.
    */
-  private EnumMap<Category, StyleEntry> categoryStyles = new EnumMap<Category, StyleEntry>(
-      Category.class);
+  private EnumMap<Category, StyleEntry> categoryStyles=
+    new EnumMap<Category, StyleEntry>( Category.class);
 
   /**
    * Listeners, lazily created
    */
   private transient List<CategoryStylesListener> listeners;
 
-  private static final Color keywordCol_any = new Color( 109, 137, 164);
-
-  private static final Color keywordCol = new Color( 127, 0, 85);
-
-  private static final Color literalColor = new Color( 42, 0, 255);
-
-  private static final Color keywordCol_type = new Color( 181, 0, 121);
-
-  private static final Color commentColor = new Color( 63, 127, 95);
-
-  private static final Color docCommentColor = new Color( 6, 40, 143);
+  private static EnumMap<Category, StyleEntry> defaultStyles;
 
   /**
    * Constructs an empty set of color and font style informations.
    */
-  public CategoryStyles() {
+  public CategoryStyles()
+  {
     super();
   }
 
@@ -69,7 +61,7 @@ public class CategoryStyles implements Serializable
    */
   public int getStyle( Category category)
   {
-    StyleEntry style = categoryStyles.get( category);
+    StyleEntry style= categoryStyles.get( category);
     if (style != null) {
       return style.style;
     }
@@ -87,7 +79,7 @@ public class CategoryStyles implements Serializable
    */
   public boolean isBold( Category category)
   {
-    StyleEntry style = categoryStyles.get( category);
+    StyleEntry style= categoryStyles.get( category);
     if (style != null) {
       return style.isBold();
     }
@@ -108,8 +100,8 @@ public class CategoryStyles implements Serializable
    */
   public void setBold( Category category, boolean bold)
   {
-    StyleEntry style = getOrCreateStyle( category);
-    boolean changed = (style.isBold() != bold);
+    StyleEntry style= getOrCreateStyle( category);
+    boolean changed= (style.isBold() != bold);
     style.setBold( bold);
     if (style.isDefault()) {
       categoryStyles.remove( category);
@@ -130,7 +122,7 @@ public class CategoryStyles implements Serializable
    */
   public boolean isItalic( Category category)
   {
-    StyleEntry style = categoryStyles.get( category);
+    StyleEntry style= categoryStyles.get( category);
     if (style != null) {
       return style.isItalic();
     }
@@ -151,8 +143,8 @@ public class CategoryStyles implements Serializable
    */
   public void setItalic( Category category, boolean italic)
   {
-    StyleEntry style = getOrCreateStyle( category);
-    boolean changed = (style.isItalic() != italic);
+    StyleEntry style= getOrCreateStyle( category);
+    boolean changed= (style.isItalic() != italic);
     style.setItalic( italic);
     if (style.isDefault()) {
       categoryStyles.remove( category);
@@ -173,7 +165,7 @@ public class CategoryStyles implements Serializable
    */
   public Color getColor( Category category)
   {
-    StyleEntry style = categoryStyles.get( category);
+    StyleEntry style= categoryStyles.get( category);
     if (style != null) {
       return style.color;
     }
@@ -194,10 +186,10 @@ public class CategoryStyles implements Serializable
    */
   public void setColor( Category category, Color newColor)
   {
-    StyleEntry style = getOrCreateStyle( category);
-    Color oldColor = style.getColor();
-    boolean changed = !(newColor == null ? oldColor == null : newColor
-        .equals( oldColor));
+    StyleEntry style= getOrCreateStyle( category);
+    Color oldColor= style.getColor();
+    boolean changed= !(newColor == null
+      ? oldColor == null : newColor.equals( oldColor));
     style.setColor( newColor);
     if (style.isDefault()) {
       categoryStyles.remove( category);
@@ -208,9 +200,9 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Checks whether the category has a color and/or font style value specified
-   * in the set. If no style for a category is defined, any text of that
-   * category will be rendered in the default style of the {@link
+   * Checks whether the category has a color and/or font style specified in the
+   * set. If no style for a category is defined, any text of that category will
+   * be rendered in the default style of the {@link
    * javax.swing.text.JTextComponent}.
    * 
    * @param category
@@ -224,8 +216,8 @@ public class CategoryStyles implements Serializable
   }
 
   /**
-   * Sets the specified category to its default rendering style. This is
-   * equivalent to calling <code>
+   * Sets the rendering style for the specified category to
+   * <code>Component</code>'s default. This is equivalent to calling <code>
    * <pre>
    * setColor( category, null);
    * setBold( category, false);
@@ -233,11 +225,11 @@ public class CategoryStyles implements Serializable
    * </pre></code>.
    * 
    * @param category
-   *        the category to undefine.
+   *        the category of which the rendering style is to be removed.
    */
   public void undefine( Category category)
   {
-    boolean changed = isDefined( category);
+    boolean changed= isDefined( category);
     if (changed) {
       categoryStyles.remove( category);
       fireCategoryStylesChanged( category);
@@ -248,9 +240,10 @@ public class CategoryStyles implements Serializable
    * Removes all styles in this <code>CategoryStyles</code> object and then
    * adds the styles contained in <code>newStyles</code>.<br>
    * This can be used in conjunction with
-   * {@link HighlightingKit#getDefaultCategoryStyles() getCategoryStyles()} to apply a
+   * {@link HighlightingKit#getCategoryStyles() getCategoryStyles()} to apply a
    * (persistent) set of color and font style informations and automatically
-   * reflect the changes to any <code>JEditorPane</code> in the application.
+   * reflect the changes to any <code>JEditorPane</code> in the application.<br>
+   * Convenience method that reduces the number of listener notifications.
    * 
    * @param newStyles
    *        the new styles to add.
@@ -258,57 +251,78 @@ public class CategoryStyles implements Serializable
   public void replaceWith( CategoryStyles newStyles)
   {
     for (Category cat : Category.values()) {
-      StyleEntry oldStyle = this.categoryStyles.get( cat);
-      StyleEntry newStyle = newStyles.categoryStyles.get( cat);
+      StyleEntry oldStyle= this.categoryStyles.get( cat);
+      StyleEntry newStyle= newStyles.categoryStyles.get( cat);
 
-      boolean changed = false;
-      if (oldStyle != null) {
-        if (newStyle == null) {
-          categoryStyles.remove( cat);
-          changed = true;
-        }
-        else {
-          if ( !oldStyle.equals( newStyle)) {
-            categoryStyles.put( cat, newStyle);
-            changed = true;
-          }
-        }
+      if (oldStyle != null && newStyle == null) {
+        categoryStyles.remove( cat);
+        fireCategoryStylesChanged( cat);
       }
-      else { // oldstyle is null
-        if (newStyle != null) {
-          categoryStyles.put( cat, newStyle);
-          changed = true;
-        }
-      }
-
-      if (changed) {
+      else if (newStyle != null && !newStyle.equals( oldStyle)) {
+        categoryStyles.put( cat, newStyle);
         fireCategoryStylesChanged( cat);
       }
     } // for
   }
 
   /**
-   * Applies a built-in set of color and font style informations to the
-   * specified <code>CategoryStyles</code> object. Convenience method.
+   * Adds a built-in set of color and font style informations to this
+   * <code>CategoryStyles</code> object. Existing styles will be replaced.<br>
+   * Convenience method that reduces the number of listener notifications.
    */
-  public static void applyDefaultStyles( CategoryStyles target)
+  public void applyDefaultStyles()
   {
-    target.setColor( Category.COMMENT_1, commentColor);
-    target.setColor( Category.COMMENT_2, commentColor);
-    target.setColor( Category.STRINGVAL, literalColor);
-    target.setItalic( Category.STRINGVAL, true);
-    target.setColor( Category.NUMERICVAL, literalColor);
-    target.setColor( Category.PREDEFVAL, literalColor);
-    target.setBold( Category.PREDEFVAL, true);
-    target.setColor( Category.KEYWORD_STATEMENT, keywordCol);
-    target.setBold( Category.KEYWORD_STATEMENT, true);
-    target.setColor( Category.KEYWORD_OPERATOR, keywordCol);
-    target.setBold( Category.KEYWORD_OPERATOR, true);
-    target.setColor( Category.KEYWORD_TYPE, keywordCol_type);
-    target.setBold( Category.KEYWORD_TYPE, true);
-    target.setColor( Category.KEYWORD, keywordCol_any);
-    target.setBold( Category.KEYWORD, true);
-    target.setColor( Category.DOC, docCommentColor);
+    EnumMap<Category, StyleEntry> defaultStyles= getDefaultStyles();
+
+    for (Map.Entry<Category, StyleEntry> elem : defaultStyles.entrySet()) {
+      Category cat= elem.getKey();
+      StyleEntry newStyle= elem.getValue();
+      StyleEntry oldStyle= this.categoryStyles.get( cat);
+      if ( !newStyle.equals( oldStyle)) {
+        categoryStyles.put( cat, newStyle);
+        fireCategoryStylesChanged( cat);
+      }
+    }
+  }
+
+  /**
+   * Gets the built-in set of color and font style informations.
+   */
+  private static synchronized EnumMap<Category, StyleEntry> getDefaultStyles()
+  {
+    // lazily initialised
+    if (defaultStyles == null) {
+      defaultStyles= new EnumMap<Category, StyleEntry>( Category.class);
+
+      final Color keywordCol_any= new Color( 109, 137, 164);
+      final Color keywordCol= new Color( 127, 0, 85);
+      final Color literalColor= new Color( 42, 0, 255);
+      final Color keywordCol_type= new Color( 181, 0, 121);
+      final Color commentColor= new Color( 63, 127, 95);
+      final Color docCommentColor= new Color( 6, 40, 143);
+
+      defaultStyles.put( Category.COMMENT_1, new StyleEntry( commentColor,
+        Font.PLAIN));
+      defaultStyles.put( Category.COMMENT_2, new StyleEntry( commentColor,
+        Font.PLAIN));
+      defaultStyles.put( Category.STRINGVAL, new StyleEntry( literalColor,
+        Font.ITALIC));
+      defaultStyles.put( Category.NUMERICVAL, new StyleEntry( literalColor,
+        Font.PLAIN));
+      defaultStyles.put( Category.PREDEFVAL, new StyleEntry( literalColor,
+        Font.BOLD));
+      defaultStyles.put( Category.KEYWORD_STATEMENT, new StyleEntry(
+        keywordCol, Font.BOLD));
+      defaultStyles.put( Category.KEYWORD_OPERATOR, new StyleEntry( keywordCol,
+        Font.BOLD));
+      defaultStyles.put( Category.KEYWORD_TYPE, new StyleEntry(
+        keywordCol_type, Font.BOLD));
+      defaultStyles.put( Category.KEYWORD, new StyleEntry( keywordCol_any,
+        Font.BOLD));
+      defaultStyles.put( Category.DOC, new StyleEntry( docCommentColor,
+        Font.PLAIN));
+    }
+    return defaultStyles;
   }
 
   /**
@@ -329,7 +343,7 @@ public class CategoryStyles implements Serializable
     if (this == obj)
       return true;
     if (obj instanceof CategoryStyles) {
-      CategoryStyles that = (CategoryStyles) obj;
+      CategoryStyles that= (CategoryStyles) obj;
       return this.categoryStyles.equals( that.categoryStyles);
     }
     return false;
@@ -343,7 +357,7 @@ public class CategoryStyles implements Serializable
   public void addCategoryStylesListener( CategoryStylesListener listener)
   {
     if (listeners == null) {
-      listeners = new ArrayList<CategoryStylesListener>();
+      listeners= new ArrayList<CategoryStylesListener>();
     }
     listeners.add( listener);
   }
@@ -358,7 +372,7 @@ public class CategoryStyles implements Serializable
   protected void fireCategoryStylesChanged( Category cat)
   {
     if (listeners != null) {
-      CategoryStylesEvent evt = new CategoryStylesEvent( this, cat);
+      CategoryStylesEvent evt= new CategoryStylesEvent( this, cat);
       for (CategoryStylesListener listener : listeners) {
         listener.styleChanged( evt);
       }
@@ -376,9 +390,9 @@ public class CategoryStyles implements Serializable
     if (category == null) {
       throw new NullPointerException( "category");
     }
-    StyleEntry style = categoryStyles.get( category);
+    StyleEntry style= categoryStyles.get( category);
     if (style == null) {
-      style = new StyleEntry();
+      style= new StyleEntry();
       categoryStyles.put( category, style);
     }
     return style;
@@ -390,7 +404,7 @@ public class CategoryStyles implements Serializable
     /**
      * Comment for <code>serialVersionUID</code>
      */
-    private static final long serialVersionUID = 3546358431356237617L;
+    private static final long serialVersionUID= 3546358431356237617L;
 
     /**
      * The foreground color to use. Set to <code>null</code> if the default
@@ -408,9 +422,20 @@ public class CategoryStyles implements Serializable
     /**
      * Constructs a new StyleEntry object with no color and a plain font style.
      */
-    public StyleEntry() {
-      this.color = null;
-      this.style = Font.PLAIN;
+    public StyleEntry()
+    {
+      this.color= null;
+      this.style= Font.PLAIN;
+    }
+
+    /**
+     * Constructs a new StyleEntry object with the specified color and a font
+     * style.
+     */
+    public StyleEntry( Color color, int style)
+    {
+      this.color= color;
+      this.style= style;
     }
 
     /**
@@ -421,7 +446,7 @@ public class CategoryStyles implements Serializable
      */
     protected void setColor( Color newColor)
     {
-      this.color = newColor;
+      this.color= newColor;
     }
 
     /**
@@ -435,10 +460,10 @@ public class CategoryStyles implements Serializable
     protected void setBold( boolean bold)
     {
       if (bold) {
-        style |= Font.BOLD;
+        style|= Font.BOLD;
       }
       else {
-        style &= ~Font.BOLD;
+        style&= ~Font.BOLD;
       }
     }
 
@@ -453,10 +478,10 @@ public class CategoryStyles implements Serializable
     protected void setItalic( boolean italic)
     {
       if (italic) {
-        style |= Font.ITALIC;
+        style|= Font.ITALIC;
       }
       else {
-        style &= ~Font.ITALIC;
+        style&= ~Font.ITALIC;
       }
     }
 
@@ -509,15 +534,17 @@ public class CategoryStyles implements Serializable
      */
     public String toString()
     {
-      String ctext = null;
+      String ctext= null;
       if (color != null) {
-        ctext = "r=" + color.getRed() + ",g=" + color.getGreen() + ",b="
+        ctext=
+          "r=" + color.getRed() + ",g=" + color.getGreen() + ",b="
             + color.getBlue();
       }
 
-      return getClass().getName() + "[" + ctext + ",s="
-          + (isBold() ? "bold" : "") + (isItalic() ? "italic" : "")
-          + ( !isItalic() && !isBold() ? "plain" : "") + "]";
+      return getClass().getName() + "[" + ctext + ",s=" + (isBold()
+        ? "bold" : "") + (isItalic()
+        ? "italic" : "") + ( !isItalic() && !isBold()
+        ? "plain" : "") + "]";
     }
 
     /**
@@ -527,14 +554,15 @@ public class CategoryStyles implements Serializable
     {
       if (obj == null || obj.getClass() != StyleEntry.class)
         return false;
-      StyleEntry ob = (StyleEntry) obj;
-      return ob.style == style
-          && (ob.color == null ? color == null : ob.color.equals( color));
+      StyleEntry ob= (StyleEntry) obj;
+      return ob.style == style && (ob.color == null
+        ? color == null : ob.color.equals( color));
     }
 
     public int hashCode()
     {
-      return color == null ? style : style + color.hashCode();
+      return style * 31 + (color == null
+        ? 0 : color.hashCode());
     }
 
     /**
@@ -550,17 +578,17 @@ public class CategoryStyles implements Serializable
     }
 
     private void writeObject( java.io.ObjectOutputStream out)
-        throws IOException
+      throws IOException
     {
       out.writeByte( style);
       out.writeInt( color.getRGB());
     }
 
-    private void readObject( java.io.ObjectInputStream in) throws IOException,
-        ClassNotFoundException
+    private void readObject( java.io.ObjectInputStream in)
+      throws IOException, ClassNotFoundException
     {
-      style = in.readByte();
-      color = new Color( in.readInt(), true);
+      style= in.readByte();
+      color= new Color( in.readInt(), true);
     }
 
   }
