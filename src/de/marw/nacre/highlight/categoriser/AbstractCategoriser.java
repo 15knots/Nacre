@@ -1,6 +1,6 @@
 /* $Id$ */
 
-// Copyright © 2004 Martin Weber
+// Copyright © 2004-2006 Martin Weber
 
 package de.marw.nacre.highlight.categoriser;
 
@@ -10,12 +10,14 @@ import javax.swing.text.Segment;
 
 
 /**
- * 
+ * A basic implementation of <code>Categoriser</code> that provides some
+ * commonly useful methods to match portions of text to highlight. The methods
+ * included can match white space, integer and floating point numbers,
  */
 public abstract class AbstractCategoriser implements Categoriser
 {
 
-  private static final boolean debug = false;
+  private static final boolean debug= false;
 
   /**
    * The input segment currently in use or <code>null</code>.
@@ -27,8 +29,8 @@ public abstract class AbstractCategoriser implements Categoriser
   /**
    * Constructor for subclasses.
    */
-  protected AbstractCategoriser() {
-  }
+  protected AbstractCategoriser()
+  {}
 
   /*
    * 
@@ -37,10 +39,10 @@ public abstract class AbstractCategoriser implements Categoriser
   {
     if (debug) {
       System.out.println( "# AbstractCategoriser.openInput(), offset="
-          + lexerInput.getBeginIndex() + ", count="
-          + (lexerInput.getEndIndex() - lexerInput.getBeginIndex()));
+        + lexerInput.getBeginIndex() + ", count="
+        + (lexerInput.getEndIndex() - lexerInput.getBeginIndex()));
     }
-    this.input = lexerInput;
+    this.input= lexerInput;
     this.input.first(); // initialize CharIterator
   }
 
@@ -51,9 +53,9 @@ public abstract class AbstractCategoriser implements Categoriser
   {
     if (debug) {
       System.out
-          .println( "# AbstractCategoriser.closeInput() ---------------------------");
+        .println( "# AbstractCategoriser.closeInput() ---------------------------");
     }
-    input = null;
+    input= null;
   }
 
   /**
@@ -78,7 +80,7 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   protected int matchWhitespace()
   {
-    int len = 0;
+    int len= 0;
     while (Character.isWhitespace( LA( len))) {
       len++;
     }
@@ -86,14 +88,13 @@ public abstract class AbstractCategoriser implements Categoriser
   }
 
   /**
-   * Matches a number. <br>
-   * 
-   * <pre>
-   *             Number 
-   *                : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
-   *                | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
-   *                | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
-   * </pre>
+   * Matches an integer or floating point number. <br>
+   * <code>
+   * Number 
+   *   : ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
+   *   | Decimal ( Exponent )? ( FloatSuffix)? | Decimal ( IntSuffix )?
+   *   | '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )? 
+   * </code>
    * 
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
@@ -102,15 +103,15 @@ public abstract class AbstractCategoriser implements Categoriser
   {
 
     int len;
-    len = matchDecimal( 0); // matched Decimal
+    len= matchDecimal( 0); // matched Decimal
     if (len == 1) {
       // hexadecimal number?
       if (LA( 0) == '0' && Character.toUpperCase( LA( 1)) == 'X'
-          && isHexDigit( LA( 2))) {
-        len += 2;
-        len += matchHexDecimal( 3);
+        && isHexDigit( LA( 2))) {
+        len+= 2;
+        len+= matchHexDecimal( 3);
         // match trailing LongSuffix and UnsignedSuffix...
-        len += matchIntSuffix( len);
+        len+= matchIntSuffix( len);
         // matched '0' ( 'x' | 'X' ) HexDecimal ( IntSuffix )?
         return len;
       }
@@ -120,10 +121,10 @@ public abstract class AbstractCategoriser implements Categoriser
         // fractional number?
         if (Character.isDigit( LA( len + 1))) {
           // fractional number: matched Decimal '.' Digit
-          len += 2;
-          len += matchDecimal( len); // matched Decimal '.' Decimal
-          len += matchExponent( len);
-          len += matchFloatSuffix( len);
+          len+= 2;
+          len+= matchDecimal( len); // matched Decimal '.' Decimal
+          len+= matchExponent( len);
+          len+= matchFloatSuffix( len);
           // matched ( Decimal )? '.' Decimal ( Exponent )? ( FloatSuffix)?
           return len;
         }
@@ -134,32 +135,35 @@ public abstract class AbstractCategoriser implements Categoriser
       // if we ran here, we matched Decimal, either an integer or float
       // match trailing suffixes...
       // try suffixes for float
-      int expolen = matchExponent( len);
+      int expolen= matchExponent( len);
       // matched Decimal (Exponent)?
-      int suflen_f = matchFloatSuffix( len + expolen);
-      int suflen_i = 0;
+      int suflen_f= matchFloatSuffix( len + expolen);
+      int suflen_i= 0;
       if (expolen == 0) {
         // no exponent, try suffixes for integer
         // match trailing LongSuffix and UnsignedSuffix...
-        suflen_i = matchIntSuffix( len);
+        suflen_i= matchIntSuffix( len);
       }
-      len += Math.max( suflen_i, suflen_f) + expolen;
+      len+= Math.max( suflen_i, suflen_f) + expolen;
     }
     return len;
   }
 
   /**
    * Matches a decimal number. <br>
+   * <code>
    * Decimal: [0-9]+
+   * </code>
    * 
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
+   * @see #matchNumber()
    */
   protected int matchDecimal( int lookAhead)
   {
-    int len = 0;
+    int len= 0;
     while (Character.isDigit( LA( lookAhead++))) {
       len++;
     }
@@ -168,16 +172,19 @@ public abstract class AbstractCategoriser implements Categoriser
 
   /**
    * Matches a hexadecimal number. <br>
+   * <code>
    * HexDecimal: [0-9a-fA-F]+
+   * </code>
    * 
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
+   * @see #matchNumber()
    */
   protected int matchHexDecimal( int lookAhead)
   {
-    int len = 0;
+    int len= 0;
     while (isHexDigit( LA( lookAhead++))) {
       len++;
     }
@@ -186,34 +193,37 @@ public abstract class AbstractCategoriser implements Categoriser
 
   /**
    * Matches an exponent. <br>
+   * <code>
    * Exponent : ( 'e' | 'E' ) ( '+' | '-' )? Decimal
+   * </code>
    * 
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
+   * @see #matchNumber()
    */
   protected int matchExponent( int lookAhead)
   {
-    int len = 0;
-    char c = LA( lookAhead);
+    int len= 0;
+    char c= LA( lookAhead);
     if ((c == 'e' || c == 'E')) {
-      c = LA( lookAhead + 1);
+      c= LA( lookAhead + 1);
       if (c == '+' || c == '-') {
-        len = matchDecimal( lookAhead + 2);
+        len= matchDecimal( lookAhead + 2);
         if (len == 0) {
           // missing trailing number: no match
           return 0;
         }
-        len += 2;
+        len+= 2;
       }
       else {
-        len = matchDecimal( lookAhead + 1);
+        len= matchDecimal( lookAhead + 1);
         if (len == 0) {
           // missing trailing number: no match
           return 0;
         }
-        len += 1;
+        len+= 1;
       }
     }
     return len;
@@ -221,23 +231,29 @@ public abstract class AbstractCategoriser implements Categoriser
 
   /**
    * Matches the suffix that indicates a floating point numeric literal. <br>
+   * An example implementation for C would be:<code> 
    * FloatSuffix: [fFlL]
+   * </code>
    * 
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
+   * @see #matchNumber()
    */
   protected abstract int matchFloatSuffix( int lookAhead);
 
   /**
    * Matches the suffix that indicates an integer numeric literal. <br>
+   * An example implementation for C would be:<code> 
    * IntSuffix: [lLuU]
+   * </code>
    * 
    * @param lookAhead
-   *        the position ahead of the current index of the input segment. *
+   *        the position ahead of the current index of the input segment.
    * @return the length of the matching text or <code>0</code> if no match was
    *         found.
+   * @see #matchNumber()
    */
   protected abstract int matchIntSuffix( int lookAhead);
 
@@ -256,7 +272,7 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   protected final char LA( int lookAhead)
   {
-    int offset = input.getIndex();
+    int offset= input.getIndex();
     if (offset + lookAhead >= input.getEndIndex()) {
       return CharacterIterator.DONE;
     }
@@ -264,7 +280,8 @@ public abstract class AbstractCategoriser implements Categoriser
   }
 
   /**
-   * Consumes the specified number of character from the input.
+   * Consumes (skips) the specified number of character from the input, starting
+   * from the current index of the input segment.
    * 
    * @param num
    *        the positive number of character to consume.
@@ -296,10 +313,10 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   protected final boolean matchOneOfStrings( int length, final String[] matches)
   {
-    for (int i = 0; i < matches.length; i++) {
+    for (int i= 0; i < matches.length; i++) {
       if (matches[i].length() == length
-          && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
-              matches[i]) > 0)
+        && AbstractCategoriser.regionMatches( false, input, input.getIndex(),
+          matches[i]) > 0)
         return true;
     }
     return false; // no match
@@ -321,22 +338,22 @@ public abstract class AbstractCategoriser implements Categoriser
    *         found.
    */
   public static int regionMatches( boolean ignoreCase, Segment text,
-      int offset, String match)
+    int offset, String match)
   {
-    int endpos = offset + match.length();
-    char[] textArray = text.array;
+    int endpos= offset + match.length();
+    char[] textArray= text.array;
 
     if (endpos > text.getEndIndex()) {
       return 0; // no match
     }
-    int j = 0;
-    for (int i = offset; i < endpos; i++, j++) {
-      char c1 = textArray[i];
-      char c2 = match.charAt( j);
+    int j= 0;
+    for (int i= offset; i < endpos; i++, j++) {
+      char c1= textArray[i];
+      char c2= match.charAt( j);
 
       if (ignoreCase) {
-        c1 = Character.toUpperCase( c1);
-        c2 = Character.toUpperCase( c2);
+        c1= Character.toUpperCase( c1);
+        c2= Character.toUpperCase( c2);
       }
 
       if (c1 != c2) {
@@ -358,7 +375,7 @@ public abstract class AbstractCategoriser implements Categoriser
    */
   public static boolean isHexDigit( char ch)
   {
-    ch = Character.toUpperCase( ch);
+    ch= Character.toUpperCase( ch);
     switch (ch) {
       case '0':
       case '1':
