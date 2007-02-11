@@ -32,34 +32,35 @@ import de.marw.nacre.highlight.categoriser.Category;
 public class CustomizerFrame extends JFrame
 {
 
-  private javax.swing.JPanel jContentPane = null; // @jve:decl-index=0:visual-constraint="24,15"
+  private javax.swing.JPanel jContentPane= null; // @jve:decl-index=0:visual-constraint="24,15"
 
-  private JScrollPane jScrollPane_preview = null;
+  private JScrollPane jScrollPane_preview= null;
 
-  private JEditorPane jPreviewEditorPane = null;
+  private JEditorPane jPreviewEditorPane= null;
 
-  private JLabel jLabel = null;
+  private JLabel jLabel= null;
 
-  private JPanel jDialogButtonsPanel = null;
+  private JPanel jDialogButtonsPanel= null;
 
-  private JButton jButton_Apply = null;
+  private JButton jButton_Apply= null;
 
-  private JButton jButton_Close = null;
+  private JButton jButton_Close= null;
 
-  private JButton jButton_OK = null;
+  private JButton jButton_OK= null;
 
-  private JPanel jCustomizerPanel = null;
+  private JPanel jCustomizerPanel= null;
 
-  private JLabel jLabel1 = null;
+  private JLabel jLabel1= null;
 
-  private JTable jCategoryTable = null;
+  private JTable jCategoryTable= null;
 
-  private JScrollPane jScrollPane_table = null;
+  private JScrollPane jScrollPane_table= null;
 
   /**
    * This is the default constructor
    */
-  public CustomizerFrame() {
+  public CustomizerFrame()
+  {
     super();
     initialize();
   }
@@ -72,14 +73,14 @@ public class CustomizerFrame extends JFrame
     this.setContentPane( getJContentPane()); // Generated
     this.pack();
     this.setSize( 400, 500);
-    HighlightingKit kit = ((HighlightingKit) jPreviewEditorPane.getEditorKit());
-    CategoryStyles styles = kit.getCategoryStyles();
+    HighlightingKit kit= ((HighlightingKit) jPreviewEditorPane.getEditorKit());
+    CategoryStyles styles= kit.getCategoryStyles();
 
     setTitle( "HighlightingKit: " + kit.getContentType());
-    Map<Category, String> descriptions = kit.getCategoryDescriptions( null);
+    Map<Category, String> descriptions= kit.getCategoryDescriptions( null);
     System.out.println( "[initialize] value of descriptions: " + descriptions);
     this.jCategoryTable
-        .setModel( new CategoryTableModel( descriptions, styles));
+      .setModel( new CategoryTableModel( descriptions, styles));
     this.jCategoryTable.setDefaultRenderer( Color.class, new ColorRenderer());
   }
 
@@ -91,7 +92,7 @@ public class CustomizerFrame extends JFrame
   private javax.swing.JPanel getJContentPane()
   {
     if (jContentPane == null) {
-      jContentPane = new javax.swing.JPanel();
+      jContentPane= new javax.swing.JPanel();
       jContentPane.setLayout( new java.awt.BorderLayout());
       jContentPane.add( getJCustomizerPanel(), java.awt.BorderLayout.CENTER); // Generated
       jContentPane.add( getJDialogButtonsPanel(), java.awt.BorderLayout.SOUTH); // Generated
@@ -107,7 +108,7 @@ public class CustomizerFrame extends JFrame
   private JScrollPane getJScrollPane_preview()
   {
     if (jScrollPane_preview == null) {
-      jScrollPane_preview = new JScrollPane();
+      jScrollPane_preview= new JScrollPane();
       jScrollPane_preview.setViewportView( getPreview()); // Generated
     }
     return jScrollPane_preview;
@@ -121,11 +122,11 @@ public class CustomizerFrame extends JFrame
   private JEditorPane getPreview()
   {
     if (jPreviewEditorPane == null) {
-      jPreviewEditorPane = new JEditorPane();
+      jPreviewEditorPane= new JEditorPane();
       // HighlightingKit kit = new JavaHighlightingKit();
       // jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(),
       // kit);
-      HighlightingKit kit = new C_HighlightingKit();
+      HighlightingKit kit= new C_HighlightingKit();
       jPreviewEditorPane.setEditorKitForContentType( kit.getContentType(), kit);
       // 
       jPreviewEditorPane.setContentType( kit.getContentType());
@@ -141,7 +142,8 @@ public class CustomizerFrame extends JFrame
    */
   private String getPreviewText()
   {
-    String text = "/* text for preview\n" + "*/\n" + "\n"
+    String text=
+      "/* text for preview\n" + "*/\n" + "\n"
         + "# define falze (\'X\'==\'U\')  \n" + "#include <stdio.h>\n" + "\n"
         + "int pain( int orkc, char** orks){\n"
         + "   print( \"date= \" __DATE__ \"time=\" __TIME__);\n"
@@ -161,11 +163,11 @@ public class CustomizerFrame extends JFrame
   private JPanel getJDialogButtonsPanel()
   {
     if (jDialogButtonsPanel == null) {
-      jDialogButtonsPanel = new JPanel();
+      jDialogButtonsPanel= new JPanel();
       jDialogButtonsPanel.setLayout( new BoxLayout( jDialogButtonsPanel,
-          BoxLayout.X_AXIS)); // Generated
+        BoxLayout.X_AXIS)); // Generated
       jDialogButtonsPanel.setBorder( javax.swing.BorderFactory
-          .createLineBorder( Color.gray, 1)); // Generated
+        .createLineBorder( Color.gray, 1)); // Generated
       jDialogButtonsPanel.add( getJButton_OK(), null); // Generated
       jDialogButtonsPanel.add( getJButton_Close(), null); // Generated
       jDialogButtonsPanel.add( getJButton_Apply(), null); // Generated
@@ -181,17 +183,17 @@ public class CustomizerFrame extends JFrame
   private JComponent getJCustomizerPanel()
   {
     if (jCustomizerPanel == null) {
-      jLabel = new JLabel();
+      jLabel= new JLabel();
       jLabel.setText( "Foreground:"); // Generated
-      jLabel1 = new JLabel();
+      jLabel1= new JLabel();
       jLabel1.setText( "Preview:"); // Generated
-      jCustomizerPanel = new JPanel();
+      jCustomizerPanel= new JPanel();
       jCustomizerPanel.setBorder( javax.swing.BorderFactory.createEmptyBorder(
-          4, 4, 4, 4)); // Generated
+        4, 4, 4, 4)); // Generated
       jCustomizerPanel.setLayout( new BoxLayout( jCustomizerPanel,
-          BoxLayout.Y_AXIS)); // Generated
+        BoxLayout.Y_AXIS)); // Generated
       jCustomizerPanel.add( jLabel, null); // Generated
-      Box tBox = new Box( BoxLayout.X_AXIS);
+      Box tBox= new Box( BoxLayout.X_AXIS);
       tBox.add( getJScrollPane_table(), null); // Generated
       tBox.add( Box.createGlue());
       jCustomizerPanel.add( tBox);
@@ -216,7 +218,7 @@ public class CustomizerFrame extends JFrame
   private JTable getJCategoryTable()
   {
     if (jCategoryTable == null) {
-      jCategoryTable = new JTable() {
+      jCategoryTable= new JTable() {
         public Dimension getPreferredScrollableViewportSize()
         {
           return getPreferredSize();
@@ -238,7 +240,7 @@ public class CustomizerFrame extends JFrame
   private JScrollPane getJScrollPane_table()
   {
     if (jScrollPane_table == null) {
-      jScrollPane_table = new JScrollPane();
+      jScrollPane_table= new JScrollPane();
       jScrollPane_table.setViewportView( getJCategoryTable()); // Generated
     }
     return jScrollPane_table;
@@ -252,7 +254,7 @@ public class CustomizerFrame extends JFrame
   private JButton getJButton_Apply()
   {
     if (jButton_Apply == null) {
-      jButton_Apply = new JButton();
+      jButton_Apply= new JButton();
       jButton_Apply.setText( "Apply"); // Generated
     }
     return jButton_Apply;
@@ -266,7 +268,7 @@ public class CustomizerFrame extends JFrame
   private JButton getJButton_Close()
   {
     if (jButton_Close == null) {
-      jButton_Close = new JButton();
+      jButton_Close= new JButton();
       jButton_Close.setText( "Close"); // Generated
     }
     return jButton_Close;
@@ -280,7 +282,7 @@ public class CustomizerFrame extends JFrame
   private JButton getJButton_OK()
   {
     if (jButton_OK == null) {
-      jButton_OK = new JButton();
+      jButton_OK= new JButton();
       jButton_OK.setText( "OK"); // Generated
     }
     return jButton_OK;
@@ -289,7 +291,7 @@ public class CustomizerFrame extends JFrame
   public static void main( String[] args)
   {
     try {
-      JFrame f = new CustomizerFrame();
+      JFrame f= new CustomizerFrame();
       f.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE);
       f.setVisible( true);
     }

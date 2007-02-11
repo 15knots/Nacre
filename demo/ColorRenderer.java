@@ -1,4 +1,3 @@
-
 import java.awt.Color;
 import java.awt.Component;
 
@@ -21,7 +20,7 @@ import javax.swing.table.TableCellRenderer;
 public class ColorRenderer extends JPanel implements TableCellRenderer
 {
 
-  protected Border noFocusBorder = new EmptyBorder( 1, 1, 1, 1);
+  protected Border noFocusBorder= new EmptyBorder( 1, 1, 1, 1);
 
   // We need a place to store the color the JLabel should be returned
   // to after its foreground and background colors have been set
@@ -38,18 +37,19 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
   /**
    * 
    */
-  public ColorRenderer() {
-    super(false);
-    setLayout(new BoxLayout(this,BoxLayout.X_AXIS));
+  public ColorRenderer()
+  {
+    super( false);
+    setLayout( new BoxLayout( this, BoxLayout.X_AXIS));
     setOpaque( true);
     setBorder( noFocusBorder);
-    label = new JLabel();
-    label.setFont(null);
-    colorLabel=new JButton();
-    colorLabel.setFont(null);
+    label= new JLabel();
+    label.setFont( null);
+    colorLabel= new JButton();
+    colorLabel.setFont( null);
     add( label);
-    add(Box.createHorizontalStrut(3));
-    add(Box.createGlue());
+    add( Box.createHorizontalStrut( 3));
+    add( Box.createGlue());
     add( colorLabel);
     // TODO Auto-generated constructor stub
   }
@@ -73,7 +73,7 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
    * @return the default table cell renderer
    */
   public Component getTableCellRendererComponent( JTable table, Object value,
-      boolean isSelected, boolean hasFocus, int row, int column)
+    boolean isSelected, boolean hasFocus, int row, int column)
   {
 
     if (isSelected) {
@@ -81,12 +81,10 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
       super.setBackground( table.getSelectionBackground());
     }
     else {
-      super
-          .setForeground( (unselectedForeground != null) ? unselectedForeground
-              : table.getForeground());
-      super
-          .setBackground( (unselectedBackground != null) ? unselectedBackground
-              : table.getBackground());
+      super.setForeground( (unselectedForeground != null)
+        ? unselectedForeground : table.getForeground());
+      super.setBackground( (unselectedBackground != null)
+        ? unselectedBackground : table.getBackground());
     }
 
     setFont( table.getFont());
@@ -95,11 +93,11 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
       setBorder( UIManager.getBorder( "Table.focusCellHighlightBorder"));
       if ( !isSelected && table.isCellEditable( row, column)) {
         Color col;
-        col = UIManager.getColor( "Table.focusCellForeground");
+        col= UIManager.getColor( "Table.focusCellForeground");
         if (col != null) {
           super.setForeground( col);
         }
-        col = UIManager.getColor( "Table.focusCellBackground");
+        col= UIManager.getColor( "Table.focusCellBackground");
         if (col != null) {
           super.setBackground( col);
         }
@@ -125,13 +123,14 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
    */
   protected void setValue( Color value)
   {
-    if(value == null){
-      label.setText("<default>");
-      colorLabel.setVisible(false);
-    }else {
-    label.setText( colorToHex( value));
-    colorLabel.setBackground(value);
-    colorLabel.setVisible(true);
+    if (value == null) {
+      label.setText( "<default>");
+      colorLabel.setVisible( false);
+    }
+    else {
+      label.setText( colorToHex( value));
+      colorLabel.setBackground( value);
+      colorLabel.setVisible( true);
     }
   }
 
@@ -142,28 +141,28 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
   static String colorToHex( Color color)
   {
 
-    StringBuffer colorstr = new StringBuffer( "#");
+    StringBuffer colorstr= new StringBuffer( "#");
 
     // Red
-    String str = Integer.toHexString( color.getRed());
+    String str= Integer.toHexString( color.getRed());
     if (str.length() > 2)
-      str = str.substring( 0, 2);
+      str= str.substring( 0, 2);
     else if (str.length() < 2)
       colorstr.append( "0");
     colorstr.append( str);
 
     // Green
-    str = Integer.toHexString( color.getGreen());
+    str= Integer.toHexString( color.getGreen());
     if (str.length() > 2)
-      str = str.substring( 0, 2);
+      str= str.substring( 0, 2);
     else if (str.length() < 2)
       colorstr.append( "0");
     colorstr.append( str);
 
     // Blue
-    str = Integer.toHexString( color.getBlue());
+    str= Integer.toHexString( color.getBlue());
     if (str.length() > 2)
-      str = str.substring( 0, 2);
+      str= str.substring( 0, 2);
     else if (str.length() < 2)
       colorstr.append( "0");
     colorstr.append( str);
@@ -179,18 +178,18 @@ public class ColorRenderer extends JPanel implements TableCellRenderer
   {
     String digits;
     if (value.startsWith( "#")) {
-      digits = value.substring( 1, Math.min( value.length(), 7));
+      digits= value.substring( 1, Math.min( value.length(), 7));
     }
     else {
-      digits = value;
+      digits= value;
     }
-    String hstr = "0x" + digits;
+    String hstr= "0x" + digits;
     Color c;
     try {
-      c = Color.decode( hstr);
+      c= Color.decode( hstr);
     }
     catch (NumberFormatException nfe) {
-      c = null;
+      c= null;
     }
     return c;
   }

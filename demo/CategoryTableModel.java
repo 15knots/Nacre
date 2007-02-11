@@ -21,10 +21,10 @@ public class CategoryTableModel extends AbstractTableModel
   /**
    * 
    */
-  private static final long serialVersionUID = -7437682496492287789L;
+  private static final long serialVersionUID= -7437682496492287789L;
 
-  private final String[] columnNames = new String[] { "Category", "Color", "Bold",
-      "Italic" };
+  private final String[] columnNames=
+    new String[] { "Category", "Color", "Bold", "Italic" };
 
   private final CategoryStyles styles;
 
@@ -36,15 +36,16 @@ public class CategoryTableModel extends AbstractTableModel
    * 
    */
   public CategoryTableModel( Map<Category, String> descriptions,
-      CategoryStyles styles) {
+    CategoryStyles styles)
+  {
     super();
     if (styles == null) {
       throw new NullPointerException( "styles");
     }
-    this.styles = styles;
-    this.descriptions = descriptions;
-    this.rowToDescriptionMap = descriptions.keySet().toArray(
-        new Category[getRowCount()]);
+    this.styles= styles;
+    this.descriptions= descriptions;
+    this.rowToDescriptionMap=
+      descriptions.keySet().toArray( new Category[getRowCount()]);
   }
 
   /**
@@ -106,7 +107,7 @@ public class CategoryTableModel extends AbstractTableModel
    */
   public void setValueAt( Object aValue, int rowIndex, int columnIndex)
   {
-    Category cat = getCategoryAt( rowIndex);
+    Category cat= getCategoryAt( rowIndex);
     if (cat != null) {
       switch (columnIndex) {
         case 0:
@@ -129,7 +130,7 @@ public class CategoryTableModel extends AbstractTableModel
    */
   public Object getValueAt( int rowIndex, int columnIndex)
   {
-    Category cat = getCategoryAt( rowIndex);
+    Category cat= getCategoryAt( rowIndex);
     if (cat != null) {
       switch (columnIndex) {
         case 0:
