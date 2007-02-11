@@ -21,8 +21,7 @@ import javax.swing.text.Document;
 public abstract class DemoFrame extends JFrame
 {
 
-  // TODO theoretically, highlighting will work with any JTextComponent, check
-  // this type
+  /** the editor component that shows the highlighted text */
   private JEditorPane editor;
 
   public DemoFrame()
@@ -42,13 +41,13 @@ public abstract class DemoFrame extends JFrame
   protected abstract String getDemoName();
 
   /**
-   * Gets the editor component that showe the highlighted text.
+   * Gets the editor component that shows the highlighted text.
    */
   protected JEditorPane getEditor()
   {
     if (editor == null) {
       editor= new JEditorPane();
-      // change the frames title
+      // change the frame's title
       PropertyChangeListener updater= new TitleUpdater();
       editor.addPropertyChangeListener( "document", updater);
       editor.addPropertyChangeListener( "editorKit", updater);
