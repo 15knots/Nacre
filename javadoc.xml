@@ -1,23 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="javadoc">
-  <target name="javadoc">
-    <javadoc access="protected"
-             author="true"
-             classpath="/usr/share/eclipse/plugins/org.junit_3.8.1/junit.jar"
-             destdir="doc"
-             doctitle="Syntax Highlighting Kit"
-             nodeprecated="false"
-             nodeprecatedlist="false"
-             encoding="ISO8859-1"
-             noindex="false"
-             nonavbar="false"
-             notree="false"
-             source="1.5"
-             sourcefiles="src/de/marw/javax/swing/text/highlight/CHighlightingKit.java,src/de/marw/javax/swing/text/highlight/CategoryStylesListener.java,src/de/marw/javax/swing/text/highlight/CategoryStylesEvent.java,src/de/marw/javax/swing/text/highlight/JavaHighlightingKit.java,src/CustomizerFrame.java,src/de/marw/javax/swing/text/highlight/categoriser/Cpp_Categoriser.java,src/de/marw/javax/swing/text/highlight/CategoryStyles.java,src/de/marw/javax/swing/text/highlight/categoriser/JavaCategoriser.java,src/de/marw/javax/swing/text/highlight/HiliteView.java,src/de/marw/javax/swing/text/highlight/categoriser/C_Categoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/Token.java,src/de/marw/javax/swing/text/highlight/categoriser/C_likeCategoriser.java,src/de/marw/javax/swing/text/highlight/categoriser/AbstractCategoriser.java,src/de/marw/javax/swing/text/highlight/HighlightingKit.java,src/ColorRenderer.java,src/de/marw/javax/swing/text/highlight/Category.java,src/de/marw/javax/swing/text/highlight/categoriser/Categoriser.java,src/CategoryTableModel.java,src/HighlightKitTest.java,src/de/marw/javax/swing/text/highlight/SegmentInputStream.java"
-             sourcepath="src"
-             splitindex="true"
-             use="true"
-             version="true"
-    />
-  </target>
+<target name="javadoc">
+<javadoc access="private" author="true" classpath="/usr/share/eclipse/plugins/org.junit_3.8.1/junit.jar" destdir="doc" doctitle="Syntax Highlighting Kit" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="de.marw.nacre.highlight.categoriser,de.marw.nacre.tool,de.marw.nacre.highlight,de.marw.nacre.editorkits" source="1.5" sourcefiles="demo/DemoFrame.java,demo/HighlightKitDemo.java,demo/CustomizerFrame.java,demo/Highlighting02Demo.java,demo/CategoryTableModel.java,demo/Highlighting01Demo.java,demo/ColorRenderer.java,unittest/de/marw/nacre/HighlightKitTest.java" sourcepath="demo:unittest:src" splitindex="false" use="false" version="true">
+<link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
+</javadoc>
+</target>
 </project>

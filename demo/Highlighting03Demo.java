@@ -26,7 +26,7 @@ import de.marw.nacre.highlight.HighlightingKit;
  * </pre>
  * </code>
  */
-public class HighlightKitDemo extends DemoFrame
+public class Highlighting03Demo extends DemoFrame
 {
 
   @Override
@@ -38,6 +38,13 @@ public class HighlightKitDemo extends DemoFrame
   // //////////////////////////////////////////////////////////////////
   // static methods
   // //////////////////////////////////////////////////////////////////
+  private static final String sampleText=
+    "/* Sample code.\n*/\n\n" + " #  include <stdio.h>\n\n"
+      + "#ifndef HELLO\n" + " #define HELLO \"Hello\"\n" + "#endif\n\n"
+      + "int main( int argc, char ** argv)\n" + "{\n" + "  int i;\n"
+      + "  for( i=0; i< argc; i++)\n" + "    printf( HELLO \" world!\");\n\n"
+      + "  return 0 * sizeof(int);\n" + "}\n";
+
   /**
    */
   public static void main( String[] args)
@@ -48,14 +55,17 @@ public class HighlightKitDemo extends DemoFrame
     }
 
     // GUI setup
-    HighlightKitDemo frame= new HighlightKitDemo();
+    Highlighting03Demo frame= new Highlighting03Demo();
     JEditorPane editor= frame.getEditor();
     configureEditor( editor);
 
     try {
       // read file
-      File file= new File( args[0]);
-
+//      File file= new File( args[0]);
+//      editor.read( new FileReader( file), file);
+// TODO mit editor.read() lässt sich das NICHT verzögert umstellen!
+      editor.setText( sampleText);
+      
       // select highlighting depending on filename extension
       if (args[0].endsWith( ".c")) {
         editor.setContentType( "text/x-c-src");
@@ -63,7 +73,6 @@ public class HighlightKitDemo extends DemoFrame
       else if (args[0].endsWith( ".java")) {
         editor.setContentType( "text/x-java");
       }
-      editor.read( new FileReader( file), file);
 
       frame.pack();
       frame.setSize( 211, 701);

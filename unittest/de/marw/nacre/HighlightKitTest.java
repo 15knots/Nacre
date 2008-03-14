@@ -1,3 +1,5 @@
+package de.marw.nacre;
+
 /* $Id$ */
 
 // Copyright 2004-2006 Martin Weber
@@ -127,7 +129,7 @@ public class HighlightKitTest
     kit=
         (HighlightingKit) editor.getEditorKitForContentType( editor
             .getContentType());
-    CategoryStyles styles= kit.getDefaultCategoryStyles();
+    CategoryStyles styles= kit.getCategoryStyles();
     styles.setColor( Category.COMMENT_2, Color.YELLOW);
   }
 
